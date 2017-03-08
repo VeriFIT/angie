@@ -275,7 +275,7 @@ void LlvmCfgParser::constantValuesToBeCreatedInsert(const llvm::Constant* c)
 
 // Structure of the created vector:
 // 0: return value | empty arg if it its void-type
-// 1: function call target | operation's cmp or arithmetic flags | empty 
+// 1: function call target | operation's cmp or arithmetic flags | empty
 // 2+: operands
 
 OperationArgs LlvmCfgParser::GetOperArgsForInstr(const llvm::Instruction& instr)
@@ -398,7 +398,7 @@ OperationArgs LlvmCfgParser::GetOperArgsForInstr(const llvm::Instruction& instr)
     auto& typedInstr = static_cast<const llvm::GetElementPtrInst&>(instr);
     llvm::APInt constantOffset{64, 0};
     if (typedInstr.accumulateConstantOffset(llvmDataLayout, constantOffset))
-    {      
+    {
       args.push_back(OperArg{FrontendValueId{constantOffset.getZExtValue()}, Type::CreateVoidType()});
     }
     else
@@ -704,7 +704,7 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   // -----------
 
   for (auto& func : module.functions())
-  { 
+  {
     if (func.isDeclaration())
       continue;
     auto& cfg    = ParseFunction(func);
@@ -728,7 +728,7 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   auto returnType = llvm::Type::getVoidTy(ctx);
   auto params     = mainFType->params();
   auto ftype      = llvm::FunctionType::get(returnType, params, false);
- 
+
   auto entryFunc  = llvm::Function::Create(mainFType, llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__entry", &module);
   auto entryBlock = llvm::BasicBlock::Create(ctx, "", entryFunc);
   auto argcType   = mainFType->getParamType(0);

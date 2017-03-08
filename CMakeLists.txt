@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(ng)
+project(angie)
 
 # for ValuesZ3 Z3prover
 set(Z3 0)

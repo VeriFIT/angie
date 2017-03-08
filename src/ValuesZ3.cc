@@ -33,9 +33,9 @@ std::map<ValueId, z3::expr> Z3ValueContainer::idsToExprs;
 
 boost::tribool constexpr Z3ResultToTribool(z3::check_result result)
 {
-  return 
-    result == z3::unsat ? boost::tribool(false) : 
-    (result == z3::sat ? boost::tribool(true) : 
+  return
+    result == z3::unsat ? boost::tribool(false) :
+    (result == z3::sat ? boost::tribool(true) :
       boost::indeterminate);
 }
 

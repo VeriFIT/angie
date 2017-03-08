@@ -69,7 +69,7 @@ public:
     return ss.str();
   }
 
-  constexpr 
+  constexpr
     bool operator<(const ValueId& offset) const { return sourceOffset < offset; }
 
 protected:
@@ -92,7 +92,7 @@ std::ostream& operator<<(std::ostream& os, const EdgeBase& edge)
 }
 
 struct HvEdge : EdgeBase {
-  
+
 public:
   /*ctr*/ HvEdge(ValueId sourceOffset, ValueId value, Type type) :
     EdgeBase(sourceOffset, value, type)
@@ -106,9 +106,9 @@ public:
   }
 
   virtual void Print(std::ostream& os) const override
-  {  
+  {
     os << "srcOffset: " << sourceOffset << ", value: " << value;
-  }  
+  }
 
   // TODO: using for the priate copy and move constructors and operator
 
@@ -150,7 +150,7 @@ public:
   {
     sourceOffset = offset;
   }
-  
+
   // From existing PtEdge, same source, same target object, different target field
   PtEdge(const PtEdge& baseEdge, ValueId value, Type type, ValueId targetOffset) :
     targetObjectId{baseEdge.targetObjectId},
@@ -160,7 +160,7 @@ public:
   }
 
   virtual void Print(std::ostream& os) const override
-  {  
+  {
     HvEdge::Print(os);
     os << " target: " << targetObjectId;
   }
@@ -172,7 +172,7 @@ template<typename T>
 struct ModificationObserver;
 
 template<>
-struct ModificationObserver<HvEdge> 
+struct ModificationObserver<HvEdge>
 {
   void operator()(const HvEdge&) {};
 };
@@ -281,13 +281,13 @@ public:
   const auto  GetOutEdges() const   { return ::ranges::view::concat(hvEdges, ptEdges); }
   const auto& GetHvOutEdges() const { return hvEdges; }
   const auto& GetPtOutEdges() const { return ptEdges; }
-    
+
         HvEdge* FindHvEdgeByValue (ValueId offset)       { return FindEdgeByValue(hvEdges, offset); }
   const HvEdge* FindHvEdgeByValue (ValueId offset) const { return FindEdgeByValue(hvEdges, offset); }
 
         PtEdge* FindPtEdgeByValue (ValueId offset)       { return FindEdgeByValue(ptEdges, offset); }
   const PtEdge* FindPtEdgeByValue (ValueId offset) const { return FindEdgeByValue(ptEdges, offset); }
-    
+
         HvEdge* FindHvEdgeByOffset(ValueId offset)       { return FindEdgeByOffset(hvEdges, offset); }
   const HvEdge* FindHvEdgeByOffset(ValueId offset) const { return FindEdgeByOffset(hvEdges, offset); }
 
@@ -331,7 +331,7 @@ public:
     return *objectHandle;
   }
 
-  // Returns new pointer to different field [baseOffset + offset, type] of the same object 
+  // Returns new pointer to different field [baseOffset + offset, type] of the same object
   auto CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type)
   {
     auto& baseEdge = FindPtEdge(basePtr);
@@ -360,7 +360,7 @@ public:
 
     // move from new uptr<Object>
     // create new object and place it into map
-    auto& obj = objects.emplace(oid, std::make_unique<Object>()).first.operator*().second.operator*(); 
+    auto& obj = objects.emplace(oid, std::make_unique<Object>()).first.operator*().second.operator*();
 
     // initialize the object
     obj.id = oid;
@@ -371,12 +371,12 @@ public:
 
   //template<typename UniqueOrderedMap, typename ModifiedValueType>
   //ValueId CreateOrModifyManual(
-  //  UniqueOrderedMap& map, 
-  //  UniqueOrderedMap::key_type&& key, 
+  //  UniqueOrderedMap& map,
+  //  UniqueOrderedMap::key_type&& key,
   //  UniqueOrderedMap::mapped_type&& newValue
   //  ModifiedValueType&& value,
   //  ModifiedValueType* accessor = &UniqueOrderedMap::key_type
-  //  ) 
+  //  )
   //{
   //  // src: http://stackoverflow.com/a/101980
 
@@ -417,10 +417,10 @@ public:
     {
       object.CreateOrModifyHvEdge(offset, value, type);
 
-      //// Repeat the same logic - does the edge exists? -> modify or create       
+      //// Repeat the same logic - does the edge exists? -> modify or create
       //HvEdge* edge;
       //if (edge = object.FindHvEdge(offset))
-      //{ // Then modify it 
+      //{ // Then modify it
       //  //TODO: edge modification -> should have a reference counter, when the original value is no longer accessible - FOR VALUES? PROBABLY NO
       //  edge->value = value;
       //}
@@ -432,7 +432,7 @@ public:
     }
     else /* type is pointer && and is known pointer; debug if second fails */
     {
-      PtEdge* assignedPtr; 
+      PtEdge* assignedPtr;
       if (assignedPtr = handles.FindPtEdgeByOffset(value))
       {
         object.CreateOrModifyPtEdge(offset, *assignedPtr);
@@ -443,7 +443,7 @@ public:
         // Or fallback to HvEdge scenario
         // Or use undefined value / special meaning value
         // Find out whether it is undefined-unknown or abstracted-unknown
-        auto status = GetVc().GetAbstractionStatus(value); 
+        auto status = GetVc().GetAbstractionStatus(value);
         std::cout << AbstractionStatusToString(status) << std::endl;
         throw std::runtime_error{"Writing unknown pointer value"};
       }
@@ -530,7 +530,7 @@ BaseEdge
 //  auto GetPtEdges();
 //
 //  size_t GetSize();
-//  ObjectId GetId();     
+//  ObjectId GetId();
 //  };
 //  class Region : public Object {
 //

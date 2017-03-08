@@ -54,7 +54,7 @@ Type LlvmType::CreateCharPointerType()
 
 Type LlvmType::CreateIntegerType(unsigned bitwidth)
 {
-  //TODO@michkot: fix, suboptimal efficiency 
+  //TODO@michkot: fix, suboptimal efficiency
   return Type{llvm::Type::getIntNTy(llvmModule->getContext(), bitwidth)};
 }
 

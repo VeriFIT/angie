@@ -59,14 +59,14 @@ public:
     bitwidth{bitwidth}
   {
   }
-  
+
   /*ctr*/ AngieTypeImpl(Info info, size_t size, size_t bitwidth, const AngieTypeImpl* innerType) :
     info{info},
     allocSize{size},
     innerType{innerType}
   {
   }
-  
+
   bool operator==(const AngieTypeImpl& rhs) const
   {
     return
