@@ -43,7 +43,7 @@ NotSupportedException::NotSupportedException(const char* name, const char* type)
       .append("is not supported in class of type")
       .append(type)
       .append(".")
-    ) 
+    )
   {}
 
 // Here i used originaly operator+ for concat but I ran into this problem:

@@ -44,7 +44,7 @@ typedef LlvmType Type;
 
 
 // Type -- reference to type representation (copyable, assignable)
-// Might be later changed to interaface(fully abstraact class) when multiple frontends are in mind
+// Might be later changed to interface(fully abstract class) when multiple frontends are in mind
 class LlvmType {
 private:
   llvm::Type* frontedId;
