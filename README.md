@@ -2,8 +2,8 @@ Angie project
 =============
 
 ![alt](https://cdn.travis-ci.org/images/favicon-076a22660830dc325cc8ed70e7146a59.png)
-[![Travis CI](https://api.travis-ci.org/verifit/angie.svg?branch=master)](https://travis-ci.org/verifit/angie)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/4edca1b2f3u0bxhb?svg=true)](https://ci.appveyor.com/project/verifit/angie)
+[![Travis CI](https://api.travis-ci.org/VeriFIT/angie.svg?branch=master)](https://travis-ci.org/VeriFIT/angie)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/4edca1b2f3u0bxhb?svg=true)](https://ci.appveyor.com/project/VeriFIT/angie)
 
 
 Angie is a static analysis and verification framework, specifically for methods based on abstract interpretation.
@@ -36,6 +36,26 @@ CLANGXX=clang++
 CLANG=clang
 export COPT CLANGXX CLANG
 (bash ./compile-inputs-to-ll.sh; mkdir tmp; cd tmp; cmake ../; make; cd .. ; ./tmp/ng)
+```
+
+Dependencies install
+--------------------
+For simple deployment, `install_*` helpers in `utils` directory will handle installation of CMake built or include-only libraries. Main motivation was repetitive fixing of Travis-CI and custom *nix server deployment.
+Currently needed dependencies to get Angie compiled:
+```sh
+# installation prefix
+export PREFIX=$HOME/local
+# export all the vars
+sh utils/install_main.sh export
+$(sh utils/install_main.sh export)
+# install google test (gtest)
+sh utils/install_main.sh gtest
+# install boost
+sh utils/install_main.sh boost
+# install range-v3
+sh utils/install_main.sh range-v3
+# install gsl or gsl-lite
+sh utils/install_main.sh gsl-lite
 ```
 
 Contribution and credits
