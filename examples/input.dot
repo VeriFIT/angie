@@ -1,0 +1,59 @@
+void fce2()
+ [B2 (ENTRY)]
+   Succs (1): B1
+
+ [B1]
+   1: int x;
+   Preds (1): B2
+   Succs (1): B0
+
+ [B0 (EXIT)]
+   Preds (1): B1
+
+int main(int argc, char **argv)
+ [B5 (ENTRY)]
+   Succs (1): B4
+
+ [B1]
+   1: supernumber
+   2: [B1.1] (ImplicitCastExpr, LValueToRValue, int)
+   3: return [B1.2];
+   Preds (2): B2 B3
+   Succs (1): B0
+
+ [B2]
+   1: fce2
+   2: [B2.1] (ImplicitCastExpr, FunctionToPointerDecay, void (*)(void))
+   3: [B2.2]()
+   Preds (1): B4
+   Succs (1): B1
+
+ [B3]
+   1: supernumber
+   2: [B3.1]++
+   Preds (1): B4
+   Succs (1): B1
+
+ [B4]
+   1: 1
+   2: int supernumber = 1;
+   3: supernumber
+   4: [B4.3] (ImplicitCastExpr, LValueToRValue, int)
+   5: argc
+   6: [B4.5] (ImplicitCastExpr, LValueToRValue, int)
+   7: [B4.4] + [B4.6]
+   8: supernumber
+   9: [B4.8] = [B4.7]
+  10: supernumber
+  11: [B4.10] (ImplicitCastExpr, LValueToRValue, int)
+  12: 2
+  13: [B4.11] <= [B4.12]
+   T: if [B4.13]
+   Preds (1): B5
+   Succs (2): B3 B2
+
+ [B0 (EXIT)]
+   Preds (1): B1
+
+C:\Apps\msys64\mingw64\bin\ld.exe: cannot find C:\Apps\msys64\tmp\input-b0dd59.o: No such file or directory
+clang++.exe: error: linker command failed with exit code 1 (use -v to see invocation)

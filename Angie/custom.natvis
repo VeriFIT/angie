@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="LlvmType">
+    <Expand>
+      <ExpandedItem>(*frontedId)</ExpandedItem>
+    </Expand>
+  </Type>
+  <Type Name="llvm::Type">
+    <!--<DisplayString>{ID}, SubClData={SubclassData}, Contained={NumContainedTys}</DisplayString>-->
+    <Expand>
+      <Item Name="TypeCode">ID</Item>
+      <Item Name="SubclassData">SubclassData</Item>
+      <ArrayItems>
+        <Size>NumContainedTys</Size>
+        <ValuePointer>ContainedTys</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>

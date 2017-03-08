@@ -1,0 +1,97 @@
+dist: trusty
+sudo: false
+
+matrix:
+    include:
+      - compiler: python-cpplint
+        language: python
+        install:
+            - pip install cpplint
+            - curl -o cpplint.py https://raw.githubusercontent.com/michkot/cpplint/master/cpplint.py
+        script:
+            - "python3 cpplint.py --linelength=110 --extensions=cc,hh --filter=-legal,-runtime/int,-runtime/references,-whitespace/indentaccess,-whitespace/comments,-whitespace/braces,-readability/inheritance src/* || echo fail"
+        cache:
+
+      - compiler: gcc-4.9
+        language: cpp
+        addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                    - llvm-toolchain-precise-3.9
+                packages:
+                    #- libgtest-dev
+                    - llvm-3.9-dev
+                    - clang-3.9
+                    - g++-4.9
+        env:
+            - MCXX="g++-4.9"
+            - MCC="gcc-4.9"
+
+      - compiler: gcc-6
+        language: cpp
+        addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                    - llvm-toolchain-precise-3.9
+                packages:
+                    #- libgtest-dev
+                    - llvm-3.9-dev
+                    - clang-3.9
+                    - g++-6
+        env:
+            - MCXX="g++-6"
+            - MCC="gcc-6"
+
+      - compiler: clang-3.9
+        language: cpp
+        addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                    - llvm-toolchain-precise-3.9
+                packages:
+                    #- libgtest-dev
+                    - llvm-3.9-dev
+                    - clang-3.9
+        env:
+            - MCXX="clang++-3.9"
+            - MCC="clang-3.9"
+
+cache:
+    apt: true
+    directories:
+        - $HOME/local/lib/
+        - $HOME/local/include/
+
+install:
+    - export CXX=$MCXX CC=$MCC
+    - $CXX --version
+    - alias opt=opt-3.9
+    - opt --version
+    - opt-3.9 --version
+
+#export PREFIX
+    - export PREFIX=$HOME/local
+
+#export all the vars
+    - sh utils/install_main.sh export && $(sh utils/install_main.sh export) && export
+
+#install google test (gtest)
+    - sh utils/install_main.sh gtest
+
+#install boost
+    - sh utils/install_main.sh boost
+
+#install range-v3
+    - sh utils/install_main.sh range-v3
+
+#install gsl
+    - sh utils/install_main.sh gsl-lite
+
+script: 
+    - export COPT=opt-3.9 CLANGXX=clang++-3.9 CLANG=clang-3.9
+    - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ../
+    - make
+    - make tests
