@@ -35,26 +35,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/logic/tribool.hpp>
 #include <boost/utility/string_view.hpp>
 #include <gsl/gsl>
-//KISS!!!
-
-//Q:
-//je možné, že po naplánování stavu k dalšímu kroku dojde k přidání dalšího kontextu do stejné lokace
-//a k abstrakci těcho SMG?
-//předpoklad - ne?
-
-//logické ohodnocení parametrů stavu
-//je dosažitelný? -> hodnotový systém při přidání podmínek, říká nám že nelze
-//došlo k chybě paměti (predator works!!!)
-
-//do budoucna - změnit flow nových stavů tak,
-//aby tvůrce domény mohl mít plnou kontrolu na způsobem přidávání do worklistu
-
-//indirect call of malloc - jak se o nej postarat aby se dostal do analyzátoru tam kam patří
-
-//#include "core\LlvmLoader.hh"
-//#include "core\LlvmSourceParser.hh"
-//#include "domains\smg\SpcOperationsFactory.hh"
-
 
 using namespace ::std;
 //using namespace ::boost;
@@ -68,20 +48,20 @@ using namespace ::std;
 #include "ForwardNullAnalysis.hh"
 #include "LlvmFrontend.hh"
 
-// fronta stavů ke zpracování
+// queue of states waiting for processing
 ref_queue<IState> toProcess{};
 
 void VerificationLoop()
 {
-  // smyčka
+  // loop
   while (!StatesManager::IsWorklistEmpty())
   {
-    // načti stav
+    // load state
     IState& state = StatesManager::WorklistDequeue();
 
-    // zpracuj stav
+    // process state
     {
-      // vypočet nových stavů
+      // calculate new states
       if (!state.IsNew())
         continue;
 
