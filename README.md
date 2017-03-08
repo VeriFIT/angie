@@ -2,8 +2,8 @@ Angie project
 =============
 
 ![alt](https://cdn.travis-ci.org/images/favicon-076a22660830dc325cc8ed70e7146a59.png)
-[![Travis CI](https://api.travis-ci.org/verifit/angie.svg?branch=master)](https://travis-ci.org/verifit/angie)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/4edca1b2f3u0bxhb?svg=true)](https://ci.appveyor.com/project/verifit/angie)
+[![Travis CI](https://api.travis-ci.org/VeriFIT/angie.svg?branch=master)](https://travis-ci.org/VeriFIT/angie)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/4edca1b2f3u0bxhb?svg=true)](https://ci.appveyor.com/project/VeriFIT/angie)
 
 
 Angie is a static analysis and verification framework, specifically for methods based on abstract interpretation.

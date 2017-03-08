@@ -90,7 +90,7 @@ add_custom_target(tests
     DEPENDS ${PROJECT_NAME} 
     WORKING_DIRECTORY "../" 
     COMMAND "bash" "./compile-inputs-to-ll.sh" 
-    COMMAND "${PROJECT_BINARY_DIR}/ng" "-t")
+    COMMAND "${PROJECT_BINARY_DIR}/${PROJECT_NAME}" "-t")
 
 # includes
 
