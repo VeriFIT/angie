@@ -137,7 +137,7 @@ void ValueContainer::InsertConstraint(BinaryConstraint constr)
 					//new constraint is equal to a constant -> delete all previous
           //TODO@charvin FIX: invalidates iterator you are using!, 3x in this function
           //HACK for now just do not delete, see TODO
-          // DeleteConstraint(oldConstraintId); 
+          // DeleteConstraint(oldConstraintId);
 					break;
 					//TODO::add cases for intervals
 				default:
@@ -163,7 +163,7 @@ void ValueContainer::InsertConstraint(BinaryConstraint constr)
 					//new constraint is equal to a constant -> delete all previous
           //TODO@charvin FIX: invalidates iterator you are using!, 3x in this function
           //HACK for now just do not delete, see TODO
-          // DeleteConstraint(oldConstraintId); 
+          // DeleteConstraint(oldConstraintId);
 					break;
 					//TODO::add cases for intervals
 				default:
@@ -184,7 +184,7 @@ void ValueContainer::InsertConstraint(BinaryConstraint constr)
 			//delete mutual constraints
       //TODO@charvin FIX: invalidates iterator you are using!, 3x in this function
       //HACK for now just do not delete, see TODO
-      // DeleteConstraint(oldConstraintId); 
+      // DeleteConstraint(oldConstraintId);
 		}
 
 	}
@@ -513,7 +513,7 @@ ValueId ValueContainer::Cmp(ValueId first, ValueId second, Type type, CmpFlags f
 	boost::tribool result = IsCmp(first, second, type, flags);
 	if (result == boost::indeterminate)
 		throw std::runtime_error("Fuck if I know how to create boolean from indeterminate relation.");
-	
+
 	return CreateConstIntVal(static_cast<uint64_t>(result.value));
 }
 
