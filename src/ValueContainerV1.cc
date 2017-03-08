@@ -796,10 +796,10 @@ void ValueContainer::PrintDebug() const
       cout << "#" << static_cast<uint64_t>(constraint.second.first);
 
     cout << " " << static_cast<uint64_t>(constraint.second.relation) << " ";
-    
+
     if (IsConstant(constraint.second.second))
       cout << constantContainer.at(constraint.second.second);
-    else 
+    else
       cout << "#" << static_cast<uint64_t>(constraint.second.second);
 
     cout << std::endl;
