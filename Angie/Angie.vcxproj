@@ -63,9 +63,9 @@
     <IntDir>bin\$(Platform)-$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup>
-    <ExecutablePath>C:\Apps\devroot\bin;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\Apps\devroot\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Apps\devroot\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(INCLUDE_PATH);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIBRARY_PATH);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoLlvm|x64'" />
   <ItemDefinitionGroup>
