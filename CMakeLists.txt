@@ -46,6 +46,7 @@ set(SOURCE_FILES
     src/enum_flags.h
     src/Exceptions.cc
     src/Exceptions.hh
+    src/MemoryGraphAnalysis.hh
     src/ForwardNullAnalysis.hh
     src/FrontedValueMapper.hh
     src/General.hh
