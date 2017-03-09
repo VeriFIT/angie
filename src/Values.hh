@@ -177,6 +177,8 @@ public:
 
   // Creates a new unknown value
   virtual ValueId CreateVal(Type type) = 0;
+  // Registers manually generated newId into the container. Creates a new unknown value using the newId.
+  virtual ValueId CreateVal(ValueId newId, Type type) { throw NotImplementedException(); }
 
   virtual ValueId CreateConstIntVal  (uint64_t value, Type type) = 0; 
   // To be potentially removed

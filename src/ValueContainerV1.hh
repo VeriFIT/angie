@@ -112,6 +112,7 @@ public:
   ValueId TruncateInt(ValueId first, Type sourceType, Type targetType) override;
 
   ValueId CreateVal(Type type) override { return ValueId::GetNextId(); }
+  ValueId CreateVal(ValueId newId, Type type) override { return newId; }
   ValueId CreateConstIntVal(uint64_t value, Type type) override { return CreateConstIntVal(value); }
   ValueId CreateConstIntVal(uint64_t value) override;
 
