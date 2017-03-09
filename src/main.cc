@@ -87,7 +87,7 @@ ValueContainer vc;
 
 void Verify(boost::string_view fileName)
 {
-  Mapper mapper{vc};
+  Mapper mapper;
   FuncMapper fmap;
 
   auto f = FnaOperationFactory{};
