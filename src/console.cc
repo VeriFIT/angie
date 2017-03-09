@@ -48,7 +48,7 @@ extern void playground();
 int main(int argc, char** argv)
 {
   HideUnrelatedOptions(MyCategory);
-  ParseCommandLineOptions(argc, argv, "This tools does something", false);
+  ParseCommandLineOptions(argc, argv);
 
   if (!Test)
   {
