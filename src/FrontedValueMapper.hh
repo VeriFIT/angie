@@ -25,14 +25,11 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Definitions.hh"
 #include "General.hh"
+#include "ICfgNode.hh"
 
 #include <map>
 
-//#include <range/v3/all.hpp>
-
 typedef int FunctionInfo;
-
-class ICfgNode;
 
 class FunctionHandle {
 public:

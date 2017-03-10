@@ -47,6 +47,7 @@ using namespace ::std;
 #include "ICfgNode.hh"
 #include "LlvmFrontend.hh"
 #include "FrontedValueMapper.hh"
+#include "StateStorage.hh"
 
 // queue of states waiting for processing
 ref_queue<IState> toProcess{};

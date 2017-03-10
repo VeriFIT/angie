@@ -96,6 +96,9 @@
     <ClInclude Include="..\src\MemoryGraphAnalysis.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\CfgNodeBase.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\console.cc">

@@ -24,8 +24,8 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Definitions.hh"
 #include "General.hh"
-#include "IState.hh"
-#include "StateStorage.hh"
+
+class IState;
 
 class IOperation {
 public:

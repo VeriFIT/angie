@@ -22,7 +22,9 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "LlvmFrontend.hh"
 
-#include "ICfgNode.hh"
+//#include "ICfgNode.hh"
+#include "CfgNodeBase.hh"
+
 #include "LlvmGlobals.hh"
 
 #include <llvm/IR/Module.h>

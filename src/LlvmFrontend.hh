@@ -27,6 +27,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "Values.hh"
 
 #include "FrontedValueMapper.hh"
+#include "CfgNodeBase.hh"
 
 #include <map>
 #include <boost/utility/string_view.hpp>

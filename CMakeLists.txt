@@ -40,6 +40,7 @@ add_definitions(-DNOT_COMPILE_Z3)
 set(SOURCE_FILES
     src/AngieType.cc
     src/console.cc
+    src/CfgNodeBase.hh
     src/Definitions.hh
     src/DummyOperations.hh
     src/DummyState.hh
