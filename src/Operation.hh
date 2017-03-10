@@ -170,6 +170,9 @@ public:
 
 // ================== \/ \/ \/ COMMON CODE \/ \/ \/ ===============
 
+#define INT8_TYPE Type::CreateIntegerType(8)
+#define PTR_TYPE Type::CreateCharPointerType()
+
 class BasicOperationNoop : public BasicOperation<IState, OperationArgs> {
   virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args) override final
   {

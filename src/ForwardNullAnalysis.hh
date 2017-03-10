@@ -107,8 +107,6 @@ public:
 
 };
 
-#define PTR_TYPE Type::CreateCharPointerType()
-
 class FnaOperationBranch : public OperationBranch<ForwardNullAnalysisState> {
 public:
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args, bool br) override

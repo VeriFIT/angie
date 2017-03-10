@@ -59,6 +59,7 @@ public:
   static Type CreateCharPointerType();
   static Type CreateIntegerType(unsigned bitwidth);
   static Type CreatePointerTo(Type target);
+  static Type CreateArrayOf(Type target, uint64_t size);
 
   bool operator==(const Type& rhs)
   {
