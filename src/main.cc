@@ -45,8 +45,8 @@ using namespace ::std;
 #include "IState.hh"
 #include "IOperation.hh"
 #include "ICfgNode.hh"
-#include "ForwardNullAnalysis.hh"
 #include "LlvmFrontend.hh"
+#include "FrontedValueMapper.hh"
 
 // queue of states waiting for processing
 ref_queue<IState> toProcess{};
@@ -83,19 +83,21 @@ Z3ValueContainer vc;
 ValueContainer vc;
 #endif
 
-#include "FrontedValueMapper.hh"
+#include "ForwardNullAnalysis.hh"
+#include "MemoryGraphAnalysis.hh"
 
+template<typename FactoryT, typename StateT>
 void Verify(boost::string_view fileName)
 {
   Mapper mapper;
   FuncMapper fmap;
 
-  auto f = FnaOperationFactory{};
+  auto f = FactoryT{};
   LlvmCfgParser parser{f, vc, mapper, fmap};
   parser.ParseAndOpenIrFile(fileName);//("input-int-conv.ll");
   auto& firstNode = parser.GetEntryPoint();
 
-  auto emptyStateUPtr = make_unique<ForwardNullAnalysisState>(firstNode, vc, mapper, fmap);
+  auto emptyStateUPtr = make_unique<StateT>(firstNode, vc, mapper, fmap);
 
   firstNode.GetStatesManager().InsertAndEnqueue(move(emptyStateUPtr));
 
@@ -129,7 +131,8 @@ void main_old(gsl::span<std::string> files)
   //Verify("examples/01_mincase_01_nullptr_dereference[dead].ll");
   for (auto& file : files)
   {
-    Verify(file);
+    Verify<FnaOperationFactory, ForwardNullAnalysisState>(file);
+    Verify<MemGraphOpFactory, MemoryGraphAnalysisState>(file);
   }
 
   //vc.PrintDebug();

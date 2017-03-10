@@ -344,6 +344,7 @@ class FnaOperationNoop : public BasicOperation<ForwardNullAnalysisState, Operati
 
 
 class FnaOperationFactory : public IOperationFactory {
+private:
 
   IOperation* noop = new FnaOperationNoop();
   IOperation* notSupported = new OperationNotSupportedOperation();
@@ -360,10 +361,9 @@ class FnaOperationFactory : public IOperationFactory {
   IOperation* cmp = new FnaOperationCmp();
   IOperation* br = new FnaOperationBranch();
   IOperation* ret = new FnaOperationRet();
+
 public:
-  /*ctr*/ FnaOperationFactory()
-  {
-  }
+
   // Inherited via IOperationFactory
   virtual IOperation & Ret() override { return *ret; }
   virtual IOperation & Br()  override { return *br; }
