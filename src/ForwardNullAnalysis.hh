@@ -33,9 +33,8 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include <cassert>
 
 #include "FrontedValueMapper.hh"
+#include "Operation.hh"
 //#include <range/v3/all.hpp>
-
-using namespace ::std;
 
 class StackFrame {
 public:
@@ -43,31 +42,24 @@ public:
   void AllocateMem(size_t size) { currentOffset += size; }
 };
 
-// ------------
-// ForwardNullAnalysis
-class ForwardNullAnalysisState : public IState {
+class ForwardNullAnalysisState : public StateBase {
 private:
-  
-  Mapper&     globalMapping;
-public:
-  FuncMapper& funcMapping;
-private:
-  Mapper      localMapping;
 
 public:
 
   /*ctr*/ ForwardNullAnalysisState(
-      ICfgNode& lastCfgNode, 
+      //ICfgNode& lastCfgNode, 
       ICfgNode& nextCfgNode,
       IValueContainer& vc,
       Mapper& globalMapping,
       FuncMapper& funcMapping
       ) :
-    IState(lastCfgNode, nextCfgNode),
-    vc(&vc),
-    globalMapping(globalMapping),
-    funcMapping(funcMapping),
-    localMapping(vc)
+    StateBase(
+      //lastCfgNode, 
+      nextCfgNode, 
+      vc, 
+      globalMapping,
+      funcMapping)
   {
     //stack.push_back(StackFrame{});
     stackCurrentAddr = ValueId{0};//GetVC().CreateVal(Type::CreateCharPointerType());
@@ -78,66 +70,23 @@ public:
   // copy ctr ??? or what
   /*ctr*/ ForwardNullAnalysisState(
       const ForwardNullAnalysisState& state, 
-      ICfgNode& lastCfgNode, ICfgNode& 
-      nextCfgNode
+      //ICfgNode& lastCfgNode, 
+      ICfgNode& nextCfgNode
       ) :
-    IState(lastCfgNode, nextCfgNode),
-    vc(state.vc),
-    globalMapping(state.globalMapping),
-    funcMapping(state.funcMapping),
-    localMapping(state.localMapping),
-    //stack(state.stack),
-    //stackMemory(state.stackMemory),
-    //heapMemory(state.heapMemory),
+    StateBase(
+      state, 
+      //lastCfgNode, 
+      nextCfgNode),
     stackCurrentAddr(state.stackCurrentAddr),
     hasValue(state.hasValue)
   {
   }
-  
-  //TODO: same algo as in method bellow
-  //TODO: rename
-  
-  virtual ValueId GetAnyVar(FrontendIdTypePair var) override
-  {
-    try { return globalMapping.GetValueId(var.id); }
-    catch (exception e) { return localMapping.GetValueId(var.id); }
-  }
-  //// DO NOT USE - use GetAnyOrCreateLocalVar
-  //[[deprecated]] virtual ValueId GetOrCreateGlobalVar(FrontendIdTypePair var) override
-  //{
-  //  return globalMapping.CreateOrGetValueId(var);
-  //}
-  //// DO NOT USE - use GetAnyOrCreateLocalVar
-  //[[deprecated]] virtual ValueId GetOrCreateLocalVar(FrontendIdTypePair var) override
-  //{
-  //  return localMapping.CreateOrGetValueId(var);
-  //}
 
-  //[[deprecated]] virtual ValueId GetAnyOrCreateLocalVar(FrontendIdTypePair var) override
-  //{
-  //  try { return globalMapping.GetValueId(var.id); }
-  //  catch(exception e) { return localMapping.CreateOrGetValueId(var); }
-  //}
-  virtual void LinkGlobalVar(FrontendIdTypePair var, ValueId value) override
-  {
-    globalMapping.LinkToValueId(var.id, value);
-  }
-  virtual void LinkLocalVar(FrontendIdTypePair var, ValueId value) override
-  {
-    localMapping.LinkToValueId(var.id, value);
-  }
+  //------------------------------------
 
-  IValueContainer* vc;
-  IValueContainer& GetVC() { return *vc; }
-
-  vector<string> stackMemory;
-  //vector<string> heapMemory;
-  //vector<StackFrame> stack;
-
-  //ValueId stackBaseAddr;
-  //ValueId heapBaseAddr;
   ValueId stackCurrentAddr;
-  //ValueId heapCurrentAddr;
+
+  //------------------------------------
 
   std::map<ValueId, ValueId> hasValue;
 
@@ -153,182 +102,14 @@ public:
 
 };
 
-class AnalysisErrorException : public std::logic_error {
-public:
-  /*ctr*/ AnalysisErrorException()
-    : logic_error("A fatal error was discovered by the analysis. Abstract execution can not continue in this path.")
-  {
-  }
-  /*ctr*/ AnalysisErrorException(const char* c)
-    : logic_error(c)
-  {
-  }
-
-};
-
-class InvalidDereferenceException : public AnalysisErrorException {
-public:
-  /*ctr*/ InvalidDereferenceException()
-    : AnalysisErrorException("Program tried to dereference unallocated or uninitialized memory.")
-  {
-  }
-};
-
-class PossibleNullDereferenceException : public AnalysisErrorException {
-public:
-  /*ctr*/ PossibleNullDereferenceException()
-    : AnalysisErrorException("Possible null dereference exception occured - getElementPtr.")
-  {
-  }
-};
-
-
-
-/// <summary>
-/// Base class for implementing Operation. 
-/// </summary>
-////template<bool isBranching>
-class BaseOperation : public IOperation {
-public:
-
-  virtual uptr<IState> CreateSuccessor     (IState& initialState) = 0;
-          uptr<IState> CreateSuccessorTrue (IState& initialState) { return CreateSuccessor(initialState); }
-  virtual uptr<IState> CreateSuccessorFalse(IState& initialState) { throw NotImplementedException(); }
-
-  virtual void         ExecuteOnNewState  (IState& newState, const OperationArgs& args) = 0;
-
-  // Override this again to switch to branching implementation
-  virtual void Execute(IState& originalState, const OperationArgs& args) override
-  {
-    ExecuteImplNonbranching(originalState, args);
-  }
-
-private:
-
-  // non-branching variant
-  ////template <bool T = isBranching, typename std::enable_if_t<!T>* = nullptr>
-  void ExecuteImplNonbranching(IState& originalState, const OperationArgs& args)
-  {
-    assert(!originalState.nextCfgNode.HasTwoNext()); //TODO: comment
-
-    uptr<IState> successor;
-    successor = CreateSuccessor(originalState);    
-    try
-    {
-      //TODO: moved into the try/catch/finally block, is it correct?
-      originalState.SetExplored();
-      ExecuteOnNewState(*successor, args);
-
-      // Handled in TerminalCfgNode::Execute()
-      /*if (originalState.nextCfgNode.IsTerminalNode())
-        successor->SetExplored();*/
-
-      originalState.nextCfgNode.GetStatesManager().InsertAndEnqueue(move(successor));
-    }
-    catch (AnalysisErrorException e)
-    {
-      originalState.nextCfgNode.PrintLocation();
-      printf("%s\n",e.what());
-    }
-    
-    return;
-  }
-
-  // branching variant
-  ////template <bool T = isBranching, typename std::enable_if_t<T>* = nullptr>
-  void ExecuteImplBranching(IState& originalState, const OperationArgs& args)
-  {
-    assert(originalState.nextCfgNode.HasTwoNext()); //TODO: comment
-
-    uptr<IState> successor;
-    successor = CreateSuccessorTrue(originalState);
-    ExecuteOnNewState(*successor, args);
-    originalState.nextCfgNode.GetStatesManager().InsertAndEnqueue(move(successor));
-
-    successor = CreateSuccessorFalse(originalState);
-    ExecuteOnNewState(*successor, args);
-    originalState.nextCfgNode.GetStatesManager().InsertAndEnqueue(move(successor));
-
-    originalState.SetExplored();
-    return;
-  }
-
-};
-
 #define PTR_TYPE Type::CreateCharPointerType()
 
-////template<bool isBranching>
-class BaseForwardNullAnalysisOperation : public BaseOperation/*<isBranching>*/ {
+class FnaOperationBranch : public OperationBranch<ForwardNullAnalysisState> {
 public:
-  
-  virtual uptr<IState> CreateSuccessor(IState& s) override
+  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args, bool br) override
   {
-    auto successorPtr = make_unique<ForwardNullAnalysisState>(dynamic_cast<ForwardNullAnalysisState&>(s), s.nextCfgNode, s.nextCfgNode.GetNext());
-    auto& successor = *successorPtr; 
-    // FIXME: when compiler is in compliance with newer copy elision rules
-    // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#1579
-    return move(successorPtr);
-  }
-  virtual uptr<IState> CreateSuccessorFalse(IState& s) override
-  {
-    auto successorPtr = make_unique<ForwardNullAnalysisState>(dynamic_cast<ForwardNullAnalysisState&>(s), s.nextCfgNode, s.nextCfgNode.GetNextFalse());
-    auto& successor = *successorPtr; 
-    
-    // FIXME: when compiler is in compliance with newer copy elision rules
-    // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#1579
-    return move(successorPtr);
-  }
-  virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args) override
-  {
-    return ExecuteOnNewState(static_cast<ForwardNullAnalysisState&>(newState), args);
-  }
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) = 0;
-};
-
-
-class FnaOperationBranch : public IOperation {
-public:
-
-  // Override this again to switch to branching implementation
-  virtual void Execute(IState& originalState, const OperationArgs& args) override
-  {
-    assert(originalState.nextCfgNode.HasTwoNext()); //TODO: comment
-
-    uptr<IState> successor;
-    successor = CreateSuccessorTrue(originalState);
-    ExecuteOnNewState(static_cast<ForwardNullAnalysisState&>(*successor), args, true);
-    originalState.nextCfgNode.GetStatesManager().InsertAndEnqueue(move(successor));
-
-    successor = CreateSuccessorFalse(originalState);
-    ExecuteOnNewState(static_cast<ForwardNullAnalysisState&>(*successor), args, false);
-    originalState.nextCfgNode.GetStatesManager().InsertAndEnqueue(move(successor));
-
-    originalState.SetExplored();
-    return;
-  }
-
-  uptr<IState> CreateSuccessorTrue(IState& s)
-  {
-    auto successorPtr = make_unique<ForwardNullAnalysisState>(dynamic_cast<ForwardNullAnalysisState&>(s), s.nextCfgNode, s.nextCfgNode.GetNextTrue());
-    auto& successor = *successorPtr; 
-    // FIXME: when compiler is in compliance with newer copy elision rules
-    // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#1579
-    return move(successorPtr);
-  }
-
-  uptr<IState> CreateSuccessorFalse(IState& s)
-  {
-    auto successorPtr = make_unique<ForwardNullAnalysisState>(dynamic_cast<ForwardNullAnalysisState&>(s), s.nextCfgNode, s.nextCfgNode.GetNextFalse());
-    auto& successor = *successorPtr; 
-    // FIXME: when compiler is in compliance with newer copy elision rules
-    // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#1579
-    return move(successorPtr);
-  }
-
-  void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args, bool br)
-  {
-    auto     lhs          = newState.GetAnyVar   (args.GetOperand(0));
-
+    auto lhs = newState.GetAnyVar(args.GetOperand(0));
+    newState.ForwardNullAnalysisState::GetAnyVar(args.GetOperand(0));
     if (br)
       newState.GetVC().AssumeTrue(lhs);
     else
@@ -336,8 +117,50 @@ public:
   }
 };
 
+class FnaOperationCall : public OperationCall<ForwardNullAnalysisState> {
+public:
+  void ExecuteOnNewState(ForwardNullAnalysisState& newState, const CallOpArgs& args)
+  {
+    auto callTargetId = args.GetOptions().id;
+    auto callTargetType = args.GetOptions().type;
 
-class FnaOperationBinary : public BaseForwardNullAnalysisOperation {
+    // ne need to do several thinks in here
+    // A) prepare new stack frame 
+    // B) bind argument values to formal parameters in called function
+    // C) prepare "return info" which will bind the returned value to FrontendId of returned value in caller
+    // D) plan execution of the first node in the function with state prepared according to previous points
+
+    // for that, we need:
+    // support for stack frames with "return info"
+    // a system which binds FunctionPointers (of all kinds) to functions
+
+    // for variable addressing of function, I propose the same idea I originaly had for stack:
+    // that is, "base address", here base address of function, beeing in unknown (abstract) value
+    // and other addresses somehow based on this address
+
+    auto& func = newState.GetFuncMapping().GetFunction(newState.GetAnyVar(args.GetOptions()));
+
+    int i = 0;
+    for (auto& param : func.params.GetArgs())
+    {
+      newState.LinkLocalVar(param.idTypePair, newState.GetAnyVar(args.GetOperand(i)));
+      i++;
+    }
+
+    return;
+    throw NotImplementedException();
+  }
+};
+
+class FnaOperationRet : public IOperation {
+  virtual void Execute(IState & originalState, const OperationArgs & args) override 
+  {
+    (void)args;
+    return;
+  }
+};
+
+class FnaOperationBinary : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
   {
     return ExecuteOnNewStateImpl(newState, static_cast<const BinaryOpArgs&>(args));
@@ -356,7 +179,7 @@ class FnaOperationBinary : public BaseForwardNullAnalysisOperation {
 
 };
 
-class FnaOperationGetElementPtr : public BaseForwardNullAnalysisOperation {
+class FnaOperationGetElementPtr : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
   {
     // consider packing and aligment!!!
@@ -385,7 +208,7 @@ class FnaOperationGetElementPtr : public BaseForwardNullAnalysisOperation {
   }
 };
 
-class FnaOperationAlloca : public BaseForwardNullAnalysisOperation {
+class FnaOperationAlloca : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
   {
     auto count = newState.GetAnyVar(args.GetOperand(0));
@@ -398,92 +221,10 @@ class FnaOperationAlloca : public BaseForwardNullAnalysisOperation {
 
     newState.stackCurrentAddr = retVal;
     newState.LinkLocalVar(args.GetTarget(), retVal);
-    newState.stackMemory.push_back("alokovano xy");
   }
 };
 
-class FnaOperationCall : public IOperation {
-public:
-
-  virtual void Execute(IState& originalState, const OperationArgs& args) override
-  {
-    Execute(originalState, static_cast<const CallOpArgs&>(args));
-  }
-
-private:
-
-  void Execute(IState& originalState, const CallOpArgs& args)
-  {
-    assert(!originalState.nextCfgNode.HasTwoNext()); //TODO: comment
-
-    uptr<IState> successor;
-    {
-      auto& typedS = dynamic_cast<ForwardNullAnalysisState&>(originalState);
-      auto& nextJump = typedS.funcMapping.GetFunction(typedS.GetAnyVar(args.GetOptions())).cfg;
-      successor = make_unique<ForwardNullAnalysisState>(typedS, typedS.nextCfgNode, nextJump);
-    }
-    try
-    {
-      //TODO: moved into the try/catch/finally block, is it correct?
-      originalState.SetExplored();
-      ExecuteOnNewState(dynamic_cast<ForwardNullAnalysisState&>(*successor), args);
-
-      // Handled in TerminalCfgNode::Execute()
-      /*if (originalState.nextCfgNode.IsTerminalNode())
-      successor->SetExplored();*/
-
-      originalState.nextCfgNode.GetStatesManager().InsertAndEnqueue(move(successor));
-    }
-    catch (AnalysisErrorException e)
-    {
-      originalState.nextCfgNode.PrintLocation();
-      printf("%s\n",e.what());
-    }
-
-    return;
-  }
-  void ExecuteOnNewState(ForwardNullAnalysisState& newState, const CallOpArgs& args)
-  {
-    auto callTargetId = args.GetOptions().id;
-    auto callTargetType = args.GetOptions().type;
-
-    // ne need to do several thinks in here
-    // A) prepare new stack frame 
-    // B) bind argument values to formal parameters in called function
-    // C) prepare "return info" which will bind the returned value to FrontendId of returned value in caller
-    // D) plan execution of the first node in the function with state prepared according to previous points
-
-    // for that, we need:
-    // support for stack frames with "return info"
-    // a system which binds FunctionPointers (of all kinds) to functions
-    
-    // for variable addressing of function, I propose the same idea I originaly had for stack:
-    // that is, "base address", here base address of function, beeing in unknown (abstract) value
-    // and other addresses somehow based on this address
-    
-    auto& func = newState.funcMapping.GetFunction(newState.GetAnyVar(args.GetOptions()));
-
-    int i = 0;
-    for (auto& param : func.params.GetArgs())
-    {
-      newState.LinkLocalVar(param.idTypePair, newState.GetAnyVar(args.GetOperand(i)));
-      i++;
-    }
-
-    return;
-    throw NotImplementedException();
-  }
-};
-
-class FnaOperationRet : public IOperation {
-  virtual void Execute(IState & originalState, const OperationArgs & args) override 
-  {
-    (void)args;
-    return;
-  }
-};
-
-class FnaOperationLoad : public BaseForwardNullAnalysisOperation {
+class FnaOperationLoad : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
   {
 
@@ -508,7 +249,7 @@ class FnaOperationLoad : public BaseForwardNullAnalysisOperation {
   }
 };
 
-class FnaOperationStore : public BaseForwardNullAnalysisOperation {
+class FnaOperationStore : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
   {
 
@@ -522,7 +263,7 @@ class FnaOperationStore : public BaseForwardNullAnalysisOperation {
   }
 };
 
-class FnaOperationMemset : public BaseForwardNullAnalysisOperation {
+class FnaOperationMemset : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
   {
 
@@ -545,7 +286,7 @@ class FnaOperationMemset : public BaseForwardNullAnalysisOperation {
   }
 };
 
-class FnaOperationTrunc : public BaseForwardNullAnalysisOperation {
+class FnaOperationTrunc : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
   {
     return ExecuteOnNewStateImpl(newState, static_cast<const TruncExtendOpArgs&>(args));
@@ -563,7 +304,7 @@ class FnaOperationTrunc : public BaseForwardNullAnalysisOperation {
   }
 };
 
-class FnaOperationExtend : public BaseForwardNullAnalysisOperation {
+class FnaOperationExtend : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
   {
     return ExecuteOnNewStateImpl(newState, static_cast<const TruncExtendOpArgs&>(args));
@@ -581,7 +322,7 @@ class FnaOperationExtend : public BaseForwardNullAnalysisOperation {
   }
 };
 
-class FnaOperationCast : public BaseForwardNullAnalysisOperation {
+class FnaOperationCast : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
   {
     return ExecuteOnNewStateImpl(newState, static_cast<const CastOpArgs&>(args));
@@ -603,7 +344,7 @@ class FnaOperationCast : public BaseForwardNullAnalysisOperation {
   }
 };
 
-class FnaOperationCmp : public BaseForwardNullAnalysisOperation {
+class FnaOperationCmp : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
   {
     return ExecuteOnNewStateImpl(newState, static_cast<const CmpOpArgs&>(args));
@@ -621,7 +362,7 @@ class FnaOperationCmp : public BaseForwardNullAnalysisOperation {
   }
 };
 
-class FnaOperationNoop : public BaseForwardNullAnalysisOperation {
+class FnaOperationNoop : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
   {
     (void)args;

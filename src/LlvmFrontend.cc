@@ -713,7 +713,7 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
       params.GetArgs().push_back(ToOperArg(param));
     auto  info   = FunctionInfo{};
     auto  handle = std::make_unique<FunctionHandle>(cfg, std::move(params), info);
-    auto  vid    = mapper.CreateOrGetValueId(ToIdTypePair(func));
+    auto  vid    = mapper.CreateOrGetValueId(ToIdTypePair(func), vc);
     fmap.RegisterFunction(vid, std::move(handle));
   }
 
@@ -770,8 +770,8 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   entryPointCfg = &LlvmCfgNode::CreateNode(opFactory.Call(), args, *mainCall);
 
   // Register argc, argv as values
-  mapper.CreateOrGetValueId(ToOperArg(argc).idTypePair);
-  mapper.CreateOrGetValueId(ToOperArg(argv).idTypePair);
+  mapper.CreateOrGetValueId(ToOperArg(argc).idTypePair, vc);
+  mapper.CreateOrGetValueId(ToOperArg(argv).idTypePair, vc);
 
   while (!parseAndLinkTogether.empty())
   {

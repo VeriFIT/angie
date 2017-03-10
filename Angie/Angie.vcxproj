@@ -135,6 +135,7 @@
     <ClInclude Include="..\src\LlvmGlobals.hh" />
     <ClInclude Include="..\..\croaring\roaring.h" />
     <ClInclude Include="..\..\croaring\roaring.hh" />
+    <ClInclude Include="..\src\Operation.hh" />
     <ClInclude Include="..\src\precompall.hh" />
     <ClInclude Include="..\src\precompllvm.hh" />
     <ClInclude Include="..\src\precompother.hh" />

@@ -65,8 +65,8 @@ void VerificationLoop()
       if (!state.IsNew())
         continue;
 
-      state.nextCfgNode.GetDebugInfo();
-      state.nextCfgNode.Execute(state);
+      state.GetNextStep().GetDebugInfo();
+      state.GetNextStep().Execute(state);
     }
 
   }
@@ -87,7 +87,7 @@ ValueContainer vc;
 
 void Verify(boost::string_view fileName)
 {
-  Mapper mapper{vc};
+  Mapper mapper;
   FuncMapper fmap;
 
   auto f = FnaOperationFactory{};
@@ -95,7 +95,7 @@ void Verify(boost::string_view fileName)
   parser.ParseAndOpenIrFile(fileName);//("input-int-conv.ll");
   auto& firstNode = parser.GetEntryPoint();
 
-  auto emptyStateUPtr = make_unique<ForwardNullAnalysisState>(firstNode.GetPrevs()[0], firstNode, vc, mapper, fmap);
+  auto emptyStateUPtr = make_unique<ForwardNullAnalysisState>(firstNode, vc, mapper, fmap);
 
   firstNode.GetStatesManager().InsertAndEnqueue(move(emptyStateUPtr));
 

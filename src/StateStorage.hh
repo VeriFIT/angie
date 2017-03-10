@@ -49,7 +49,7 @@ private:
 
 public:
   void InsertAndEnqueue(
-    uptr<IState> statePtr,
+    uptr<IState>&& statePtr,
     WorklistPriority prioroty = WorklistPriority::Standard
   )
   {
@@ -71,7 +71,7 @@ public:
     // else -> just add it
     {
       IState& state = *statePtr;
-      statePool.push_back(move(statePtr));
+      statePool.push_back(std::move(statePtr));
       localStates.push_back(state);
 
       // here we should utilize priorities

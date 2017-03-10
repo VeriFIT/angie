@@ -90,6 +90,9 @@
     <ClInclude Include="..\src\precompother.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Operation.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\console.cc">
