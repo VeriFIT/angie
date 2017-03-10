@@ -28,19 +28,11 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "ICfgNode.hh"
 #include "IState.hh"
 #include "StateStorage.hh"
-#include "DummyState.hh"
 
 #include <cassert>
 
 #include "FrontedValueMapper.hh"
 #include "Operation.hh"
-//#include <range/v3/all.hpp>
-
-class StackFrame {
-public:
-  int currentOffset{0};
-  void AllocateMem(size_t size) { currentOffset += size; }
-};
 
 class ForwardNullAnalysisState : public StateBase {
 private:
@@ -119,7 +111,7 @@ public:
 
 class FnaOperationCall : public OperationCall<ForwardNullAnalysisState> {
 public:
-  void ExecuteOnNewState(ForwardNullAnalysisState& newState, const CallOpArgs& args)
+  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const CallOpArgs& args) override
   {
     auto callTargetId = args.GetOptions().id;
     auto callTargetType = args.GetOptions().type;
@@ -160,12 +152,8 @@ class FnaOperationRet : public IOperation {
   }
 };
 
-class FnaOperationBinary : public BasicOperation<ForwardNullAnalysisState> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
-  {
-    return ExecuteOnNewStateImpl(newState, static_cast<const BinaryOpArgs&>(args));
-  }
-  void ExecuteOnNewStateImpl(ForwardNullAnalysisState& newState, const BinaryOpArgs& args)
+class FnaOperationBinary : public BasicOperation<ForwardNullAnalysisState, BinaryOpArgs> {
+  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const BinaryOpArgs& args) override
   {
     auto opts = args.GetOptions();
 
@@ -286,12 +274,8 @@ class FnaOperationMemset : public BasicOperation<ForwardNullAnalysisState> {
   }
 };
 
-class FnaOperationTrunc : public BasicOperation<ForwardNullAnalysisState> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
-  {
-    return ExecuteOnNewStateImpl(newState, static_cast<const TruncExtendOpArgs&>(args));
-  }
-  void ExecuteOnNewStateImpl(ForwardNullAnalysisState& newState, const TruncExtendOpArgs& args)
+class FnaOperationTrunc : public BasicOperation<ForwardNullAnalysisState, TruncExtendOpArgs> {
+  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const TruncExtendOpArgs& args) override
   {
     //newstate
     ArithFlags flags = args.GetOptions();
@@ -304,12 +288,8 @@ class FnaOperationTrunc : public BasicOperation<ForwardNullAnalysisState> {
   }
 };
 
-class FnaOperationExtend : public BasicOperation<ForwardNullAnalysisState> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
-  {
-    return ExecuteOnNewStateImpl(newState, static_cast<const TruncExtendOpArgs&>(args));
-  }
-  void ExecuteOnNewStateImpl(ForwardNullAnalysisState& newState, const TruncExtendOpArgs& args)
+class FnaOperationExtend : public BasicOperation<ForwardNullAnalysisState, TruncExtendOpArgs> {
+  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const TruncExtendOpArgs& args) override
   {
     //newstate
     ArithFlags flags = args.GetOptions();
@@ -322,12 +302,8 @@ class FnaOperationExtend : public BasicOperation<ForwardNullAnalysisState> {
   }
 };
 
-class FnaOperationCast : public BasicOperation<ForwardNullAnalysisState> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
-  {
-    return ExecuteOnNewStateImpl(newState, static_cast<const CastOpArgs&>(args));
-  }
-  void ExecuteOnNewStateImpl(ForwardNullAnalysisState& newState, const CastOpArgs& args)
+class FnaOperationCast : public BasicOperation<ForwardNullAnalysisState, CastOpArgs> {
+  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const CastOpArgs& args) override  
   {
     auto lhs           = newState.GetAnyVar(args.GetOperand(0));
     auto opts          = args.GetOptions();
@@ -344,12 +320,8 @@ class FnaOperationCast : public BasicOperation<ForwardNullAnalysisState> {
   }
 };
 
-class FnaOperationCmp : public BasicOperation<ForwardNullAnalysisState> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
-  {
-    return ExecuteOnNewStateImpl(newState, static_cast<const CmpOpArgs&>(args));
-  }
-  void ExecuteOnNewStateImpl(ForwardNullAnalysisState& newState, const CmpOpArgs& args)
+class FnaOperationCmp : public BasicOperation<ForwardNullAnalysisState, CmpOpArgs> {
+  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const CmpOpArgs& args) override
   {
     //newstate
     auto lhs         = newState.GetAnyVar(args.GetOperand(0));
@@ -362,8 +334,8 @@ class FnaOperationCmp : public BasicOperation<ForwardNullAnalysisState> {
   }
 };
 
-class FnaOperationNoop : public BasicOperation<ForwardNullAnalysisState> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args)
+class FnaOperationNoop : public BasicOperation<ForwardNullAnalysisState, OperationArgs> {
+  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
   {
     (void)args;
     return;
