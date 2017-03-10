@@ -36,6 +36,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <tuple>
 
+//#include <gsl/gsl>
 #include <range/v3/all.hpp>
 
 typedef int FrontendId;
@@ -231,7 +232,7 @@ private:
   {
     using namespace ::ranges;
     auto res = ::ranges::find(range, offset, &EdgeBase::sourceOffset);
-    if (res != end(range))
+    if (res != ::ranges::end(range))
     {
       return &*res;
     }
@@ -245,7 +246,7 @@ private:
   {
     using namespace ::ranges;
     auto res = ::ranges::find(range, value, &EdgeBase::value);
-    if (res != end(range))
+    if (res != ::ranges::end(range))
     {
       return &*res;
     }
@@ -314,13 +315,34 @@ class Region : public Object {
 };
 
 class Graph {
-
-public:
+private:
 
   Object handles;
   std::map<ObjectId, uptr<Object>> objects;
 
-  IValueContainer& GetVc();
+public:
+
+  Graph() = default;
+  Graph(const Graph& g) :
+    handles(g.handles),
+    vc(g.vc)
+  {
+    //objects = ranges::transform(
+    //  g.objects, 
+    //  [](const decltype(objects)::value_type& kvp) { 
+    //    return decltype(objects)::value_type{kvp.first, std::make_unique<Object>(*kvp.second)}; 
+    //    }
+    //  );
+    for (const auto& kvp : g.objects)
+    {
+      objects.emplace(kvp.first, std::make_unique<Object>(*kvp.second));
+    }
+  }
+
+
+  IValueContainer* vc;
+  //gsl::not_null<IValueContainer*> vc;
+  IValueContainer& GetVc() { return *vc; }
 
   // Returns PtEdge [object, offset, type] corresponding to given pointer value
   // The given pointer must be bound to an existing object, otherwise it is an undefined behaviour!

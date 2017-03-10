@@ -68,12 +68,12 @@ class OperationHelpers;
 template<typename StateT, typename OperArgsT>
 class OperationHelpers<StateT, OperArgsT, std::false_type> {
 public:
-  void SafelyExecuteAndEnque(IState& lastSt, uptr<StateT>&& successor, const OperationArgs& args)
+  void SafelyExecuteAndEnque(IState& lastSt, uptr<IState>&& successor, const OperationArgs& args)
   {
     try
     {
       lastSt.SetExplored();
-      ExecuteOnNewState(*successor, static_cast<const OperArgsT&>(args));
+      ExecuteOnNewState(static_cast<StateT&>(*successor), static_cast<const OperArgsT&>(args));
       lastSt.GetNextStep().GetStatesManager().InsertAndEnqueue(std::move(successor));
     }
     catch (AnalysisErrorException e)
@@ -88,12 +88,12 @@ public:
 template<typename StateT, typename OperArgsT>
 class OperationHelpers<StateT, OperArgsT, std::true_type> {
 public:
-  void SafelyExecuteAndEnque(IState& lastSt, uptr<StateT>&& successor, const OperationArgs& args, bool br)
+  void SafelyExecuteAndEnque(IState& lastSt, uptr<IState>&& successor, const OperationArgs& args, bool br)
   {
     try
     {
       lastSt.SetExplored();
-      ExecuteOnNewState(*successor, static_cast<const OperArgsT&>(args), br);
+      ExecuteOnNewState(static_cast<StateT&>(*successor), static_cast<const OperArgsT&>(args), br);
       lastSt.GetNextStep().GetStatesManager().InsertAndEnqueue(std::move(successor));
     }
     catch (AnalysisErrorException e)
@@ -116,7 +116,7 @@ public:
   {
     assert(!lastSt.GetNextStep().HasTwoNext()); //TODO: comment
 
-    uptr<StateT> successor = make_unique<StateT>(dynamic_cast<StateT&>(lastSt), lastSt.GetNextStep().GetNext());
+    uptr<IState> successor = lastSt.CreateSuccessor(lastSt.GetNextStep().GetNext());
     this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
   }
 };
@@ -136,10 +136,10 @@ private:
   {
     assert(!lastSt.GetNextStep().HasTwoNext()); //TODO: comment
 
-    uptr<StateT> successor;
+    uptr<IState> successor;
     {
       auto& nextJump = lastSt.GetFuncMapping().GetFunction(lastSt.GetAnyVar(args.GetOptions())).cfg;
-      successor = make_unique<StateT>(dynamic_cast<StateT&>(lastSt), nextJump);
+      successor = lastSt.CreateSuccessor(nextJump);
     }
     this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
 
@@ -156,14 +156,77 @@ public:
   {
     assert(lastSt.GetNextStep().HasTwoNext()); //TODO: comment
 
-    uptr<StateT> successor;
-    successor = make_unique<StateT>(dynamic_cast<StateT&>(lastSt), lastSt.GetNextStep().GetNextTrue());
+    uptr<IState> successor;
+    successor = lastSt.CreateSuccessor(lastSt.GetNextStep().GetNextTrue());
     this->SafelyExecuteAndEnque(lastSt, std::move(successor), args, true);
 
-    successor = make_unique<StateT>(dynamic_cast<StateT&>(lastSt), lastSt.GetNextStep().GetNextFalse());
+    successor = lastSt.CreateSuccessor(lastSt.GetNextStep().GetNextFalse());
     this->SafelyExecuteAndEnque(lastSt, std::move(successor), args, false);
 
     lastSt.SetExplored();
     return;
   }
 };
+
+// ================== \/ \/ \/ COMMON CODE \/ \/ \/ ===============
+
+class BasicOperationNoop : public BasicOperation<IState, OperationArgs> {
+  virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args) override final
+  {
+  }
+};
+
+class BasicOperationBinOp : public BasicOperation<IState, BinaryOpArgs> {
+  virtual void ExecuteOnNewState(IState& newState, const BinaryOpArgs& args) override final
+  {
+    auto opts        = args.GetOptions();
+
+    auto type        = args.GetOperand(0).type;
+    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
+    auto rhs         = newState.GetAnyVar(args.GetOperand(1));
+
+    ValueId retVal = newState.GetVc().BinOp(lhs, rhs, type, opts);
+    newState.LinkLocalVar(args.GetTarget(), retVal);
+  }
+};
+
+class BasicOperationTruncate : public BasicOperation<IState, TruncExtendOpArgs> {
+  virtual void ExecuteOnNewState(IState& newState, const TruncExtendOpArgs& args) override final
+  {
+    ArithFlags flags = args.GetOptions();
+    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
+    auto tarType     = args.GetTarget().type;
+    auto srcType     = args.GetOperand(0).type;
+
+    ValueId retVal = newState.GetVc().TruncateInt(lhs, srcType, tarType);
+    newState.LinkLocalVar(args.GetTarget(), retVal);
+  }
+};
+
+class BasicOperationExtend : public BasicOperation<IState, TruncExtendOpArgs> {
+  virtual void ExecuteOnNewState(IState& newState, const TruncExtendOpArgs& args) override final
+  {
+    ArithFlags flags = args.GetOptions();
+    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
+    auto tarType     = args.GetTarget().type;
+    auto srcType     = args.GetOperand(0).type;
+
+    ValueId retVal = newState.GetVc().ExtendInt(lhs, srcType, tarType, flags);
+    newState.LinkLocalVar(args.GetTarget(), retVal);
+  }
+};
+
+class BasicOperationCmp : public BasicOperation<IState, CmpOpArgs> {
+  virtual void ExecuteOnNewState(IState& newState, const CmpOpArgs& args) override final
+  {
+    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
+    auto rhs         = newState.GetAnyVar(args.GetOperand(1));
+    auto srcType     = args.GetOperand(0).type;
+    auto flags       = args.GetOptions();
+
+    ValueId retVal = newState.GetVc().Cmp(lhs, rhs, srcType, flags);
+    newState.LinkLocalVar(args.GetTarget(), retVal);
+  }
+};
+
+// ================== ^^^^^ COMMON CODE ^^^^^ ===============

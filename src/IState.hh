@@ -48,6 +48,8 @@ class IState {
 public:
   virtual ~IState() {}
 
+  virtual uptr<IState> CreateSuccessor(ICfgNode& nextStep) const = 0;
+
   // informace o posledni provedene op. na ktere je stav zalozen?
 
   virtual StateCondition GeCondition() const = 0;
@@ -67,6 +69,7 @@ public:
   // meaning: Succesors of this state are un-processed
   virtual bool IsNew() const = 0;
 
+  virtual IValueContainer& GetVc() = 0;
   virtual FuncMapper& GetFuncMapping() const = 0;
 
   virtual ValueId GetAnyVar (FrontendIdTypePair var) const = 0;
@@ -146,7 +149,8 @@ public:
   //------------------------------------
 
 
-  IValueContainer& GetVC() { return vc; }
+  virtual IValueContainer& GetVc() override final { return vc; }
+  [[deprecated]] IValueContainer& GetVC() { return vc; }
 
   virtual FuncMapper& GetFuncMapping() const override { return funcMapping; }
 

@@ -62,7 +62,7 @@ set(SOURCE_FILES
     src/LlvmGlobals.hh
     src/LlvmType.cc
     src/main.cc
-    src/Smg.cc
+    # src/Smg.cc
     src/StateStorage.cc
     src/StateStorage.hh
     src/Type.hh
