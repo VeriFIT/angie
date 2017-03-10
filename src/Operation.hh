@@ -117,7 +117,7 @@ public:
     assert(!lastSt.GetNextStep().HasTwoNext()); //TODO: comment
 
     uptr<StateT> successor = make_unique<StateT>(dynamic_cast<StateT&>(lastSt), lastSt.GetNextStep().GetNext());
-    SafelyExecuteAndEnque(lastSt, std::move(successor), args);
+    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
   }
 };
 
@@ -141,7 +141,7 @@ private:
       auto& nextJump = lastSt.GetFuncMapping().GetFunction(lastSt.GetAnyVar(args.GetOptions())).cfg;
       successor = make_unique<StateT>(dynamic_cast<StateT&>(lastSt), nextJump);
     }
-    SafelyExecuteAndEnque(lastSt, std::move(successor), args);
+    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
 
     return;
   }
@@ -158,10 +158,10 @@ public:
 
     uptr<StateT> successor;
     successor = make_unique<StateT>(dynamic_cast<StateT&>(lastSt), lastSt.GetNextStep().GetNextTrue());
-    SafelyExecuteAndEnque(lastSt, std::move(successor), args, true);
+    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args, true);
 
     successor = make_unique<StateT>(dynamic_cast<StateT&>(lastSt), lastSt.GetNextStep().GetNextFalse());
-    SafelyExecuteAndEnque(lastSt, std::move(successor), args, false);
+    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args, false);
 
     lastSt.SetExplored();
     return;
