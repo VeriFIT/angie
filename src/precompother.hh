@@ -24,17 +24,26 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #if defined(_MSC_VER)
 
-//#include <gsl/gsl_algorithm>
 #include <vector>
 #include <map>
+#include <set>
+
 #include <algorithm>
-#include <string>
-#include <sstream>
+#include <functional>
 
 #include <iostream>
+#include <string>
+#include <sstream>
 
 #pragma warning(push, 3)
 #include <range/v3/all.hpp>
 #pragma warning(pop)
+
+#pragma warning(push, 3)
+#include <gsl/gsl>
+#pragma warning(pop)
+
+#include <boost/utility/string_view.hpp>
+#include <boost/logic/tribool.hpp>
 
 #endif
