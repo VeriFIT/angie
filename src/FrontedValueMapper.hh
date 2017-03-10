@@ -27,7 +27,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "General.hh"
 
 #include <map>
-#include <cassert>
 
 //#include <range/v3/all.hpp>
 

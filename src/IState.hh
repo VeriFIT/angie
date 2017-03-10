@@ -66,7 +66,9 @@ public:
   virtual void SetExplored() = 0;
   // meaning: Succesors of this state are un-processed
   virtual bool IsNew() const = 0;
-  
+
+  virtual FuncMapper& GetFuncMapping() const = 0;
+
   virtual ValueId GetAnyVar (FrontendIdTypePair var) const = 0;
   virtual void LinkGlobalVar(FrontendIdTypePair var, ValueId value) = 0;
   virtual void LinkLocalVar (FrontendIdTypePair var, ValueId value) = 0;
@@ -88,14 +90,11 @@ private:
 
   Mapper&     globalMapping;
   Mapper      localMapping;
+  FuncMapper& funcMapping;
   IValueContainer& vc;
 
   //ICfgNode& lastCfgNode;
   ICfgNode& nextCfgNode; 
-
-public:
-
-  FuncMapper& funcMapping;
 
 protected:
 
@@ -148,6 +147,8 @@ public:
 
 
   IValueContainer& GetVC() { return vc; }
+
+  virtual FuncMapper& GetFuncMapping() const override { return funcMapping; }
 
   //TODO: rename / refactor..
 
