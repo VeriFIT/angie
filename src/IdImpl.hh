@@ -24,6 +24,18 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdint>
 #include <iostream>
 
+// How to use:
+
+/* Into header file
+class SometNameForPlaceholderToken;
+using SomeId = Id<SometNameForPlaceholderToken>;
+*/
+
+/* Into source file
+template<>
+SomeId SomeId::nextIdToGive{};
+*/
+
 template<typename T>
 class Id {
 private:

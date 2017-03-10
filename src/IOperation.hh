@@ -27,8 +27,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "IState.hh"
 #include "StateStorage.hh"
 
-using namespace ::std;
-
 class IOperation {
 public:
   //vektor kontext po provedeni, pristi instrukce

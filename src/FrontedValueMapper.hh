@@ -25,18 +25,14 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Definitions.hh"
 #include "General.hh"
-#include "IOperation.hh"
-#include "ICfgNode.hh"
-#include "IState.hh"
-#include "StateStorage.hh"
-#include "DummyState.hh"
 
 #include <map>
-#include <cassert>
 
 //#include <range/v3/all.hpp>
 
 typedef int FunctionInfo;
+
+class ICfgNode;
 
 class FunctionHandle {
 public:
@@ -74,22 +70,16 @@ public:
 class Mapper {
 
 private:
-
-  IValueContainer* vc;
   std::map<FrontendValueId, ValueId> innerMap;
 
 public:
 
-  /*ctr*/ Mapper(IValueContainer& vc) : vc(&vc) {}
-
-  /*ctr*/ Mapper(const Mapper&) = default;
-
-  ValueId GetValueId(FrontendValueId id)
+  ValueId GetValueId(FrontendValueId id) const
   {
     return innerMap.at(id);
   }
   
-  auto GetFrontendIds(ValueId id)
+  auto GetFrontendIds(ValueId id) const
   {
     return nullptr;//innerMap | ranges::view::remove_if([=](STL_ITEM_T(innerMap) pair){ return pair.second == id; });
   }
@@ -99,13 +89,15 @@ public:
     innerMap.insert({id, value});
   }
 
-  ValueId CreateOrGetValueId(FrontendIdTypePair arg) 
+  ValueId CreateOrGetValueId(FrontendIdTypePair arg, IValueContainer& vc)
   {
+    FrontendValueId id = arg.id;
+
     // src: http://stackoverflow.com/a/101980
 
-    decltype(innerMap)::iterator lb = innerMap.lower_bound(arg.id);
+    decltype(innerMap)::iterator lb = innerMap.lower_bound(id);
 
-    if (lb != innerMap.end() && !(innerMap.key_comp()(arg.id, lb->first)))
+    if (lb != innerMap.end() && !(innerMap.key_comp()(id, lb->first)))
     {
       // key already exists
       // update lb->second if you care to
@@ -115,8 +107,31 @@ public:
     {
       // the key does not exist in the innerMap
       // add it to the innerMap
-      auto newValue = vc->CreateVal(arg.type);
-      innerMap.insert(lb, decltype(innerMap)::value_type{arg.id, newValue}); // Use lb as a hint to insert,
+      auto newValue = vc.CreateVal(arg.type);
+      innerMap.insert(lb, decltype(innerMap)::value_type{id, newValue}); // Use lb as a hint to insert,
+                                                                         // so it can avoid extra lookup
+      return newValue;
+    }
+  }
+  
+  ValueId CreateOrGetValueId(FrontendValueId id) 
+  {
+    // src: http://stackoverflow.com/a/101980
+
+    decltype(innerMap)::iterator lb = innerMap.lower_bound(id);
+
+    if (lb != innerMap.end() && !(innerMap.key_comp()(id, lb->first)))
+    {
+      // key already exists
+      // update lb->second if you care to
+      return lb->second;
+    }
+    else
+    {
+      // the key does not exist in the innerMap
+      // add it to the innerMap
+      auto newValue = ValueId::GetNextId();
+      innerMap.insert(lb, decltype(innerMap)::value_type{id, newValue}); // Use lb as a hint to insert,
                                                                              // so it can avoid extra lookup
       return newValue;
     }

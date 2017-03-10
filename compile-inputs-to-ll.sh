@@ -5,10 +5,10 @@ SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 cd $SCRIPTPATH
 
-# this needs fixing by auto-detect!!!
-# COPT=opt-3.9
-# CLANGXX=clang++-3.9
-# CLANG=clang-3.9
+# supply different values if you wish to override
+: ${COPT:=opt}
+: ${CLANG:=clang}
+: ${CLANGXX:=clang++}
 
 # $CLANGXX -S -g -emit-llvm input1.cpp -o - | $COPT -lowerswitch -S -o input1.ll
 # $CLANGXX -S -g -emit-llvm input2.cpp -o - | $COPT -lowerswitch -S -o input2.ll
@@ -18,25 +18,23 @@ cd $SCRIPTPATH
 # $CLANGXX -S -g -emit-llvm input-logop.cpp -o - | $COPT -lowerswitch -S -o input-logop.ll
 
 # the following set-up skips -mem2reg and -simplecfg for retaining switch-less, phi-less output
-        passes_normal="-lowerswitch -globalopt -demanded-bits -branch-prob -inferattrs -ipsccp -dse -loop-simplify -scoped-noalias -barrier -adce -memdep -licm -globals-aa -rpo-functionattrs -basiccg -loop-idiom -forceattrs -early-cse -instcombine -sccp "
+passes_normal="-lowerswitch -globalopt -demanded-bits -branch-prob -inferattrs -ipsccp -dse -loop-simplify -scoped-noalias -barrier -adce -memdep -licm -globals-aa -rpo-functionattrs -basiccg -loop-idiom -forceattrs -early-cse -instcombine -sccp "
 passes_leave_deadcode="-lowerswitch -globalopt -demanded-bits -branch-prob -inferattrs -ipsccp      -loop-simplify -scoped-noalias -barrier       -memdep -licm -globals-aa -rpo-functionattrs -basiccg -loop-idiom -forceattrs                         -sccp "
 
 directory=examples
 ext=.c
 deadcode="\[dead\]"
-for ll_file in $(ls $directory/*$ext)
-do
-    echo $ll_file    
-    filen=$(basename $ll_file $ext)
-    dirn=$(dirname $ll_file)
-    if grep -q -P $deadcode <<<$filen ;
-    then
-        passes=$passes_leave_deadcode
-    else
-        # because some of the extra passes introduce ConstExpr into code, temporarily disable them
-        # passes=$passes_normal
-        passes=$passes_leave_deadcode
-    fi
-    echo "$CLANG -S -g -emit-llvm $dirn/$filen.c -o - | $COPT $passes -S -o $dirn/$filen.ll"
-    $CLANG -S -g -emit-llvm $dirn/$filen.c -o - | $COPT $passes -S -o $dirn/$filen.ll
+for ll_file in $(ls $directory/*$ext); do
+	echo $ll_file
+	filen=$(basename $ll_file $ext)
+	dirn=$(dirname $ll_file)
+	if grep -q -P $deadcode <<<$filen; then
+		passes=$passes_leave_deadcode
+	else
+		# because some of the extra passes introduce ConstExpr into code, temporarily disable them
+		# passes=$passes_normal
+		passes=$passes_leave_deadcode
+	fi
+	echo "$CLANG -S -g -emit-llvm $dirn/$filen.c -o - | $COPT $passes -S -o $dirn/$filen.ll"
+	$CLANG -S -g -emit-llvm $dirn/$filen.c -o - | $COPT $passes -S -o $dirn/$filen.ll
 done

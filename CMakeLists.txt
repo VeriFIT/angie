@@ -52,6 +52,7 @@ set(SOURCE_FILES
     src/ICfgNode.hh
     src/IdImpl.hh
     src/IOperation.hh
+    src/Operation.hh
     src/IState.hh
     src/laboratory.cc
     src/LlvmFrontend.cc
