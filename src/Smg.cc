@@ -49,9 +49,10 @@ class Object;
 typedef Object IObject;
 
 typedef size_t ObjectSize;
-typedef ValueId ObjectId;
 typedef int ObjectType; // not used
 
+class ObjectIdToken;
+using ObjectId = Id<ObjectIdToken>;
 
 struct EdgeBase {
 
@@ -432,8 +433,7 @@ public:
     }
     else /* type is pointer && and is known pointer; debug if second fails */
     {
-      PtEdge* assignedPtr;
-      if (assignedPtr = handles.FindPtEdgeByOffset(value))
+      if (PtEdge* assignedPtr = handles.FindPtEdgeByOffset(value))
       {
         object.CreateOrModifyPtEdge(offset, *assignedPtr);
       }
@@ -457,48 +457,10 @@ public:
 
 } // namespace Smg::Impl
 
+// namespace Smg
 
-
-typedef Impl::Graph Graph;
-
-class Object {
-
-  ////These functions require access to whole graph, to see which edges ends in this object
-  //ImplEdgeEnumerable GetEdgesAll() const;
-
-  //ImplEdgeEnumerable GetEdgesTo(Graph) const;
-  //ImplEdgeEnumerable GetPtEdgesTo(Graph) const;
-
-  //ImplObjectEnumerable GetPredecessorObjects() const;
-};
-
-
-} // namespace Smg
-
-void playground()
-{
-  using namespace ::Smg::Impl;
-  Object o;
-  Type t = Type::CreateIntegerType(32);
-  o.hvEdges.push_back(HvEdge{ValueId{0}, ValueId{1}, t});
-  o.ptEdges.push_back(PtEdge{ValueId{4},ValueId{5},t,ObjectId{7},ValueId{8}});
-  o.hvEdges.push_back(HvEdge{ValueId{0}, ValueId{1}, t});
-  o.ptEdges.push_back(PtEdge{ValueId{4},ValueId{5},t,ObjectId{7},ValueId{8}});
-  //auto all = o.GetOutEdges();
-  //for(auto& x : all)
-  //{
-  //  std::cout << x << std::endl;
-  //}
-
-  ////o.FindPtEdge(4);
-  //o.FindHvEdge(ValueId{1});
-  //const Object& o2 = o;
-  //o2.FindHvEdge(ValueId{1});
-  ////o.CreateHvEdge(11, 12, 13);
-
-  return;
-  //gsl::
-}
+using ObjectId = Impl::ObjectId;
+//using Graph    = Impl::Graph;
 
 /*
 
@@ -519,32 +481,125 @@ BaseEdge
 */
 
 
+//class ValueWrapper {
+//  ValueId id;
+//  Type type;
+//  IValueContainer& vc;
 //
-//typedef uint64_t ObjectId ;
-//class Smg {
-//  Object& GetHandles();
-//  };
-//  class Object {
-//  auto GetOutEges();
-//  auto GetHvEdges();
-//  auto GetPtEdges();
-//
-//  size_t GetSize();
-//  ObjectId GetId();
-//  };
-//  class Region : public Object {
-//
-//  };
-//  class Sls : Object {
-//  uint16_t GetLevel();
-//  uint16_t GetRank();
-//  };
-//  class BaseEdge {
-//  ValueId  GetSourceOffset();
-//  ValueId  GetValue();
-//  Type     GetType();
-//};
-//class PtEdge : public BaseEdge {
-//  ObjectId GetTargetObjectId(); //GetTargetBasePtr();
-//  ValueId  GetTargetOffset();
-//};
+//  ValueWrapper operator+(const ValueWrapper& rhs) { vc.Add(id, rhs.id, type,  }
+//}
+
+class ISmgVisitor;
+class Object;
+
+class Edge {
+private:
+  Impl::EdgeBase& edge;
+  Impl::Graph&    graph;
+public:
+  ValueId  GetSourceOffset();
+  void Accept(ISmgVisitor);
+};
+class HvEdge : public Edge {
+public:
+  ValueId  GetValue();
+  Type     GetType();
+};
+class PtEdge : public HvEdge {
+public:
+  //ObjectId GetTargetObjectId(); //GetTargetBasePtr();
+  Object& GetTargetObject();
+  ValueId GetTargetOffset();
+};
+class Object {
+private:
+  Impl::Object& object;
+  Impl::Graph&  graph;
+public:
+  auto GetPtOutEdges();
+  auto GetHvOutEdges();
+  auto GetOutEdges();
+  auto GetPtInEdges();
+  ValueId GetSize();
+  ObjectId GetId();
+  void Accept(ISmgVisitor&);
+};
+////These functions require access to whole graph, to see which edges ends in this object
+//ImplEdgeEnumerable GetEdgesAll() const;
+
+//ImplEdgeEnumerable GetEdgesTo(Graph) const;
+//ImplEdgeEnumerable GetPtEdgesTo(Graph) const;
+
+//ImplObjectEnumerable GetPredecessorObjects() const;
+class Region : public Object {
+public:
+  bool IsValid();
+  bool IsFreed();
+  bool IsNullified();
+};
+class Sls : public Object {
+public:
+  uint16_t GetLevel();
+  uint16_t GetRank();
+};
+class Graph {
+  Impl::Graph& graph;
+private:
+  //auto GetInEdges();
+  void Accept(ISmgVisitor&);
+};
+
+} // namespace Smg
+
+
+void playground()
+{
+  using namespace ::Smg::Impl;
+  Object o;
+
+  Type int8     = Type::CreateIntegerType(8);
+  Type int32    = Type::CreateIntegerType(32);
+  Type int64    = Type::CreateIntegerType(64);
+  Type int32Ptr = Type::CreatePointerTo(int32);
+
+  ObjectId o1{1};
+  ObjectId o2{2};
+  ObjectId o3{3};
+  ObjectId o4{4};
+  ObjectId o5{5};
+
+  ValueId  v0{0};
+  ValueId  v1{1};
+  ValueId  v2{2};
+  ValueId  v3{3};
+  ValueId  v4{4};
+  ValueId  v5{5};
+  ValueId  v8{8};
+  ValueId  v10{10};
+  ValueId  v16{16};
+
+  ValueId  vPtr1{~0ull - 1};
+  ValueId  vPtr2{~0ull - 2};
+  ValueId  vPtr3{~0ull - 3};
+
+  o.hvEdges.push_back(HvEdge{v0, v2   , int32});
+  o.ptEdges.push_back(PtEdge{v4, vPtr1, int32Ptr, o2, v0});
+  //auto all = o.GetOutEdges();
+  //for(auto& x : all)
+  //{
+  //  std::cout << x << std::endl;
+  //}
+
+  ////o.FindPtEdge(4);
+  //o.FindHvEdge(ValueId{1});
+  //const Object& o2 = o;
+  //o2.FindHvEdge(ValueId{1});
+  ////o.CreateHvEdge(11, 12, 13);
+
+  return;
+  //gsl::
+}
+
+
+template<>
+Smg::Impl::ObjectId Smg::Impl::ObjectId::nextIdToGive{};
