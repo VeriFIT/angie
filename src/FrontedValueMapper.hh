@@ -25,11 +25,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Definitions.hh"
 #include "General.hh"
-#include "IOperation.hh"
-#include "ICfgNode.hh"
-#include "IState.hh"
-#include "StateStorage.hh"
-#include "DummyState.hh"
 
 #include <map>
 #include <cassert>
@@ -37,6 +32,8 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 //#include <range/v3/all.hpp>
 
 typedef int FunctionInfo;
+
+class ICfgNode;
 
 class FunctionHandle {
 public:

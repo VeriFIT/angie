@@ -43,31 +43,24 @@ public:
   void AllocateMem(size_t size) { currentOffset += size; }
 };
 
-// ------------
-// ForwardNullAnalysis
-class ForwardNullAnalysisState : public IState {
+class ForwardNullAnalysisState : public StateBase {
 private:
-  
-  Mapper&     globalMapping;
-public:
-  FuncMapper& funcMapping;
-private:
-  Mapper      localMapping;
 
 public:
 
   /*ctr*/ ForwardNullAnalysisState(
-      ICfgNode& lastCfgNode, 
+      //ICfgNode& lastCfgNode, 
       ICfgNode& nextCfgNode,
       IValueContainer& vc,
       Mapper& globalMapping,
       FuncMapper& funcMapping
       ) :
-    IState(lastCfgNode, nextCfgNode),
-    vc(&vc),
-    globalMapping(globalMapping),
-    funcMapping(funcMapping),
-    localMapping(vc)
+    StateBase(
+      //lastCfgNode, 
+      nextCfgNode, 
+      vc, 
+      globalMapping,
+      funcMapping)
   {
     //stack.push_back(StackFrame{});
     stackCurrentAddr = ValueId{0};//GetVC().CreateVal(Type::CreateCharPointerType());
@@ -78,66 +71,23 @@ public:
   // copy ctr ??? or what
   /*ctr*/ ForwardNullAnalysisState(
       const ForwardNullAnalysisState& state, 
-      ICfgNode& lastCfgNode, ICfgNode& 
-      nextCfgNode
+      //ICfgNode& lastCfgNode, 
+      ICfgNode& nextCfgNode
       ) :
-    IState(lastCfgNode, nextCfgNode),
-    vc(state.vc),
-    globalMapping(state.globalMapping),
-    funcMapping(state.funcMapping),
-    localMapping(state.localMapping),
-    //stack(state.stack),
-    //stackMemory(state.stackMemory),
-    //heapMemory(state.heapMemory),
+    StateBase(
+      state, 
+      //lastCfgNode, 
+      nextCfgNode),
     stackCurrentAddr(state.stackCurrentAddr),
     hasValue(state.hasValue)
   {
   }
-  
-  //TODO: same algo as in method bellow
-  //TODO: rename
-  
-  virtual ValueId GetAnyVar(FrontendIdTypePair var) override
-  {
-    try { return globalMapping.GetValueId(var.id); }
-    catch (exception e) { return localMapping.GetValueId(var.id); }
-  }
-  //// DO NOT USE - use GetAnyOrCreateLocalVar
-  //[[deprecated]] virtual ValueId GetOrCreateGlobalVar(FrontendIdTypePair var) override
-  //{
-  //  return globalMapping.CreateOrGetValueId(var);
-  //}
-  //// DO NOT USE - use GetAnyOrCreateLocalVar
-  //[[deprecated]] virtual ValueId GetOrCreateLocalVar(FrontendIdTypePair var) override
-  //{
-  //  return localMapping.CreateOrGetValueId(var);
-  //}
 
-  //[[deprecated]] virtual ValueId GetAnyOrCreateLocalVar(FrontendIdTypePair var) override
-  //{
-  //  try { return globalMapping.GetValueId(var.id); }
-  //  catch(exception e) { return localMapping.CreateOrGetValueId(var); }
-  //}
-  virtual void LinkGlobalVar(FrontendIdTypePair var, ValueId value) override
-  {
-    globalMapping.LinkToValueId(var.id, value);
-  }
-  virtual void LinkLocalVar(FrontendIdTypePair var, ValueId value) override
-  {
-    localMapping.LinkToValueId(var.id, value);
-  }
+  //------------------------------------
 
-  IValueContainer* vc;
-  IValueContainer& GetVC() { return *vc; }
-
-  vector<string> stackMemory;
-  //vector<string> heapMemory;
-  //vector<StackFrame> stack;
-
-  //ValueId stackBaseAddr;
-  //ValueId heapBaseAddr;
   ValueId stackCurrentAddr;
-  //ValueId heapCurrentAddr;
+
+  //------------------------------------
 
   std::map<ValueId, ValueId> hasValue;
 
