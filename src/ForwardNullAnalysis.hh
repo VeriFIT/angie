@@ -116,9 +116,9 @@ public:
     auto lhs = newState.GetAnyVar(args.GetOperand(0));
     newState.ForwardNullAnalysisState::GetAnyVar(args.GetOperand(0));
     if (br)
-      newState.GetVC().AssumeTrue(lhs);
+      newState.GetVc().AssumeTrue(lhs);
     else
-      newState.GetVC().AssumeFalse(lhs);
+      newState.GetVc().AssumeFalse(lhs);
   }
 };
 
@@ -183,13 +183,13 @@ class FnaOperationGetElementPtr : public BasicOperation<ForwardNullAnalysisState
     uint64_t offset = static_cast<uint64_t>(args.GetOptions().idTypePair.id); //HACK relaying on ValueId == constant value stored by that id    
 
     //! We assume, that getelementptr instruction is always generated as forerunner of load/store op.
-    if (newState.GetVC().IsZero(lhs))
+    if (newState.GetVc().IsZero(lhs))
     {
       throw PossibleNullDereferenceException();
     }
     
-    ValueId offsetVal     = newState.GetVC().CreateConstIntVal(offset, PTR_TYPE);
-    ValueId retVal        = newState.GetVC().Add(lhs, offsetVal, PTR_TYPE, ArithFlags::Default);
+    ValueId offsetVal     = newState.GetVc().CreateConstIntVal(offset, PTR_TYPE);
+    ValueId retVal        = newState.GetVc().Add(lhs, offsetVal, PTR_TYPE, ArithFlags::Default);
     newState.LinkLocalVar(args.GetTarget(), retVal);
   }
 };
@@ -200,10 +200,10 @@ class FnaOperationAlloca : public BasicOperation<ForwardNullAnalysisState> {
     auto count = newState.GetAnyVar(args.GetOperand(0));
     auto type  = args.GetTarget().type;
 
-    ValueId elementSize64 = newState.GetVC().CreateConstIntVal(type.GetPointerElementType().GetSizeOf(), PTR_TYPE);
-    ValueId count64       = newState.GetVC().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
-    ValueId size64        = newState.GetVC().Mul(elementSize64, count64, PTR_TYPE, ArithFlags::Default);
-    ValueId retVal        = newState.GetVC().Add(newState.stackCurrentAddr, size64, PTR_TYPE, ArithFlags::Default);
+    ValueId elementSize64 = newState.GetVc().CreateConstIntVal(type.GetPointerElementType().GetSizeOf(), PTR_TYPE);
+    ValueId count64       = newState.GetVc().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
+    ValueId size64        = newState.GetVc().Mul(elementSize64, count64, PTR_TYPE, ArithFlags::Default);
+    ValueId retVal        = newState.GetVc().Add(newState.stackCurrentAddr, size64, PTR_TYPE, ArithFlags::Default);
 
     newState.stackCurrentAddr = retVal;
     newState.LinkLocalVar(args.GetTarget(), retVal);
@@ -251,7 +251,7 @@ class FnaOperationMemset : public BasicOperation<ForwardNullAnalysisState> {
     auto value  = newState.GetAnyVar(args.GetOperand(1));
     auto len    = newState.GetAnyVar(args.GetOperand(2));
 
-    auto& vc = newState.GetVC();
+    auto& vc = newState.GetVc();
     auto i = vc.CreateConstIntVal(0, PTR_TYPE);
     auto one = vc.CreateConstIntVal(1, PTR_TYPE);
     while (vc.IsCmp(len, i, PTR_TYPE, CmpFlags::UnsigGt))

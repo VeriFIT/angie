@@ -150,7 +150,6 @@ public:
 
 
   virtual IValueContainer& GetVc() override final { return vc; }
-  [[deprecated]] IValueContainer& GetVC() { return vc; }
 
   virtual FuncMapper& GetFuncMapping() const override { return funcMapping; }
 

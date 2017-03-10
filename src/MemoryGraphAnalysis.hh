@@ -159,9 +159,9 @@ class MemGraphOpAlloca : public BasicOperation<MemoryGraphAnalysisState> {
     auto count = newState.GetAnyVar(args.GetOperand(0));
     auto type  = args.GetTarget().type;
 
-    ValueId elementSize64 = newState.GetVC().CreateConstIntVal(type.GetPointerElementType().GetSizeOf(), PTR_TYPE);
-    ValueId count64       = newState.GetVC().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
-    ValueId size64        = newState.GetVC().Mul(elementSize64, count64, PTR_TYPE, ArithFlags::Default);
+    ValueId elementSize64 = newState.GetVc().CreateConstIntVal(type.GetPointerElementType().GetSizeOf(), PTR_TYPE);
+    ValueId count64       = newState.GetVc().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
+    ValueId size64        = newState.GetVc().Mul(elementSize64, count64, PTR_TYPE, ArithFlags::Default);
     ValueId retVal        = newState.Alloca(type); //! Not enough!
     //TODO: count is unhandled... probably solve this by converting type to array<type, count>
 
