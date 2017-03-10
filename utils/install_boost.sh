@@ -20,7 +20,9 @@ CLEANUP=                          # DEFAULT: OFF
 BUILD_CONFIG=                     # DEFAULT: debug
 :                                 # Download Link
 :                                 # DEFAULT: "https://codeload.github.com/$REPO_AUTHOR/$REPO_NAME/$FORMAT/$BRANCH"
-LINK=https://downloads.sourceforge.net/project/boost/boost/1.63.0/boost_1_63_0.tar.gz
+LINK=http://mirror.nienbo.com/boost/1.63.0/boost_1_63_0.tar.gz
+#LINK=https://fossies.org/linux/misc/boost_1_63_0.tar.gz
+#LINK=https://downloads.sourceforge.net/project/boost/boost/1.63.0/boost_1_63_0.tar.gz
 
 build_install() {
 	build_install_to_include
