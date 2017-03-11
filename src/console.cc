@@ -31,8 +31,8 @@ using namespace ::std;
 using namespace ::llvm::cl;
 
 OptionCategory MyCategory("Angie options");
-opt<string> OutputFilename("o", cat(MyCategory), desc("Specify output filename"), value_desc("filename"), init("-"));
-opt<string> InputFilename(Positional, cat(MyCategory), desc("<input file>"), init(""));
+//opt<string> OutputFilename("o", cat(MyCategory), desc("Specify output filename"), value_desc("filename"), init("-"));
+opt<string> InputFilename("f", cat(MyCategory), desc("LLVM IR file to perfrom analysis on"), value_desc("filename"), init(""));
 opt<bool>   Test("t", cat(MyCategory), desc("Enable test analysis"));
 
 // laboratory.cc
@@ -50,19 +50,23 @@ int main(int argc, char** argv)
   HideUnrelatedOptions(MyCategory);
   ParseCommandLineOptions(argc, argv);
 
-  if (!Test)
+  if (Test)
   {
-    Type::InitTypeSystem();
-    playground();
+    auto files = GetExamples();
+    main_old(files);
+    return 0;
+  }
+  else if (InputFilename != "")
+  {
+    auto files = std::array<std::string,1>{InputFilename};
+    main_old(files);
     return 0;
   }
   else
   {
-#if 1
-    auto files = GetExamples();
-    main_old(files);
+    Type::InitTypeSystem();
+    playground();
     return 0;
-#endif
   }
 }
 
