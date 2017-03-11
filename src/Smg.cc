@@ -459,6 +459,55 @@ public:
   //  }
   //}
 
+  ValueId ReadValue(ValueId ptr, Type ptrType, Type tarType)
+  {
+    auto& ptrEdge = FindPtEdge(ptr, ptrType);
+
+    auto  objectId = ptrEdge.targetObjectId;
+    auto& object   = *objects.at(objectId);
+    auto  offset   = ptrEdge.targetOffset;
+
+    if (!tarType.IsPointer()) // type is just a value, so it is just a plain HV edge
+    {
+      if (HvEdge* edge = object.FindHvEdgeByOffset(offset /*, tarType */)) //TODO: we should search by type too!
+      { // HvEdge already exists        
+        return (*edge).value;
+      }
+      else
+      { // HvEdges does not yet exist -> we should attempt read reinterpretation, if there are any values
+        //TODO: should newly allocated object be covered by unknown value of object's size, \
+                or there just should not be any HvEdges at all?
+        if (object.hvEdges.size() == 0)
+        { // Unknown!
+          throw InvalidDereferenceException();
+        }
+        //TODO: read reinterpretation
+        throw NotSupportedException(
+          "HvEdges for such offset does not yet exists and read re-interpretation is not yet supproted"
+          );
+      }
+    }
+    else /* type is pointer && and is known pointer; debug if second fails */
+    {
+      if (PtEdge* edge = object.FindPtEdgeByOffset(offset))
+      {
+        handles.CreatePtEdge(PtEdge{ValueId{0},*edge});
+        return (*edge).value;
+      }
+      else
+      {
+        // Throw!
+        // Or fallback to HvEdge scenario
+        // Or use undefined value / special meaning value
+        // Find out whether it is undefined-unknown or abstracted-unknown
+        auto status = GetVc().GetAbstractionStatus(ptr);
+        std::cout << AbstractionStatusToString(status) << std::endl;
+        throw std::runtime_error{"Reading unknown pointer value"}; //HACK!, need this for argv 
+      }
+    }
+
+  }
+
   // Type is potentially not needed, because the targetPtr must be a pointer to correctly typed edge
   // We use it here to skip the ptrEdge.valueType.GetPointerElementType()
   void WriteValue(ValueId ptr, ValueId value, Type type)
