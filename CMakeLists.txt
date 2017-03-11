@@ -40,12 +40,14 @@ add_definitions(-DNOT_COMPILE_Z3)
 set(SOURCE_FILES
     src/AngieType.cc
     src/console.cc
+    src/CfgNodeBase.hh
     src/Definitions.hh
     src/DummyOperations.hh
     src/DummyState.hh
     src/enum_flags.h
     src/Exceptions.cc
     src/Exceptions.hh
+    src/MemoryGraphAnalysis.hh
     src/ForwardNullAnalysis.hh
     src/FrontedValueMapper.hh
     src/General.hh
@@ -61,6 +63,7 @@ set(SOURCE_FILES
     src/LlvmGlobals.hh
     src/LlvmType.cc
     src/main.cc
+    src/Smg.hh
     src/Smg.cc
     src/StateStorage.cc
     src/StateStorage.hh
