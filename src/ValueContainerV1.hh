@@ -118,6 +118,19 @@ public:
 
   void PrintDebug() const override;
 
+  virtual AbstractionStatus GetAbstractionStatus(ValueId value) const override
+  {
+    if (IsConstant(value))
+      return AbstractionStatus::Constant;
+
+    return AbstractionStatus::Unknown;
+  }
+
+  virtual uint64_t GetConstantIntInnerVal(ValueId value) const override
+  {
+    return constantContainer.at(value);
+  }
+
 protected:
 
   ValueId GetZero() const override { return Zero; };

@@ -22,5 +22,5 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "StateStorage.hh"
 
-vector<uptr<IState>> StatesManager::statePool{};
+std::vector<uptr<IState>> StatesManager::statePool{};
 ref_deque<IState> StatesManager::worklist{};

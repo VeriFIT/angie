@@ -22,7 +22,9 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "LlvmFrontend.hh"
 
-#include "ICfgNode.hh"
+//#include "ICfgNode.hh"
+#include "CfgNodeBase.hh"
+
 #include "LlvmGlobals.hh"
 
 #include <llvm/IR/Module.h>
@@ -90,7 +92,7 @@ public:
   static void LinkTogetherTrue(ICfgNode& prev, ICfgNode& next)
   {
     if (prev.next->next != nullptr)
-      throw runtime_error("prev Node has a succesor other then terminal node");
+      throw std::runtime_error("prev Node has a succesor other then terminal node");
     prev.next = &next;
     next.prevs.push_back(next);
   }
@@ -98,7 +100,7 @@ public:
   static void LinkTogetherFalse(ICfgNode& prev, ICfgNode& next)
   {
     if (prev.nextFalse->next != nullptr)
-      throw runtime_error("prev Node has a succesor other then terminal node");
+      throw std::runtime_error("prev Node has a succesor other then terminal node");
     prev.nextFalse = &next;
     next.prevs.push_back(next);
   }
@@ -119,7 +121,7 @@ public:
     else if (targetIndex == 1)
       LinkTogetherFalse(prev, next);
     else
-      throw out_of_range("unsupported targetIndex value");
+      throw std::out_of_range("unsupported targetIndex value");
   }
 };
 
@@ -280,7 +282,7 @@ void LlvmCfgParser::constantValuesToBeCreatedInsert(const llvm::Constant* c)
 
 OperationArgs LlvmCfgParser::GetOperArgsForInstr(const llvm::Instruction& instr)
 {
-  vector<OperArg> args;
+  std::vector<OperArg> args;
 
   //we know that this instructions outcome/value is never used
   //if (instr.user_empty())
@@ -646,6 +648,13 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
         LinkWithOrPlanProcessing(currentNode, branchInstrPtr->getSuccessor(1), 1);
       }
     }
+    break;
+    case llvm::Instruction::Ret:
+    {
+      // Create node for RET instruction, do not link with anything
+      currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr);
+    }
+    break;
     default:
       break;
     } // end of switch
@@ -779,7 +788,7 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
     LlvmCfgNode* prevNodeToLink;
     unsigned targetIndexInNode;
 
-    tie(blockToParse, prevNodeToLink, targetIndexInNode) = parseAndLinkTogether.front();
+    std::tie(blockToParse, prevNodeToLink, targetIndexInNode) = parseAndLinkTogether.front();
     parseAndLinkTogether.pop();
 
     auto& blockStartNode = ParseBasicBlock(blockToParse);
@@ -789,7 +798,7 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   DealWithConstants();
 }
 
-uptr<llvm::Module> LlvmCfgParser::OpenIrFile(string fileName)
+uptr<llvm::Module> LlvmCfgParser::OpenIrFile(std::string fileName)
 {
   llvm::SMDiagnostic err;
   llvm::LLVMContext &context = *new llvm::LLVMContext();

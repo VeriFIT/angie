@@ -74,6 +74,11 @@ public:
   {
   }
 
+  virtual uptr<IState> CreateSuccessor(ICfgNode& nextStep) const override
+  {
+    return std::make_unique<ForwardNullAnalysisState>(*this, nextStep);
+  }
+
   //------------------------------------
 
   ValueId stackCurrentAddr;
@@ -88,25 +93,18 @@ public:
   }
   ValueId Load(ValueId where)
   {
-    return hasValue.at(where);
+    try
+    {
+      // Something
+      return hasValue.at(where);
+    }
+    catch(std::out_of_range e)
+    {
+      //! We assume an invalid read if the address was not written to previously
+      throw InvalidDereferenceException();
+    }
   }
 
-
-};
-
-#define PTR_TYPE Type::CreateCharPointerType()
-
-class FnaOperationBranch : public OperationBranch<ForwardNullAnalysisState> {
-public:
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args, bool br) override
-  {
-    auto lhs = newState.GetAnyVar(args.GetOperand(0));
-    newState.ForwardNullAnalysisState::GetAnyVar(args.GetOperand(0));
-    if (br)
-      newState.GetVC().AssumeTrue(lhs);
-    else
-      newState.GetVC().AssumeFalse(lhs);
-  }
 };
 
 class FnaOperationCall : public OperationCall<ForwardNullAnalysisState> {
@@ -152,21 +150,6 @@ class FnaOperationRet : public IOperation {
   }
 };
 
-class FnaOperationBinary : public BasicOperation<ForwardNullAnalysisState, BinaryOpArgs> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const BinaryOpArgs& args) override
-  {
-    auto opts = args.GetOptions();
-
-    auto lhs  = newState.GetAnyVar(args.GetOperand(0));
-    auto rhs  = newState.GetAnyVar(args.GetOperand(1));
-    auto type = args.GetOperand(0).type;
-    
-    ValueId retVal = newState.GetVC().BinOp(lhs, rhs, type, opts);
-    newState.LinkLocalVar(args.GetTarget(), retVal);
-  }
-
-};
-
 class FnaOperationGetElementPtr : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
   {
@@ -185,13 +168,13 @@ class FnaOperationGetElementPtr : public BasicOperation<ForwardNullAnalysisState
     uint64_t offset = static_cast<uint64_t>(args.GetOptions().idTypePair.id); //HACK relaying on ValueId == constant value stored by that id    
 
     //! We assume, that getelementptr instruction is always generated as forerunner of load/store op.
-    if (newState.GetVC().IsZero(lhs))
+    if (newState.GetVc().IsZero(lhs))
     {
       throw PossibleNullDereferenceException();
     }
     
-    ValueId offsetVal     = newState.GetVC().CreateConstIntVal(offset, PTR_TYPE);
-    ValueId retVal        = newState.GetVC().Add(lhs, offsetVal, PTR_TYPE, ArithFlags::Default);
+    ValueId offsetVal     = newState.GetVc().CreateConstIntVal(offset, PTR_TYPE);
+    ValueId retVal        = newState.GetVc().Add(lhs, offsetVal, PTR_TYPE, ArithFlags::Default);
     newState.LinkLocalVar(args.GetTarget(), retVal);
   }
 };
@@ -202,10 +185,10 @@ class FnaOperationAlloca : public BasicOperation<ForwardNullAnalysisState> {
     auto count = newState.GetAnyVar(args.GetOperand(0));
     auto type  = args.GetTarget().type;
 
-    ValueId elementSize64 = newState.GetVC().CreateConstIntVal(type.GetPointerElementType().GetSizeOf(), PTR_TYPE);
-    ValueId count64       = newState.GetVC().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
-    ValueId size64        = newState.GetVC().Mul(elementSize64, count64, PTR_TYPE, ArithFlags::Default);
-    ValueId retVal        = newState.GetVC().Add(newState.stackCurrentAddr, size64, PTR_TYPE, ArithFlags::Default);
+    ValueId elementSize64 = newState.GetVc().CreateConstIntVal(type.GetPointerElementType().GetSizeOf(), PTR_TYPE);
+    ValueId count64       = newState.GetVc().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
+    ValueId size64        = newState.GetVc().Mul(elementSize64, count64, PTR_TYPE, ArithFlags::Default);
+    ValueId retVal        = newState.GetVc().Add(newState.stackCurrentAddr, size64, PTR_TYPE, ArithFlags::Default);
 
     newState.stackCurrentAddr = retVal;
     newState.LinkLocalVar(args.GetTarget(), retVal);
@@ -222,16 +205,7 @@ class FnaOperationLoad : public BasicOperation<ForwardNullAnalysisState> {
     // which value is to be loaded is but entirely up to the specific analysis
     
     auto target = newState.GetAnyVar(args.GetOperand(0));
-    ValueId value;
-    try
-    {
-      value = newState.Load(target);
-    }
-    catch(out_of_range e)
-    {
-      //! We assume an invalid read if the address was not written to previously
-      throw InvalidDereferenceException();
-    }
+    ValueId value = newState.Load(target);
 
     newState.LinkLocalVar(args.GetTarget(), value);
   }
@@ -262,7 +236,7 @@ class FnaOperationMemset : public BasicOperation<ForwardNullAnalysisState> {
     auto value  = newState.GetAnyVar(args.GetOperand(1));
     auto len    = newState.GetAnyVar(args.GetOperand(2));
 
-    auto& vc = newState.GetVC();
+    auto& vc = newState.GetVc();
     auto i = vc.CreateConstIntVal(0, PTR_TYPE);
     auto one = vc.CreateConstIntVal(1, PTR_TYPE);
     while (vc.IsCmp(len, i, PTR_TYPE, CmpFlags::UnsigGt))
@@ -271,34 +245,6 @@ class FnaOperationMemset : public BasicOperation<ForwardNullAnalysisState> {
       i      = vc.Add(i, one, PTR_TYPE, ArithFlags::Default);      
       target = vc.Add(target, one, PTR_TYPE, ArithFlags::Default);
     }
-  }
-};
-
-class FnaOperationTrunc : public BasicOperation<ForwardNullAnalysisState, TruncExtendOpArgs> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const TruncExtendOpArgs& args) override
-  {
-    //newstate
-    ArithFlags flags = args.GetOptions();
-    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
-    auto tarType     = args.GetTarget().type;
-    auto srcType     = args.GetOperand(0).type;
-    
-    ValueId retVal = newState.GetVC().TruncateInt(lhs, srcType, tarType);
-    newState.LinkLocalVar(args.GetTarget(), retVal);
-  }
-};
-
-class FnaOperationExtend : public BasicOperation<ForwardNullAnalysisState, TruncExtendOpArgs> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const TruncExtendOpArgs& args) override
-  {
-    //newstate
-    ArithFlags flags = args.GetOptions();
-    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
-    auto tarType     = args.GetTarget().type;
-    auto srcType     = args.GetOperand(0).type;
-    
-    ValueId retVal = newState.GetVC().TruncateInt(lhs, srcType, tarType);
-    newState.LinkLocalVar(args.GetTarget(), retVal);
   }
 };
 
@@ -320,50 +266,27 @@ class FnaOperationCast : public BasicOperation<ForwardNullAnalysisState, CastOpA
   }
 };
 
-class FnaOperationCmp : public BasicOperation<ForwardNullAnalysisState, CmpOpArgs> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const CmpOpArgs& args) override
-  {
-    //newstate
-    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
-    auto rhs         = newState.GetAnyVar(args.GetOperand(1));
-    auto srcType     = args.GetOperand(0).type;
-    auto flags       = args.GetOptions();
-    
-    ValueId retVal = newState.GetVC().Cmp(lhs, rhs, srcType, flags);
-    newState.LinkLocalVar(args.GetTarget(), retVal);
-  }
-};
-
-class FnaOperationNoop : public BasicOperation<ForwardNullAnalysisState, OperationArgs> {
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
-  {
-    (void)args;
-    return;
-  }
-};
-
-
 class FnaOperationFactory : public IOperationFactory {
+private:
 
-  IOperation* noop = new FnaOperationNoop();
+  IOperation* noop = new BasicOperationNoop();
   IOperation* notSupported = new OperationNotSupportedOperation();
-  IOperation* binop = new FnaOperationBinary();
+  IOperation* binop = new BasicOperationBinOp();
   IOperation* gep = new FnaOperationGetElementPtr();
   IOperation* allocaop = new FnaOperationAlloca();
   IOperation* callop = new FnaOperationCall();
-  IOperation* trunc = new FnaOperationTrunc();
-  IOperation* extend = new FnaOperationExtend();
+  IOperation* trunc = new BasicOperationTruncate();
+  IOperation* extend = new BasicOperationExtend();
   IOperation* load = new FnaOperationLoad();
   IOperation* store = new FnaOperationStore();
   IOperation* cast = new FnaOperationCast();
   IOperation* memset = new FnaOperationMemset();
-  IOperation* cmp = new FnaOperationCmp();
-  IOperation* br = new FnaOperationBranch();
+  IOperation* cmp = new BasicOperationCmp();
+  IOperation* br = new BasicOperationBranch();
   IOperation* ret = new FnaOperationRet();
+
 public:
-  /*ctr*/ FnaOperationFactory()
-  {
-  }
+
   // Inherited via IOperationFactory
   virtual IOperation & Ret() override { return *ret; }
   virtual IOperation & Br()  override { return *br; }

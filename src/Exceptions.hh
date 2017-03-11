@@ -43,5 +43,6 @@ public:
 class NotSupportedException : public std::logic_error {
 public:
   NotSupportedException() : logic_error("Not supported") {}
-  NotSupportedException(const char* name, const char* type);
+  NotSupportedException(const char* nameOfMethod, const char* realTypeOfObject);
+  NotSupportedException(const char* whatIsNotSupported);
 };
