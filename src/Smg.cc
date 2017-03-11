@@ -377,6 +377,16 @@ public:
     assert(objectHandle != nullptr); //TODO: maybe an exception?
     return *objectHandle;
   }
+  
+  // Returns PtEdge [object, offset, type] corresponding to given pointer value and type
+  // The given pointer must be bound to an existing object, otherwise it is an undefined behaviour!
+  const PtEdge& FindPtEdge(ValueId ptr, Type type)
+  {
+    // The given pointer must be bound to an existing object
+    auto objectHandle = handles.FindPtEdgeByValueType(ptr, type);
+    assert(objectHandle != nullptr); //TODO: maybe an exception?
+    return *objectHandle;
+  }
 
   // Returns new pointer to different field [baseOffset + offset, type] of the same object
   auto CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type)
