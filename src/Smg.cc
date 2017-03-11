@@ -238,7 +238,7 @@ private:
     }
     else
     {
-      nullptr;
+      return (decltype(&*res))nullptr;
     }
   }
   template<typename RangeT, typename ValueT = typename RangeT::value_type>
@@ -252,7 +252,8 @@ private:
     }
     else
     {
-      nullptr;
+      return (decltype(&*res))nullptr;
+    }
     }
   }
   /*
