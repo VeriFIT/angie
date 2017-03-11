@@ -107,19 +107,6 @@ public:
 
 };
 
-class FnaOperationBranch : public OperationBranch<ForwardNullAnalysisState> {
-public:
-  virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args, bool br) override
-  {
-    auto lhs = newState.GetAnyVar(args.GetOperand(0));
-    newState.ForwardNullAnalysisState::GetAnyVar(args.GetOperand(0));
-    if (br)
-      newState.GetVc().AssumeTrue(lhs);
-    else
-      newState.GetVc().AssumeFalse(lhs);
-  }
-};
-
 class FnaOperationCall : public OperationCall<ForwardNullAnalysisState> {
 public:
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const CallOpArgs& args) override
@@ -295,7 +282,7 @@ private:
   IOperation* cast = new FnaOperationCast();
   IOperation* memset = new FnaOperationMemset();
   IOperation* cmp = new BasicOperationCmp();
-  IOperation* br = new FnaOperationBranch();
+  IOperation* br = new BasicOperationBranch();
   IOperation* ret = new FnaOperationRet();
 
 public:

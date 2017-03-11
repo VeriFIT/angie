@@ -232,4 +232,17 @@ class BasicOperationCmp : public BasicOperation<IState, CmpOpArgs> {
   }
 };
 
+class BasicOperationBranch : public OperationBranch<IState> {
+public:
+  virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args, bool br) override
+  {
+    auto lhs = newState.GetAnyVar(args.GetOperand(0));
+    newState.GetAnyVar(args.GetOperand(0));
+    if (br)
+      newState.GetVc().AssumeTrue(lhs);
+    else
+      newState.GetVc().AssumeFalse(lhs);
+  }
+};
+
 // ================== ^^^^^ COMMON CODE ^^^^^ ===============

@@ -186,7 +186,7 @@ private:
   IOperation* gep      = new BasicOperationNoop();
   IOperation* callop   = new BasicOperationNoop();
   IOperation* cast     = new BasicOperationNoop();
-  IOperation* br       = new BasicOperationNoop();
+  IOperation* br       = new BasicOperationBranch();
   IOperation* ret      = new BasicOperationNoop();
 
 public:
