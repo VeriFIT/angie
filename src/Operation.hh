@@ -121,6 +121,17 @@ public:
   }
 };
 
+template<typename StateT, typename OperArgsT = OperationArgs>
+class OperationRet : public IOperation, OperationHelpers<StateT, OperArgsT> {
+  void Execute(IState& lastSt, const OperArgsT& args)
+  {
+    assert(!lastSt.GetNextStep().HasTwoNext()); //TODO: comment
+
+    uptr<IState> successor = lastSt.CreateSuccessor(lastSt.GetStackRetNode());
+    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
+  }
+};
+
 template<typename StateT>
 class OperationCall : public IOperation, OperationHelpers<StateT, CallOpArgs> {
 public:
@@ -140,10 +151,11 @@ private:
     {
       auto& nextJump = lastSt.GetFuncMapping().GetFunction(lastSt.GetAnyVar(args.GetOptions())).cfg;
       successor = lastSt.CreateSuccessor(nextJump);
+
+      // Prepares the instruction-after-call to be pushed on the stack
+      (*successor).SetStackRetNode(lastSt.GetNextStep().GetNext());
     }
     this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
-
-    return;
   }
 };
 

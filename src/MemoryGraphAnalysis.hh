@@ -62,7 +62,8 @@ public:
     StateBase(
       state, 
       nextCfgNode),
-    graph(state.graph)
+    graph(state.graph),
+    stack(state.stack)
   {
   }
 
@@ -164,6 +165,39 @@ public:
   ValueId CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type)
   {
     return graph.CreateDerivedPointer(basePtr, offset, type).first;
+  }
+
+  std::vector<std::tuple<Mapper,FrontendValueId,ICfgNode&>> stack;
+  ICfgNode* stackRetNode;
+
+  virtual ICfgNode& GetStackRetNode() const override
+  {
+    return std::get<2>(stack.back());
+  }
+  virtual void      SetStackRetNode(ICfgNode& node) override 
+  {
+    stackRetNode = &node;
+  }
+
+  void StackPush(FrontendValueId retFrontendId)
+  {
+    //TODO: push mappins in graph
+    stack.emplace_back(std::move(this->localMapping), retFrontendId, *stackRetNode);
+    this->localMapping = decltype(this->localMapping){};
+  }
+
+  void StackPop(ValueId retValId)
+  {
+    //TODO: pop mappins in graph
+    this->localMapping = std::get<0>(stack.back());
+    this->localMapping.LinkToValueId(std::get<1>(stack.back()), retValId);
+    stack.pop_back();
+  }
+  void StackPop()
+  {
+    //TODO: pop mappins in graph
+    this->localMapping = std::get<0>(stack.back());
+    stack.pop_back();
   }
 
 };
@@ -287,7 +321,6 @@ class MemGraphOpCast : public BasicOperation<MemoryGraphAnalysisState, CastOpArg
 
 
 class FnaxOperationCall : public OperationCall<MemoryGraphAnalysisState> {
-public:
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const CallOpArgs& args) override
   {
     auto callTargetId = args.GetOptions().id;
@@ -295,11 +328,37 @@ public:
     
     auto& func = newState.GetFuncMapping().GetFunction(newState.GetAnyVar(args.GetOptions()));
 
+    std::vector<ValueId> callArgs;
     int i = 0;
     for (auto& param : func.params.GetArgs())
-    {
-      newState.LinkLocalVar(param.idTypePair, newState.GetAnyVar(args.GetOperand(i)));
+    {      
+      callArgs.push_back(newState.GetAnyVar(args.GetOperand(i)));
       i++;
+    } 
+    newState.StackPush(args.GetTarget().id);
+    i = 0;
+    for (auto& param : func.params.GetArgs())
+    {      
+      newState.LinkLocalVar(
+        param.idTypePair, 
+        callArgs[i]
+        );
+      i++;
+    }
+  }
+};
+
+class MemGraphOpRet : public OperationRet<MemoryGraphAnalysisState> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override
+  {
+    if (args.GetArgs().size() > 2)
+    {
+      auto retVal = newState.GetAnyVar(args.GetOperand(0));
+      newState.StackPop(retVal);
+    }
+    else
+    {
+      newState.StackPop();
     }
   }
 };
@@ -323,7 +382,7 @@ private:
 
   IOperation* callop   = new FnaxOperationCall();
   IOperation* br       = new BasicOperationBranch();
-  IOperation* ret      = new BasicOperationNoop();
+  IOperation* ret      = new MemGraphOpRet();
 
 public:
   // Inherited via IOperationFactory

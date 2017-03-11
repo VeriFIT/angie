@@ -648,6 +648,13 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
         LinkWithOrPlanProcessing(currentNode, branchInstrPtr->getSuccessor(1), 1);
       }
     }
+    break;
+    case llvm::Instruction::Ret:
+    {
+      // Create node for RET instruction, do not link with anything
+      currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr);
+    }
+    break;
     default:
       break;
     } // end of switch

@@ -180,7 +180,8 @@ public:
   /*ctr*/ OperationArgs() = default;
   /*ctr*/ OperationArgs(std::vector<OperArg>&& args) : args{args} {}
 
-  std::vector<OperArg>&     GetArgs()          { return args; }
+        std::vector<OperArg>& GetArgs()        { return args; }
+  const std::vector<OperArg>& GetArgs()  const { return args; }
 
   const FrontendIdTypePair& GetTarget()  const { return args[0].idTypePair; }
   const OperArg&            GetOptions() const { return args[1]; }

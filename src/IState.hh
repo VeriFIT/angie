@@ -84,6 +84,9 @@ public:
   virtual void PushFrame(int info) { throw NotImplementedException(); }
   //pozn lokace návratu musí být uložena ve stavu, na adekvátní urovni, přilepena na stack frame
   virtual void PopFrame(FrontendIdTypePair retVar) { throw NotImplementedException(); }
+
+  virtual ICfgNode& GetStackRetNode() const         { throw NotImplementedException(); }
+  virtual void      SetStackRetNode(ICfgNode& node) { throw NotImplementedException(); }
 };
 
 class StateBase : public IState {
@@ -92,14 +95,17 @@ private:
   StateCondition condition = StateCondition::New;
 
   Mapper&     globalMapping;
-  Mapper      localMapping;
   FuncMapper& funcMapping;
-  IValueContainer& vc;
+  IValueContainer& vc; 
+  //TODO: VC should be copied when stated is cloned?! -> how about other parts of program, like Smg,... each has own reference
+  // ... we will probaly end up with thread local "current VC reference" and the owner will be state
 
   //ICfgNode& lastCfgNode;
   ICfgNode& nextCfgNode; 
 
 protected:
+
+  Mapper      localMapping;
 
   // Basic constructor
   /*ctr*/ StateBase(
