@@ -7,8 +7,8 @@ fi
 # Name of the library/package/software
 PKG_NAME=range            # DEFAULT: $REPO_NAME
 :                         # Github repo
-REPO_AUTHOR=ericniebler   # google
-REPO_NAME=range-v3        # googletest
+REPO_AUTHOR=Microsoft     # google
+REPO_NAME=Range-V3-VS2015 # googletest
 BRANCH=                   # DEFAULT: master
 :                         # Archive
 FORMAT=                   # DEFAULT: tar.gz
