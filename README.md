@@ -46,22 +46,16 @@ Dependencies install
 For simple deployment, `install_*` helpers in `utils` directory will handle installation of CMake built or include-only libraries. Main motivation was repetitive fixing of Travis-CI and custom *nix server deployment.
 Currently needed dependencies to get Angie compiled:
 ```sh
-# installation prefix, select any path $HOME/local, ...
+# installation prefix for script, select any path, $HOME/local, ...
 export PREFIX=$PWD/dependencies
 # install missing libraries
-# install google test (gtest)
 sh utils/install_main.sh gtest
-# install boost
 sh utils/install_main.sh boost
-# install range-v3-vs2015 [Win] or range-v3 
+# install range-v3-vs2015 [MS VC14+ support] or range-v3 [clang/gcc C++14]
 sh utils/install_main.sh range-v3
-# install gsl or gsl-lite [custom fork with macros disabled]
+# install gsl [C++14] or gsl-lite [C++11, custom fork with macros disabled]
 sh utils/install_main.sh gsl-lite
-# now for CMAke to find the files do
-# A) export all the vars, which will also set CPATH for compilers
-sh utils/install_main.sh export
-$(sh utils/install_main.sh export)
-# B) export or '-D'set CMAKE_PREFIX_PATH or CMAKE_INCLUDE_PATH
+# export or '-D'set CMAKE_PREFIX_PATH or CMAKE_INCLUDE_PATH
 export CMAKE_PREFIX_PATH=$PREFIX
 ```
 
