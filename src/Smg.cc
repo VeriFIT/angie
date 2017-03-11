@@ -412,8 +412,10 @@ public:
     // assign a new ObjectId and new ValueId representing the resultant pointer
     //TODO: different aquisition of ValueId based on MemorySpace
 
+    auto ptrToTypeT = Type::CreatePointerTo(type);
+
     ObjectId oid = ObjectId::GetNextId();
-    ValueId  ptr = ValueId ::GetNextId();
+    ValueId  ptr = GetVc().CreateVal(ptrToTypeT);//ValueId ::GetNextId();
 
     // move from new uptr<Object>
     // create new object and place it into map
@@ -421,7 +423,9 @@ public:
 
     // initialize the object
     obj.id = oid;
-    obj.size = type.GetSizeOf();
+    obj.size = GetVc().CreateConstIntVal(type.GetSizeOf());
+
+    handles.CreatePtEdge(PtEdge{ValueId{0}, ptr, ptrToTypeT, oid, GetVc().GetZero(PTR_TYPE)});
 
     return ptr;
   }
@@ -459,8 +463,12 @@ public:
   // We use it here to skip the ptrEdge.valueType.GetPointerElementType()
   void WriteValue(ValueId ptr, ValueId value, Type type)
   {
-    auto& ptrEdge = FindPtEdge(ptr);
+    auto& ptrEdge = FindPtEdge(ptr, Type::CreatePointerTo(type));
 
+    WriteValue(ptrEdge, value, type);
+  }
+  void WriteValue(const PtEdge& ptrEdge, ValueId value, Type type)
+  {
     // The pointer target type and the type of value beeing written must not differ
     assert(ptrEdge.valueType.GetPointerElementType() == type);
 
@@ -470,7 +478,7 @@ public:
     auto& object   = *objects.at(objectId);
     auto  offset   = ptrEdge.targetOffset;
 
-    if (!ptrEdge.valueType.IsPointer()) // it is just a plain HV edge
+    if (!type.IsPointer()) // type is just a value, so it is just a plain HV edge
     {
       object.CreateOrModifyHvEdge(offset, value, type);
 
@@ -489,7 +497,7 @@ public:
     }
     else /* type is pointer && and is known pointer; debug if second fails */
     {
-      if (PtEdge* assignedPtr = handles.FindPtEdgeByOffset(value))
+      if (PtEdge* assignedPtr = handles.FindPtEdgeByValue(value))
       {
         object.CreateOrModifyPtEdge(offset, *assignedPtr);
       }
@@ -501,7 +509,7 @@ public:
         // Find out whether it is undefined-unknown or abstracted-unknown
         auto status = GetVc().GetAbstractionStatus(value);
         std::cout << AbstractionStatusToString(status) << std::endl;
-        throw std::runtime_error{"Writing unknown pointer value"};
+        //throw std::runtime_error{"Writing unknown pointer value"}; //HACK!, need this for argv 
       }
     }
 
