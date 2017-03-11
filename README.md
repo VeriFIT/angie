@@ -18,9 +18,12 @@ The program is licensed under GNU LGPLv3+ and makes use of
 [LLVM](http://llvm.org), 
 [Boost](http://boost.org), 
 [Range-v3](https://github.com/ericniebler/range-v3) 
+\[[Range-v3-VS2015](https://github.com/microsoft/Range-V3-VS2015)\], 
+[GSL](https://github.com/Microsoft/GSL) 
+\[[GSL-lite](https://github.com/microsoft/Range-V3-VS2015)\]
+\[[V11-GSL](https://github.com/viboes/GSL)\]
 and possibly also 
 [Z3](https://github.com/Z3Prover/z3), 
-[GSL](https://github.com/Microsoft/GSL), 
 [CRoaring](https://github.com/RoaringBitmap/CRoaring). 
 All those are to my best knowledge distributed under compatible licenses.
 
@@ -45,17 +48,20 @@ Currently needed dependencies to get Angie compiled:
 ```sh
 # installation prefix
 export PREFIX=$HOME/local
-# export all the vars
-sh utils/install_main.sh export
-$(sh utils/install_main.sh export)
 # install google test (gtest)
 sh utils/install_main.sh gtest
 # install boost
 sh utils/install_main.sh boost
-# install range-v3
+# install range-v3-vs2015 [Win] or range-v3 
 sh utils/install_main.sh range-v3
-# install gsl or gsl-lite
+# install gsl or gsl-lite [custom fork with macros disabled]
 sh utils/install_main.sh gsl-lite
+# now for CMAke to find the files do
+# A) export all the vars, which will also set CPATH for compilers
+sh utils/install_main.sh export
+$(sh utils/install_main.sh export)
+# B) export or '-D'set CMAKE_PREFIX_PATH or CMAKE_INCLUDE_PATH
+export CMAKE_PREFIX_PATH=$PREFIX
 ```
 
 Contribution and credits
