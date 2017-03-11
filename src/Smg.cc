@@ -49,7 +49,7 @@ namespace Impl {
 class Object;
 typedef Object IObject;
 
-typedef size_t ObjectSize;
+typedef ValueId ObjectSize;
 typedef int ObjectType; // not used
 
 class ObjectIdToken;
@@ -396,7 +396,7 @@ public:
     auto derivedValue  = GetVc().Add(basePtr              , derivedOffset, PTR_TYPE, ArithFlags::Default);
     auto& derEdge = handles.CreatePtEdge(PtEdge{baseEdge, derivedValue, type, derivedOffset});
     //std::vector<int>().em
-    return std::make_pair(derivedValue, derEdge);
+    return std::make_pair<decltype(derivedValue), ref_wr<std::decay<decltype(derEdge)>::type>>(std::move(derivedValue), derEdge);
   }
 
   enum class MemorySpace : int8_t {
