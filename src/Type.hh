@@ -61,7 +61,7 @@ public:
   static Type CreatePointerTo(Type target);
   static Type CreateArrayOf(Type target, uint64_t size);
 
-  bool operator==(const Type& rhs)
+  bool operator==(const Type& rhs) const
   {
     return GetFrontendId() == rhs.GetFrontendId();
   }
@@ -114,7 +114,7 @@ public:
   static Type CreateIntegerType(unsigned bitwidth);
   static Type CreatePointerTo(Type target);
 
-  bool operator==(const Type& rhs)
+  bool operator==(const Type& rhs) const
   {
     return GetFrontendId() == rhs.GetFrontendId();
   }
