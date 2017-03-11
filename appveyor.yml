@@ -1,0 +1,44 @@
+version: 0.1.3.{build}
+branches:
+  only:
+  - master
+  - develop
+image: Visual Studio 2017
+configuration:
+- Debug
+- Release
+init:
+- >-
+    set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%
+    set MSYSTEM=MINGW64
+environment:
+  matrix:
+  - COMPILER: msvc
+    GENERATOR: Visual Studio 15 2017 Win64
+    CFLAGS: /MP
+    CXXFLAGS: /MP
+  - COMPILER: mingw
+    GENERATOR: MSYS Makefiles
+install:
+  - mkdir -p build/lib build/include && cd build
+#export PREFIX
+  - set LIB_DIR=%CD%/lib
+  - set INC_DIR=%CD%/include
+  - set PATH=%CD%/bin;%CD%/lib;%PATH%
+#install google test (gtest)
+  - sh utils/install_main.sh gtest
+#install boost
+  - sh utils/install_main.sh boost
+#install range-v3
+  - sh utils/install_main.sh range-v3-vs2015
+#install gsl
+  - sh utils/install_main.sh gsl
+- >-
+    cmake -DCMAKE_BUILD_TYPE="%CONFIGURATION%" %CMAKE_OPTS% -G "%GENERATOR%" ../
+build_script:
+- if %COMPILER% == "mingw" ( cmake --build . -- -j4 ) else ( cmake --build . )
+test_script:
+- cmake --build . --target tests
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
