@@ -46,8 +46,9 @@ Dependencies install
 For simple deployment, `install_*` helpers in `utils` directory will handle installation of CMake built or include-only libraries. Main motivation was repetitive fixing of Travis-CI and custom *nix server deployment.
 Currently needed dependencies to get Angie compiled:
 ```sh
-# installation prefix
-export PREFIX=$HOME/local
+# installation prefix, select any path $HOME/local, ...
+export PREFIX=$PWD/dependencies
+# install missing libraries
 # install google test (gtest)
 sh utils/install_main.sh gtest
 # install boost
