@@ -254,6 +254,19 @@ private:
     {
       return (decltype(&*res))nullptr;
     }
+  }
+  template<typename RangeT, typename ValueT = typename RangeT::value_type>
+  static auto FindEdgeByValueType(RangeT& range, ValueId value, Type type)
+  {
+    //using namespace ::ranges;
+    auto res = std::find_if(std::begin(range), std::end(range), [=](const ValueT& ed) { return ed.value == value && ed.valueType == type; });
+    if (res != std::end(range))
+    {
+      return &*res;
+    }
+    else
+    {
+      return (decltype(&*res))nullptr;
     }
   }
   /*
@@ -296,6 +309,9 @@ public:
 
         PtEdge* FindPtEdgeByOffset(ValueId offset)       { return FindEdgeByOffset(ptEdges, offset); }
   const PtEdge* FindPtEdgeByOffset(ValueId offset) const { return FindEdgeByOffset(ptEdges, offset); }
+  
+        PtEdge* FindPtEdgeByValueType (ValueId value, Type type)       { return FindEdgeByValueType (ptEdges, value, type); }
+  const PtEdge* FindPtEdgeByValueType (ValueId value, Type type) const { return FindEdgeByValueType (ptEdges, value, type); }
 
   template<typename... Args>
   HvEdge& CreateHvEdge(Args&&... args) { return CreateEdge(hvEdges, std::forward<Args>(args)...); }
