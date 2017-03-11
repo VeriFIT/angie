@@ -49,7 +49,8 @@ public:
       nextCfgNode, 
       vc, 
       globalMapping,
-      funcMapping)
+      funcMapping),
+    graph{&vc}
   {
   }
 
@@ -82,12 +83,11 @@ public:
     graph.WriteValue(where, what, ofType);
   }
 
-  ValueId Load(ValueId where)
+  ValueId Load(ValueId ptr, Type ptrType, Type tarType)
   {
     try
     {
-      // Something
-      return ValueId{};
+      return graph.ReadValue(ptr, ptrType, tarType);
     }
     catch(out_of_range e)
     {
@@ -96,24 +96,74 @@ public:
     }
   }
 
-  ValueId Alloca(Type type)
+  ValueId Alloca(Type type, ValueId count)
   {
+    auto& vc = GetVc();
+    if (vc.GetAbstractionStatus(count) != AbstractionStatus::Constant)
+    {
+      throw NotSupportedException("Alloca with abstract count is not supported");
+    }
+    if (vc.GetConstantIntInnerVal(count) != 1)
+    {
+      throw NotSupportedException("Alloca with count != 1 is not supported");
+    }
     return graph.AllocateObject(type);
   }
 
-  ValueId Malloc()
+  ValueId Malloc(ValueId size)
   {
-    return ValueId{};
+    auto& vc = GetVc();
+    if (vc.GetAbstractionStatus(size) != AbstractionStatus::Constant)
+    {
+      throw NotSupportedException("Malloc with abstract size is not supported");
+    }
+    auto byteArrayT = Type::CreateArrayOf(INT8_TYPE, vc.GetConstantIntInnerVal(size));
+    return graph.AllocateObject(byteArrayT);
   }
 
-  ValueId Calloc()
+  ValueId Calloc(ValueId size)
   {
-    return ValueId{};
+    auto mem = Malloc(size);
+    Memclear(mem, size);
+    return mem;
   }
 
   ValueId Realloc()
   {
-    return ValueId{};
+    throw NotSupportedException("Realloc is not supported");
+  }
+
+  void Memset(ValueId target, ValueId value, ValueId size)
+  {
+    auto& vc = GetVc();
+    if (vc.IsZero(value))
+    {
+      return Memclear(target, size);
+    }
+    if (vc.GetAbstractionStatus(size) != AbstractionStatus::Constant)
+    {
+      throw NotSupportedException("Memset of arbitraty value with abstract size is not supported");
+    }
+
+    // size is constant    
+    throw NotSupportedException("Memset of arbitraty value is not supported");
+  }
+
+  void Memclear(ValueId target, ValueId size)
+  {
+    auto& vc = GetVc();
+    if (vc.GetAbstractionStatus(size) != AbstractionStatus::Constant)
+    {
+      throw NotSupportedException("Memclear with abstract size is not supported");
+    }
+    auto byteArrayT = Type::CreateArrayOf(INT8_TYPE, vc.GetConstantIntInnerVal(size));
+    auto& edge = graph.CreateDerivedPointer(target, vc.GetZero(PTR_TYPE), Type::CreatePointerTo(byteArrayT)).second;
+    graph.WriteValue(edge, vc.GetZero(INT8_TYPE), byteArrayT);
+  }
+
+  ValueId CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type)
+  {
+    return graph.CreateDerivedPointer(basePtr, offset, type).first;
   }
 
 };
@@ -127,10 +177,13 @@ class MemGraphOpLoad : public BasicOperation<MemoryGraphAnalysisState> {
     // it in fact means just to bind an existing value to another FrontendValueId
     // which value is to be loaded is but entirely up to the specific analysis
 
-    auto target = newState.GetAnyVar(args.GetOperand(0));
-    ValueId value = newState.Load(target);
+    auto ptr = args.GetOperand(0);
+    auto reg = args.GetTarget();
 
-    newState.LinkLocalVar(args.GetTarget(), value);
+    auto ptrId = newState.GetAnyVar(ptr);
+    ValueId value = newState.Load(ptrId, ptr.type, reg.type);
+
+    newState.LinkLocalVar(reg, value);
   }
 };
 
@@ -149,23 +202,105 @@ class MemGraphOpStore : public BasicOperation<MemoryGraphAnalysisState> {
   }
 };
 
-// ================== \/ \/ \/ COMMON CODE \/ \/ \/ ===============
-
-// ================== ^^^^^ COMMON CODE ^^^^^ ===============
-
 class MemGraphOpAlloca : public BasicOperation<MemoryGraphAnalysisState> {
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
   {
     auto count = newState.GetAnyVar(args.GetOperand(0));
     auto type  = args.GetTarget().type;
 
-    ValueId elementSize64 = newState.GetVc().CreateConstIntVal(type.GetPointerElementType().GetSizeOf(), PTR_TYPE);
     ValueId count64       = newState.GetVc().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
-    ValueId size64        = newState.GetVc().Mul(elementSize64, count64, PTR_TYPE, ArithFlags::Default);
-    ValueId retVal        = newState.Alloca(type); //! Not enough!
-    //TODO: count is unhandled... probably solve this by converting type to array<type, count>
+    ValueId retVal        = newState.Alloca(type.GetPointerElementType(), count64);
 
     newState.LinkLocalVar(args.GetTarget(), retVal);
+  }
+};
+
+class MemGraphOpMemset : public BasicOperation<MemoryGraphAnalysisState> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override
+  {
+    // this operation should somehow Store a value in register to certain address in memory
+    // the way for the operation to handle such a "write" is completely analysis specific
+
+    auto target = newState.GetAnyVar(args.GetOperand(0));
+    auto value  = newState.GetAnyVar(args.GetOperand(1));
+    auto len    = newState.GetAnyVar(args.GetOperand(2));
+
+    newState.Memset(target, value, len);
+  }
+};
+
+// ================== \/ \/ \/ COMMON CODE \/ \/ \/ ===============
+
+// ================== ^^^^^ COMMON CODE ^^^^^ ===============
+
+class MemGraphOpGetElementPtr : public BasicOperation<MemoryGraphAnalysisState> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override
+  {
+    // consider packing and aligment!!!
+
+    //auto numOfIndexes = args.size() - 2;
+
+    //auto lvl0Size = args.GetOperand(0).type.GetPointerElementType().GetSizeOf();
+
+    //if (args.GetOperand(0).type.IsStruct())
+    //{
+    //  auto lvl1Size = args.GetOperand(0).type.GetPointerElementType().GetStructElementOffset(/*and here index*/);
+    //}
+
+    auto source          = args.GetOperand(0);
+    auto sourceId        = newState.GetAnyVar   (source);
+    uint64_t offset      = static_cast<uint64_t>(args.GetOptions().idTypePair.id); //HACK relaying on ValueId == constant value stored by that id    
+
+    //! We assume, that getelementptr instruction is always generated as forerunner of load/store op.
+    if (newState.GetVc().IsZero(sourceId))
+    {
+      throw PossibleNullDereferenceException();
+    }
+
+    ValueId offsetVal     = newState.GetVc().CreateConstIntVal(offset, PTR_TYPE);
+    ValueId retVal        = newState.CreateDerivedPointer(sourceId, offsetVal, args.GetTarget().type);
+
+    newState.LinkLocalVar(args.GetTarget(), retVal);
+  }
+};
+
+class MemGraphOpCast : public BasicOperation<MemoryGraphAnalysisState, CastOpArgs> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const CastOpArgs& args) override  
+  {
+    auto lhs           = newState.GetAnyVar(args.GetOperand(0));
+    auto opts          = args.GetOptions();
+    //ArithFlags flags = static_cast<ArithFlags>(static_cast<uint64_t>(args[1].id) & 0xffff);
+    auto tarType     = args.GetTarget().type;
+    auto srcType     = args.GetOperand(0).type;
+
+    if (opts.opKind == CastOpKind::BitCast)
+    {
+      newState.LinkLocalVar(args.GetTarget(), lhs);
+      newState.CreateDerivedPointer(lhs, newState.GetVc().GetZero(PTR_TYPE), tarType);
+    }
+    else if(opts.opKind == CastOpKind::Extend)      
+      newState.LinkLocalVar(args.GetTarget(), lhs); //TODO: hack!
+    else
+      throw NotImplementedException();
+  }
+};
+
+
+class FnaxOperationCall : public OperationCall<MemoryGraphAnalysisState> {
+public:
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const CallOpArgs& args) override
+  {
+    auto callTargetId = args.GetOptions().id;
+    auto callTargetType = args.GetOptions().type;
+    
+    auto& func = newState.GetFuncMapping().GetFunction(newState.GetAnyVar(args.GetOptions()));
+
+    int i = 0;
+    for (auto& param : func.params.GetArgs())
+    {
+      newState.LinkLocalVar(param.idTypePair, newState.GetAnyVar(args.GetOperand(i)));
+      i++;
+    }
   }
 };
 
@@ -176,16 +311,17 @@ private:
   IOperation* noop     = new BasicOperationNoop();
   IOperation* load     = new MemGraphOpLoad();
   IOperation* store    = new MemGraphOpStore();
-  IOperation* allocaop = new MemGraphOpAlloca();
   IOperation* binop    = new BasicOperationBinOp();
+  IOperation* cmp      = new BasicOperationCmp();
   IOperation* trunc    = new BasicOperationTruncate();
   IOperation* extend   = new BasicOperationExtend();
-  IOperation* cmp      = new BasicOperationCmp();
+  IOperation* allocaop = new MemGraphOpAlloca();
+  IOperation* memset   = new MemGraphOpMemset();
 
-  IOperation* memset   = new BasicOperationNoop();
-  IOperation* gep      = new BasicOperationNoop();
-  IOperation* callop   = new BasicOperationNoop();
-  IOperation* cast     = new BasicOperationNoop();
+  IOperation* gep      = new MemGraphOpGetElementPtr();
+  IOperation* cast     = new MemGraphOpCast();
+
+  IOperation* callop   = new FnaxOperationCall();
   IOperation* br       = new BasicOperationBranch();
   IOperation* ret      = new BasicOperationNoop();
 

@@ -186,6 +186,7 @@
     <ClCompile Include="..\..\croaring\roaring.c">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\src\precompall.cc">
       <PrecompiledHeader>Create</PrecompiledHeader>

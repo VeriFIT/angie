@@ -132,7 +132,7 @@ void main_old(gsl::span<std::string> files)
   //Verify("examples/01_mincase_01_nullptr_dereference[dead].ll");
   for (auto& file : files)
   {
-    Verify<FnaOperationFactory, ForwardNullAnalysisState>(file);
+    //Verify<FnaOperationFactory, ForwardNullAnalysisState>(file);
     Verify<MemGraphOpFactory, MemoryGraphAnalysisState>(file);
   }
 

@@ -298,17 +298,17 @@ public:
   const auto& GetHvOutEdges() const { return hvEdges; }
   const auto& GetPtOutEdges() const { return ptEdges; }
 
-        HvEdge* FindHvEdgeByValue (ValueId offset)       { return FindEdgeByValue(hvEdges, offset); }
-  const HvEdge* FindHvEdgeByValue (ValueId offset) const { return FindEdgeByValue(hvEdges, offset); }
+        HvEdge* FindHvEdgeByValue     (ValueId value )       { return FindEdgeByValue (hvEdges, value ); }
+  const HvEdge* FindHvEdgeByValue     (ValueId value ) const { return FindEdgeByValue (hvEdges, value ); }
 
-        PtEdge* FindPtEdgeByValue (ValueId offset)       { return FindEdgeByValue(ptEdges, offset); }
-  const PtEdge* FindPtEdgeByValue (ValueId offset) const { return FindEdgeByValue(ptEdges, offset); }
+        PtEdge* FindPtEdgeByValue     (ValueId value )       { return FindEdgeByValue (ptEdges, value ); }
+  const PtEdge* FindPtEdgeByValue     (ValueId value ) const { return FindEdgeByValue (ptEdges, value ); }
 
-        HvEdge* FindHvEdgeByOffset(ValueId offset)       { return FindEdgeByOffset(hvEdges, offset); }
-  const HvEdge* FindHvEdgeByOffset(ValueId offset) const { return FindEdgeByOffset(hvEdges, offset); }
+        HvEdge* FindHvEdgeByOffset    (ValueId offset)       { return FindEdgeByOffset(hvEdges, offset); }
+  const HvEdge* FindHvEdgeByOffset    (ValueId offset) const { return FindEdgeByOffset(hvEdges, offset); }
 
-        PtEdge* FindPtEdgeByOffset(ValueId offset)       { return FindEdgeByOffset(ptEdges, offset); }
-  const PtEdge* FindPtEdgeByOffset(ValueId offset) const { return FindEdgeByOffset(ptEdges, offset); }
+        PtEdge* FindPtEdgeByOffset    (ValueId offset)       { return FindEdgeByOffset(ptEdges, offset); }
+  const PtEdge* FindPtEdgeByOffset    (ValueId offset) const { return FindEdgeByOffset(ptEdges, offset); }
   
         PtEdge* FindPtEdgeByValueType (ValueId value, Type type)       { return FindEdgeByValueType (ptEdges, value, type); }
   const PtEdge* FindPtEdgeByValueType (ValueId value, Type type) const { return FindEdgeByValueType (ptEdges, value, type); }
