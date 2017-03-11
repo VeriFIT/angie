@@ -40,13 +40,13 @@ public:
   virtual ICfgNode& GetNextTrue() const override
   {
     if (nextFalse == nullptr)
-      throw runtime_error("not branch");
+      throw std::runtime_error("not branch");
     return *next;
   }
   virtual ICfgNode& GetNextFalse() const override
   {
     if (nextFalse == nullptr)
-      throw runtime_error("not branch");
+      throw std::runtime_error("not branch");
     return *nextFalse;
   }
 

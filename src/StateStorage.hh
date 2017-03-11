@@ -26,8 +26,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "General.hh"
 #include "IState.hh"
 
-using namespace ::std;
-
 class NewStateCfgNodePair {
 public:
   uptr<IState> c; // newly created program state
@@ -41,7 +39,7 @@ enum class WorklistPriority {
 };
 
 class StatesManager {
-  static vector<uptr<IState>> statePool;
+  static std::vector<uptr<IState>> statePool;
   static ref_deque<IState> worklist;
 
   ref_vector<IState> localStates;

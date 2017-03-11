@@ -89,7 +89,7 @@ public:
     {
       return graph.ReadValue(ptr, ptrType, tarType);
     }
-    catch(out_of_range e)
+    catch(std::out_of_range e)
     {
       //! We assume an invalid read if the address was not written to previously
       throw InvalidDereferenceException();

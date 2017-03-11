@@ -36,9 +36,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/utility/string_view.hpp>
 #include <gsl/gsl>
 
-using namespace ::std;
-//using namespace ::boost;
-
 #include "Definitions.hh"
 #include "General.hh"
 #include "Values.hh"
@@ -49,8 +46,22 @@ using namespace ::std;
 #include "FrontedValueMapper.hh"
 #include "StateStorage.hh"
 
+//#define USE_Z3
+#if defined(USE_Z3)
+#include "ValuesZ3.hh"
+using ValContT = Z3ValueContainer;
+#else
+#include "ValueContainerV1.hh"
+using ValContT = ValueContainer;
+#endif
+
+#include "ForwardNullAnalysis.hh"
+#include "MemoryGraphAnalysis.hh"
+
 // queue of states waiting for processing
 ref_queue<IState> toProcess{};
+
+ValContT vc;
 
 void VerificationLoop()
 {
@@ -73,19 +84,6 @@ void VerificationLoop()
   }
 }
 
-//#define USE_Z3
-#if defined(USE_Z3)
-#include "ValuesZ3.hh"
-
-Z3ValueContainer vc;
-#else
-#include "ValueContainerV1.hh"
-
-ValueContainer vc;
-#endif
-
-#include "ForwardNullAnalysis.hh"
-#include "MemoryGraphAnalysis.hh"
 
 template<typename FactoryT, typename StateT>
 void Verify(boost::string_view fileName)
@@ -98,7 +96,7 @@ void Verify(boost::string_view fileName)
   parser.ParseAndOpenIrFile(fileName);//("input-int-conv.ll");
   auto& firstNode = parser.GetEntryPoint();
 
-  auto emptyStateUPtr = make_unique<StateT>(firstNode, vc, mapper, fmap);
+  auto emptyStateUPtr = std::make_unique<StateT>(firstNode, vc, mapper, fmap);
 
   firstNode.GetStatesManager().InsertAndEnqueue(move(emptyStateUPtr));
 

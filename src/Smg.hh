@@ -475,8 +475,8 @@ public:
       }
       else
       { // HvEdges does not yet exist -> we should attempt read reinterpretation, if there are any values
-        //TODO: should newly allocated object be covered by unknown value of object's size, \
-                or there just should not be any HvEdges at all?
+        //TODO: should newly allocated object be covered by unknown value of object's size,
+             // or there just should not be any HvEdges at all?
         if (object.hvEdges.size() == 0)
         { // Unknown!
           throw InvalidDereferenceException();
