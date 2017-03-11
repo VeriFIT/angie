@@ -339,7 +339,14 @@ private:
 
 public:
 
-  Graph() = default;
+  Graph(IValueContainer* vc):
+    vc(vc)
+  {
+    auto& obj = objects.emplace(ObjectId{0}, std::make_unique<Object>()).first.operator*().second.operator*();
+    obj.id = ObjectId{0};
+    obj.size = ValueId{0};
+    handles.CreatePtEdge(PtEdge{ValueId{0}, ValueId{0}, Type::CreateCharPointerType(), ObjectId{0}, GetVc().GetZero(PTR_TYPE)});
+  }
   Graph(const Graph& g) :
     handles(g.handles),
     vc(g.vc)
@@ -641,4 +648,4 @@ void playground()
 
 
 template<>
-Smg::Impl::ObjectId Smg::Impl::ObjectId::nextIdToGive{};
+Smg::Impl::ObjectId Smg::Impl::ObjectId::nextIdToGive(1);
