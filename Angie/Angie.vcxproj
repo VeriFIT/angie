@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugNoLlvm|x64">
@@ -141,6 +141,7 @@
     <ClInclude Include="..\src\precompall.hh" />
     <ClInclude Include="..\src\precompllvm.hh" />
     <ClInclude Include="..\src\precompother.hh" />
+    <ClInclude Include="..\src\Smg.hh" />
     <ClInclude Include="..\src\StateStorage.hh" />
     <ClInclude Include="..\src\Type.hh" />
     <ClInclude Include="..\src\ValueContainerV1.hh" />
