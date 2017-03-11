@@ -39,7 +39,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 //#include <gsl/gsl>
 #include <range/v3/all.hpp>
 
-typedef int FrontendId;
 using ValueIdTypePair = std::tuple<ValueId, Type>;
 
 namespace Smg {
@@ -231,8 +230,8 @@ private:
   static auto FindEdgeByOffset(RangeT& range, ValueId offset)
   {
     using namespace ::ranges;
-    auto res = ::ranges::find(range, offset, &EdgeBase::sourceOffset);
-    if (res != ::ranges::end(range))
+    auto res = find(range, offset, &EdgeBase::sourceOffset);
+    if (res != end(range))
     {
       return &*res;
     }
@@ -245,8 +244,8 @@ private:
   static auto FindEdgeByValue(RangeT& range, ValueId value)
   {
     using namespace ::ranges;
-    auto res = ::ranges::find(range, value, &EdgeBase::value);
-    if (res != ::ranges::end(range))
+    auto res = find(range, value, &EdgeBase::value);
+    if (res != end(range))
     {
       return &*res;
     }
@@ -258,9 +257,9 @@ private:
   template<typename RangeT, typename ValueT = typename RangeT::value_type>
   static auto FindEdgeByValueType(RangeT& range, ValueId value, Type type)
   {
-    //using namespace ::ranges;
-    auto res = std::find_if(std::begin(range), std::end(range), [=](const ValueT& ed) { return ed.value == value && ed.valueType == type; });
-    if (res != std::end(range))
+    using namespace ::ranges;
+    auto res = find_if(range, [=](const ValueT& ed) { return ed.value == value && ed.valueType == type; });
+    if (res != end(range))
     {
       return &*res;
     }
