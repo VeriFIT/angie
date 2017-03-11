@@ -33,7 +33,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "FrontedValueMapper.hh"
 #include "Operation.hh"
 
-#include "Smg.cc"
+#include "Smg.hh"
 
 class MemoryGraphAnalysisState : public StateBase {
 public:
