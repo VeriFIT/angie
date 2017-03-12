@@ -23,11 +23,18 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "ISmgVisitor.hh"
+#include "..\memgraph\plotter.h"
 
+//
 class SmgPrinter : public ISmgVisitor
 {
+private:
+	memgraph::Graph *graph;
+	memgraph::Plotter *plotter;
+
 public:
 	/*ctr*/SmgPrinter();
+	~SmgPrinter() { delete plotter; } //plotter deletes graph it contains (for some reason)
 
 	void Visit(HvEdge&)	override;
 	void Visit(PtEdge&)	override;
@@ -35,5 +42,7 @@ public:
 	void Visit(Region&)	override;
 	void Visit(Sls&)	override;
 	void Visit(Graph&)	override;
+
+	std::string GetDot() const { return plotter->getDot(); }
 
 };

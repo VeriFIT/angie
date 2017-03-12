@@ -30,7 +30,7 @@ class ISmgVisitor
 public:
 	virtual void Visit(HvEdge&)	= 0;
 	virtual void Visit(PtEdge&)	= 0;
-	virtual void Visit(Object&) = 0;
+	virtual void Visit(Object&)	= 0;
 	virtual void Visit(Region&)	= 0;
 	virtual void Visit(Sls&)	= 0;
 	virtual void Visit(Graph&)	= 0;
