@@ -21,6 +21,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 /** @file SmgPrinter.cc */
 
 #include "SmgPrinter.hh"
+#include "..\memgraph\plotter.h"
 
 
 SmgPrinter::SmgPrinter() : graph{ new memgraph::Graph() }, plotter{ new memgraph::Plotter(graph) } 
