@@ -102,6 +102,15 @@
     <ClInclude Include="..\src\Smg.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\SmgCrawler.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmgPrinter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ISmgVisitor.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\console.cc">
@@ -153,6 +162,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\main.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmgCrawler.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmgPrinter.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

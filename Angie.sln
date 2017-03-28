@@ -4,6 +4,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Angie", "Angie\Angie.vcxproj", "{C3DE3F41-1F25-4B02-AF00-7E9B3E84A58C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "memgraph", "memgraph\memgraph.vcxproj", "{873E2DAF-CF7F-4D49-A614-49BBC8C5F83D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -17,6 +19,12 @@ Global
 		{C3DE3F41-1F25-4B02-AF00-7E9B3E84A58C}.DebugNoLlvm|x64.Build.0 = DebugNoLlvm|x64
 		{C3DE3F41-1F25-4B02-AF00-7E9B3E84A58C}.Release|x64.ActiveCfg = Release|x64
 		{C3DE3F41-1F25-4B02-AF00-7E9B3E84A58C}.Release|x64.Build.0 = Release|x64
+		{873E2DAF-CF7F-4D49-A614-49BBC8C5F83D}.Debug|x64.ActiveCfg = Debug|x64
+		{873E2DAF-CF7F-4D49-A614-49BBC8C5F83D}.Debug|x64.Build.0 = Debug|x64
+		{873E2DAF-CF7F-4D49-A614-49BBC8C5F83D}.DebugNoLlvm|x64.ActiveCfg = Debug|x64
+		{873E2DAF-CF7F-4D49-A614-49BBC8C5F83D}.DebugNoLlvm|x64.Build.0 = Debug|x64
+		{873E2DAF-CF7F-4D49-A614-49BBC8C5F83D}.Release|x64.ActiveCfg = Release|x64
+		{873E2DAF-CF7F-4D49-A614-49BBC8C5F83D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
