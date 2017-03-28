@@ -33,20 +33,20 @@ class Plotter;
 class SmgPrinter : public ISmgVisitor
 {
 private:
-	memgraph::Graph *graph;
-	memgraph::Plotter *plotter;
+  memgraph::Graph *graph;
+  memgraph::Plotter *plotter;
 
 public:
-	/*ctr*/SmgPrinter();
-	~SmgPrinter() { delete plotter; } //plotter deletes graph it contains (for some reason)
+  /*ctr*/SmgPrinter();
+  ~SmgPrinter() { delete plotter; } //plotter deletes graph it contains (for some reason)
 
-	void Visit(HvEdge&)	override;
-	void Visit(PtEdge&)	override;
-	void Visit(Object&)	override;
-	void Visit(Region&)	override;
-	void Visit(Sls&)	override;
-	void Visit(Graph&)	override;
+  void Visit(Smg::HvEdge&)	override;
+  void Visit(Smg::PtEdge&)	override;
+  void Visit(Smg::Object&)	override;
+  void Visit(Smg::Region&)	override;
+  void Visit(Smg::Sls&)	override;
+  void Visit(Smg::Graph&)	override;
 
-	std::string GetDot() const { return plotter->getDot(); }
+  std::string GetDot() const;
 
 };

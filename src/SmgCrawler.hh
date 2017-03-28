@@ -27,24 +27,23 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include <set>
 
 typedef uint64_t ObjectId;
-class SmgCrawler : public ISmgVisitor
-{
+class SmgCrawler : public ISmgVisitor {
 private:
-	ISmgVisitor &innerVisitor;
-	std::set<ref_wr<Object>> alreadyVisited;
+  ISmgVisitor &innerVisitor;
+  std::set<ref_wr<Smg::Object>> alreadyVisited;
 
 public:
-	/*ctr*/SmgCrawler(ISmgVisitor &inner) : innerVisitor{ inner }, alreadyVisited{} {}
+  /*ctr*/SmgCrawler(ISmgVisitor &inner) : innerVisitor{inner}, alreadyVisited{} {}
 
-	void CrawlSmg(Object&); //walk throughout the SMG
+  void CrawlSmg(Smg::Object&); //walk throughout the SMG
 
-	void Visit(HvEdge&)	override;
-	void Visit(PtEdge&)	override;
-	void Visit(Object&)	override;
-	void Visit(Region&)	override;
-	void Visit(Sls&)	override;
-	void Visit(Graph&)	override;
+  void Visit(Smg::HvEdge&)	override;
+  void Visit(Smg::PtEdge&)	override;
+  void Visit(Smg::Object&)	override;
+  void Visit(Smg::Region&)	override;
+  void Visit(Smg::Sls&)	override;
+  void Visit(Smg::Graph&)	override;
 
 private:
-	ISmgVisitor& GetInnerVisitor() { return innerVisitor; }
+  ISmgVisitor& GetInnerVisitor() { return innerVisitor; }
 };

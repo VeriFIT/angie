@@ -22,6 +22,8 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "SmgCrawler.hh"
 
+using namespace Smg; //TODO: replace with namespace Smg {
+
 void SmgCrawler::CrawlSmg(Object &o)
 {
 	alreadyVisited.clear();
