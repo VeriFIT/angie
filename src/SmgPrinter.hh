@@ -44,8 +44,8 @@ public:
   void Visit(Smg::PtEdge&)	override;
   void Visit(Smg::Object&)	override;
   void Visit(Smg::Region&)	override;
-  void Visit(Smg::Sls&)	override;
-  void Visit(Smg::Graph&)	override;
+  void Visit(Smg::Sls&)     override;
+  void Visit(Smg::Graph&)	  override;
 
   std::string GetDot() const;
 

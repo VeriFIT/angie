@@ -43,7 +43,7 @@ void SmgCrawler::Visit(PtEdge &pte)
 	GetInnerVisitor().Visit(pte);
 
 	auto &object = pte.GetTargetObject();
-	if (alreadyVisited.find == alreadyVisited.end)
+	if (alreadyVisited.find(object) == alreadyVisited.end())
 	{
 		//have not been here yet
 		alreadyVisited.emplace(object);
