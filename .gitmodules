@@ -1,4 +1,4 @@
-[submodule "src/memgraph"]
-	path = src/memgraph
+[submodule "memgraph"]
+	path = memgraph
 	url = https://github.com/michkot/MemGraph
-	branch = feature/angieModification
+	branch = angie
