@@ -85,8 +85,9 @@ public:
 
   //virtual ValueId ConvIntToFloat(ValueId first, uint32_t flags) override;
   //virtual ValueId ConvFloatToInt(ValueId first, uint32_t flags) override;
-
+;
   virtual ValueId CreateVal(Type type) override;
+  virtual ValueId CreateVal(ValueId newId, Type type) override;
 
   virtual ValueId CreateConstIntVal  (uint64_t value, Type type) override;
   virtual ValueId CreateConstIntVal  (uint64_t value           ) override; // To be potentially removed

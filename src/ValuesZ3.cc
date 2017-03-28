@@ -373,6 +373,14 @@ ValueId Z3ValueContainer::TruncateInt(ValueId first, Type sourceType, Type targe
   return id;
 }
 
+ValueId Z3ValueContainer::CreateVal(ValueId newId, Type type)
+{
+  auto id = newId;
+  auto ex = ctx.constant(ctx.int_symbol(static_cast<uint64_t>(id)), ctx.bv_sort((unsigned)type.GetBitWidth()));
+  idsToExprs.insert({id, ex});
+
+  return id;
+}
 ValueId Z3ValueContainer::CreateVal(Type type)
 {
   auto id = ValueId::GetNextId();

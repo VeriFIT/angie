@@ -28,7 +28,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #define CHECK_FLAG(var, flag) ((var & flag) == flag)
 
-
 //BinaryConstraint helper methods
 //--------------------------------------------------------------
 BinaryConstraint::BinaryConstraint(ValueId _first, ValueId _second, CmpFlags _relation)
@@ -135,10 +134,9 @@ void ValueContainer::InsertConstraint(BinaryConstraint constr)
         {
         case CmpFlags::Eq:
           //new constraint is equal to a constant -> delete all previous
-          //TODO@charvin FIX: invalidates iterator you are using!, 3x in this function
-          //HACK for now just do not delete, see TODO
-          // DeleteConstraint(oldConstraintId);
+          DeleteConstraint(oldConstraintId);
           break;
+
           //TODO::add cases for intervals
         default:
           break;
@@ -161,10 +159,9 @@ void ValueContainer::InsertConstraint(BinaryConstraint constr)
         {
         case CmpFlags::Eq:
           //new constraint is equal to a constant -> delete all previous
-          //TODO@charvin FIX: invalidates iterator you are using!, 3x in this function
-          //HACK for now just do not delete, see TODO
-          // DeleteConstraint(oldConstraintId);
+          DeleteConstraint(oldConstraintId);
           break;
+
           //TODO::add cases for intervals
         default:
           break;
@@ -182,9 +179,7 @@ void ValueContainer::InsertConstraint(BinaryConstraint constr)
     if (constr.second == constrContainer.at(oldConstraintId).GetOther(constr.first))
     {
       //delete mutual constraints
-      //TODO@charvin FIX: invalidates iterator you are using!, 3x in this function
-      //HACK for now just do not delete, see TODO
-      // DeleteConstraint(oldConstraintId);
+      DeleteConstraint(oldConstraintId);
     }
 
   }
@@ -217,14 +212,13 @@ void ValueContainer::DeleteConstraint(ConstraintId constrId)
   constrContainer.erase(constrId);
 }
 
-const std::vector<ConstraintId>& ValueContainer::GetConstraintIdVector(const ValueId id) const
+const std::vector<ConstraintId> ValueContainer::GetConstraintIdVector(const ValueId id) const
 {
-  static std::vector<ConstraintId> emptyvec;
   auto lhsConstrId = constrIdContainer.find(id);
 
   //is there a record of any constraints for the id
   if (lhsConstrId == constrIdContainer.end())
-    return emptyvec;
+    return std::vector<ConstraintId>();
 
   //return reference to the vector of constraintIds corresponding to the id
   return lhsConstrId->second;
@@ -560,7 +554,7 @@ ValueId ValueContainer::BinOp(ValueId first, ValueId second, Type type, BinaryOp
     //check for overflow
     if (CHECK_FLAG(options.flags, ArithFlags::NoUnsignedWrap))
     {
-      if (uMax - uValueLhs < uValueRhs)	//unsigned overflow
+      if (uMax - uValueLhs < uValueRhs) //unsigned overflow
         return CreateVal(type);
     }
     else if (CHECK_FLAG(options.flags, ArithFlags::NoSignedWrap))
@@ -577,7 +571,6 @@ ValueId ValueContainer::BinOp(ValueId first, ValueId second, Type type, BinaryOp
             return CreateVal(type);
       }
     }
-
 
     uint64_t result = uValueLhs + uValueRhs;
     return CreateConstIntVal(result, type);
@@ -760,6 +753,7 @@ ValueId ValueContainer::TruncateInt(ValueId first, Type sourceType, Type targetT
 
   else
     return first;
+    
 }
 
 ValueId ValueContainer::CreateConstIntVal(uint64_t value)

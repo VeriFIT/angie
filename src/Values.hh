@@ -42,14 +42,17 @@ ENUM_FLAGS(AbstractionStatus)
 enum class AbstractionStatus {
   Undefined = 0x0000, // Value is purely abstract and no information were given to the VC
   Unknown = 0x0001, // Value might have had some asociated information but now purely unknown
+  Constant = 0x0002
 };
 
 constexpr const char* AbstractionStatusToString(const AbstractionStatus s)
 {
   return
     s == AbstractionStatus::Undefined ?
-      "Undefined" :
-      "Unknown";
+    "Undefined" :
+    s == AbstractionStatus::Unknown ?
+    "Unknown" :
+    "Constant";
 }
 
 //TODO@michkot: Document a way one should implement the following interface/abstract class
@@ -100,7 +103,7 @@ public:
   // There are no informations regarding this value
   virtual bool           IsUnknown(ValueId first) const = 0;
   //TODO: relocate, add comment
-  virtual AbstractionStatus GetAbstractionStatus(ValueId first) { throw NotImplementedException(); } 
+  virtual AbstractionStatus GetAbstractionStatus(ValueId first) const { throw NotImplementedException(); } 
 
   // --------------------------------------------------------------------------
   // Section B - modifying methods, constraint addition 
@@ -177,6 +180,8 @@ public:
 
   // Creates a new unknown value
   virtual ValueId CreateVal(Type type) = 0;
+  // Registers manually generated newId into the container. Creates a new unknown value using the newId.
+  virtual ValueId CreateVal(ValueId newId, Type type) { throw NotImplementedException(); }
 
   virtual ValueId CreateConstIntVal  (uint64_t value, Type type) = 0; 
   // To be potentially removed
@@ -193,12 +198,16 @@ public:
   virtual void PrintDebug() const { throw NotImplementedException(); }
   //virtual void Print(std::ostream& os) const { throw NotImplementedException(); }
 
+  // Zero of specific type/size
+  virtual ValueId GetZero(Type type) const = 0;
+
+  virtual uint64_t GetConstantIntInnerVal  (ValueId value) const = 0;
+  virtual double   GetConstantFloatInnerVal(ValueId value) const { throw NotImplementedException(); }
+
 protected:
 
   // Zero in all possible interpretations 
   virtual ValueId GetZero() const { throw NotImplementedException(); }
-  // Zero of specific type/size
-  virtual ValueId GetZero(Type type) const = 0;
 };
 
 //inline std::ostream& operator<<(std::ostream& os, const IValueContainer& vc) { vc.Print(os); return os; }

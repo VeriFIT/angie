@@ -18,9 +18,12 @@ The program is licensed under GNU LGPLv3+ and makes use of
 [LLVM](http://llvm.org), 
 [Boost](http://boost.org), 
 [Range-v3](https://github.com/ericniebler/range-v3) 
+\[[Range-v3-VS2015](https://github.com/microsoft/Range-V3-VS2015)\], 
+[GSL](https://github.com/Microsoft/GSL) 
+\[[GSL-lite](https://github.com/microsoft/Range-V3-VS2015)\]
+\[[V11-GSL](https://github.com/viboes/GSL)\]
 and possibly also 
 [Z3](https://github.com/Z3Prover/z3), 
-[GSL](https://github.com/Microsoft/GSL), 
 [CRoaring](https://github.com/RoaringBitmap/CRoaring). 
 All those are to my best knowledge distributed under compatible licenses.
 
@@ -43,19 +46,17 @@ Dependencies install
 For simple deployment, `install_*` helpers in `utils` directory will handle installation of CMake built or include-only libraries. Main motivation was repetitive fixing of Travis-CI and custom *nix server deployment.
 Currently needed dependencies to get Angie compiled:
 ```sh
-# installation prefix
-export PREFIX=$HOME/local
-# export all the vars
-sh utils/install_main.sh export
-$(sh utils/install_main.sh export)
-# install google test (gtest)
+# installation prefix for script, select any path, $HOME/local, ...
+export PREFIX=$PWD/dependencies
+# install missing libraries
 sh utils/install_main.sh gtest
-# install boost
 sh utils/install_main.sh boost
-# install range-v3
+# install range-v3-vs2015 [MS VC14+ support] or range-v3 [clang/gcc C++14]
 sh utils/install_main.sh range-v3
-# install gsl or gsl-lite
+# install gsl [C++14] or gsl-lite [C++11, custom fork with macros disabled]
 sh utils/install_main.sh gsl-lite
+# export or '-D'set CMAKE_PREFIX_PATH or CMAKE_INCLUDE_PATH
+export CMAKE_PREFIX_PATH=$PREFIX
 ```
 
 Contribution and credits

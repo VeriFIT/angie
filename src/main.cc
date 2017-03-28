@@ -36,20 +36,32 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/utility/string_view.hpp>
 #include <gsl/gsl>
 
-using namespace ::std;
-//using namespace ::boost;
-
 #include "Definitions.hh"
 #include "General.hh"
 #include "Values.hh"
 #include "IState.hh"
 #include "IOperation.hh"
 #include "ICfgNode.hh"
-#include "ForwardNullAnalysis.hh"
 #include "LlvmFrontend.hh"
+#include "FrontedValueMapper.hh"
+#include "StateStorage.hh"
+
+//#define USE_Z3
+#if defined(USE_Z3)
+#include "ValuesZ3.hh"
+using ValContT = Z3ValueContainer;
+#else
+#include "ValueContainerV1.hh"
+using ValContT = ValueContainer;
+#endif
+
+#include "ForwardNullAnalysis.hh"
+#include "MemoryGraphAnalysis.hh"
 
 // queue of states waiting for processing
 ref_queue<IState> toProcess{};
+
+ValContT vc;
 
 void VerificationLoop()
 {
@@ -65,37 +77,26 @@ void VerificationLoop()
       if (!state.IsNew())
         continue;
 
-      state.nextCfgNode.GetDebugInfo();
-      state.nextCfgNode.Execute(state);
+      state.GetNextStep().GetDebugInfo();
+      state.GetNextStep().Execute(state);
     }
 
   }
 }
 
-//#define USE_Z3
-#if defined(USE_Z3)
-#include "ValuesZ3.hh"
 
-Z3ValueContainer vc;
-#else
-#include "ValueContainerV1.hh"
-
-ValueContainer vc;
-#endif
-
-#include "FrontedValueMapper.hh"
-
+template<typename FactoryT, typename StateT>
 void Verify(boost::string_view fileName)
 {
-  Mapper mapper{vc};
+  Mapper mapper;
   FuncMapper fmap;
 
-  auto f = FnaOperationFactory{};
+  auto f = FactoryT{};
   LlvmCfgParser parser{f, vc, mapper, fmap};
   parser.ParseAndOpenIrFile(fileName);//("input-int-conv.ll");
   auto& firstNode = parser.GetEntryPoint();
 
-  auto emptyStateUPtr = make_unique<ForwardNullAnalysisState>(firstNode.GetPrevs()[0], firstNode, vc, mapper, fmap);
+  auto emptyStateUPtr = std::make_unique<StateT>(firstNode, vc, mapper, fmap);
 
   firstNode.GetStatesManager().InsertAndEnqueue(move(emptyStateUPtr));
 
@@ -129,7 +130,8 @@ void main_old(gsl::span<std::string> files)
   //Verify("examples/01_mincase_01_nullptr_dereference[dead].ll");
   for (auto& file : files)
   {
-    Verify(file);
+    //Verify<FnaOperationFactory, ForwardNullAnalysisState>(file);
+    Verify<MemGraphOpFactory, MemoryGraphAnalysisState>(file);
   }
 
   //vc.PrintDebug();

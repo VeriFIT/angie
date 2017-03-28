@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugNoLlvm|x64">
@@ -63,9 +63,9 @@
     <IntDir>bin\$(Platform)-$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup>
-    <ExecutablePath>C:\Apps\devroot\bin;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\Apps\devroot\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Apps\devroot\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(INCLUDE_PATH);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIBRARY_PATH);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoLlvm|x64'" />
   <ItemDefinitionGroup>
@@ -119,6 +119,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\CfgNodeBase.hh" />
     <ClInclude Include="..\src\Definitions.hh" />
     <ClInclude Include="..\src\DummyOperations.hh" />
     <ClInclude Include="..\src\DummyState.hh" />
@@ -135,9 +136,12 @@
     <ClInclude Include="..\src\LlvmGlobals.hh" />
     <ClInclude Include="..\..\croaring\roaring.h" />
     <ClInclude Include="..\..\croaring\roaring.hh" />
+    <ClInclude Include="..\src\Operation.hh" />
+    <ClInclude Include="..\src\MemoryGraphAnalysis.hh" />
     <ClInclude Include="..\src\precompall.hh" />
     <ClInclude Include="..\src\precompllvm.hh" />
     <ClInclude Include="..\src\precompother.hh" />
+    <ClInclude Include="..\src\Smg.hh" />
     <ClInclude Include="..\src\StateStorage.hh" />
     <ClInclude Include="..\src\Type.hh" />
     <ClInclude Include="..\src\ValueContainerV1.hh" />
@@ -183,6 +187,7 @@
     <ClCompile Include="..\..\croaring\roaring.c">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\src\precompall.cc">
       <PrecompiledHeader>Create</PrecompiledHeader>

@@ -58,6 +58,11 @@ Type LlvmType::CreateIntegerType(unsigned bitwidth)
   return Type{llvm::Type::getIntNTy(llvmModule->getContext(), bitwidth)};
 }
 
+Type LlvmType::CreateArrayOf(Type element, uint64_t size)
+{
+  return Type{llvm::ArrayType::get(element.GetFrontendId(), size)};
+}
+
 Type LlvmType::CreatePointerTo(LlvmType target)
 {
   return Type{target.GetFrontendId()->getPointerTo()};

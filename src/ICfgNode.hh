@@ -27,9 +27,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "IOperation.hh"
 
 class IState; //forward delcaration -- include colision ICfgNode vs IState
-#include "IState.hh"
-#include "StateStorage.hh"
-
+class StatesManager;
 
 class CfgNode;
 class LlvmCfgNode;
@@ -58,7 +56,7 @@ public:
   virtual ICfgNode& GetNextFalse() const = 0;
   virtual const ref_vector<ICfgNode>& GetPrevs() const = 0;
 
-  virtual StatesManager GetStatesManager() = 0;
+  virtual StatesManager& GetStatesManager() = 0;
   virtual void PrintInstruction() const = 0;
   virtual void PrintLocation() const = 0;
   virtual void GetDebugInfo() const = 0; //TODO@review: maybe find a btter name for this method?
@@ -100,7 +98,7 @@ public:
   virtual ICfgNode& GetNextFalse() const override { throw NotSupportedException{}; }
   virtual const ref_vector<ICfgNode>& GetPrevs() const override { throw NotSupportedException{}; }
 
-  virtual StatesManager GetStatesManager() override { throw NotSupportedException{}; }
+  virtual StatesManager& GetStatesManager() override { throw NotSupportedException{}; }
   virtual void PrintInstruction() const override { throw NotSupportedException{}; }
   virtual void PrintLocation() const override { throw NotSupportedException{}; }
   virtual void GetDebugInfo() const override { throw NotSupportedException{}; }
@@ -123,7 +121,7 @@ public:
   virtual ICfgNode& GetNextFalse() const override { throw NotSupportedException{}; }
   virtual const ref_vector<ICfgNode>& GetPrevs() const override { return prevs; }
 
-  virtual StatesManager GetStatesManager() override { throw NotSupportedException{}; }
+  virtual StatesManager& GetStatesManager() override { throw NotSupportedException{}; }
   //! It might be worth implementing theese as no-ops -> autonomous end of analysis
   virtual void PrintInstruction() const override  { return; }
   //! It might be worth implementing theese as no-ops -> autonomous end of analysis
@@ -141,69 +139,3 @@ public:
 private:
   /*ctr*/ TerminalCfgNode() {}
 };
-
-
-class CfgNode : public ICfgNode {
-private:
-  OperationArgs args;
-  IOperation& op;
-  StatesManager states;
-
-public:
-  virtual bool HasTwoNext() override { return nextFalse != nullptr; }
-  virtual ICfgNode& GetNext() const override { return *next; }
-  virtual ICfgNode& GetNextTrue() const override
-  {
-    if (nextFalse == nullptr)
-      throw runtime_error("not branch");
-    return *next;
-  }
-  virtual ICfgNode& GetNextFalse() const override
-  {
-    if (nextFalse == nullptr)
-      throw runtime_error("not branch");
-    return *nextFalse;
-  }
-
-  virtual const ref_vector<ICfgNode>& GetPrevs() const override { return prevs; }
-
-  virtual void Execute(IState& s, const OperationArgs& args) override
-  {
-    return op.Execute(s, args);
-  }
-  virtual StatesManager GetStatesManager() override { return states; }
-  virtual OperationArgs GetArguments() const override { return args; }
-
-protected:
-  /*ctr*/ CfgNode(IOperation& op, OperationArgs args, ICfgNode& prev, ICfgNode& next) :
-    op{op},
-    args{args},
-    ICfgNode(&next, ref_vector<ICfgNode>{1, prev})
-  {
-  }
-//
-//  // ---------------------- for dev needs only ---------------------------- //
-//public:
-//  virtual void GetDebugInfo() const override { throw NotImplementedException{}; }
-//
-//  static CfgNode& CreateNode(IOperation& op)
-//  {
-//    CfgNode* newNode = new CfgNode{op, *new StartCfgNode{}, *new TerminalCfgNode{}};
-//    ((ICfgNode&)newNode->prevs[0]).next = newNode;
-//    newNode->next->prevs.push_back(*newNode);
-//    return *newNode;
-//  }
-//
-//  //beware - adding a node after terminal node here(after inproper cast) would not raise exception
-//  CfgNode& InsertNewAfter(IOperation& op)
-//  {
-//    CfgNode* newNode = new CfgNode{op, *this, *this->next};
-//    this->next = newNode;
-//    return *newNode;
-//  }
-//  // ---------------------- for dev needs only ---------------------------- //
-};
-
-//TODO: Place for code comments of this ICfgNode block
-// add / check virtual destructors need
-// add mass deleter for Cfg? (mem leaks)

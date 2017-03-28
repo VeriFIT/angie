@@ -5,13 +5,38 @@ project(angie)
 set(Z3 0)
 
 # packages
+# LLVM
 find_package(LLVM 3.9 REQUIRED CONFIG)
 message(STATUS "LLVM version ${LLVM_PACKAGE_VERSION}")
+
+# Boost
 find_package(Boost 1.62 REQUIRED)
+
+# gtest
 find_package(GTest)
+
+# range-v3
+find_path(range_v3_DIR range/v3)
+if(NOT range_v3_DIR STREQUAL "range_v3_DIR-NOTFOUND")
+    set(range_v3_INCLUDE_DIRS "${range_v3_DIR}")
+    message(STATUS "range-v3 location ${range_v3_DIR}")
+else()
+    message(WARNING "Could NOT find range-v3")
+endif()
+
+# GSL
+find_path(GSL_DIR gsl)
+if(NOT GSL_DIR STREQUAL "GSL_DIR-NOTFOUND")
+    set(GSL_INCLUDE_DIRS "${GSL_DIR}")
+    message(STATUS "GSL location ${GSL_DIR}")
+else()
+    message(WARNING "Could NOT find GSL")
+endif()
+
 if(Z3)
     # find_package(Z3)
 endif()
+
 
 # compiler directives
 
@@ -40,18 +65,21 @@ add_definitions(-DNOT_COMPILE_Z3)
 set(SOURCE_FILES
     src/AngieType.cc
     src/console.cc
+    src/CfgNodeBase.hh
     src/Definitions.hh
     src/DummyOperations.hh
     src/DummyState.hh
     src/enum_flags.h
     src/Exceptions.cc
     src/Exceptions.hh
+    src/MemoryGraphAnalysis.hh
     src/ForwardNullAnalysis.hh
     src/FrontedValueMapper.hh
     src/General.hh
     src/ICfgNode.hh
     src/IdImpl.hh
     src/IOperation.hh
+    src/Operation.hh
     src/IState.hh
     src/laboratory.cc
     src/LlvmFrontend.cc
@@ -60,6 +88,7 @@ set(SOURCE_FILES
     src/LlvmGlobals.hh
     src/LlvmType.cc
     src/main.cc
+    src/Smg.hh
     src/Smg.cc
     src/StateStorage.cc
     src/StateStorage.hh
@@ -97,6 +126,8 @@ add_custom_target(tests
 include_directories(${LLVM_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${Z3_INCLUDE_DIRS})
+include_directories(${range_v3_INCLUDE_DIRS})
+include_directories(${GSL_INCLUDE_DIRS})
 
 # libs linking
 

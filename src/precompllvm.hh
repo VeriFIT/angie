@@ -21,3 +21,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 /** @file precompllvm.hh */
 
 #pragma once
+
+#include <llvm/IR/Instruction.h>
+#include <llvm/IR/instructions.h>

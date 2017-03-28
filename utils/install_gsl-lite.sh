@@ -7,7 +7,7 @@ fi
 # Name of the library/package/software
 PKG_NAME=gsl              # DEFAULT: $REPO_NAME
 :                         # Github repo
-REPO_AUTHOR=martinmoene   # google
+REPO_AUTHOR=michkot       # google
 REPO_NAME=gsl-lite        # googletest
 BRANCH=                   # DEFAULT: master
 :                         # Archive

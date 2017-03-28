@@ -26,8 +26,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "General.hh"
 #include "IState.hh"
 
-using namespace ::std;
-
 class NewStateCfgNodePair {
 public:
   uptr<IState> c; // newly created program state
@@ -41,7 +39,7 @@ enum class WorklistPriority {
 };
 
 class StatesManager {
-  static vector<uptr<IState>> statePool;
+  static std::vector<uptr<IState>> statePool;
   static ref_deque<IState> worklist;
 
   ref_vector<IState> localStates;
@@ -49,7 +47,7 @@ private:
 
 public:
   void InsertAndEnqueue(
-    uptr<IState> statePtr,
+    uptr<IState>&& statePtr,
     WorklistPriority prioroty = WorklistPriority::Standard
   )
   {
@@ -71,7 +69,7 @@ public:
     // else -> just add it
     {
       IState& state = *statePtr;
-      statePool.push_back(move(statePtr));
+      statePool.push_back(std::move(statePtr));
       localStates.push_back(state);
 
       // here we should utilize priorities

@@ -27,6 +27,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "Values.hh"
 
 #include "FrontedValueMapper.hh"
+#include "CfgNodeBase.hh"
 
 #include <map>
 #include <boost/utility/string_view.hpp>
@@ -50,8 +51,8 @@ class LlvmCfgParser {
   Mapper& mapper;
   FuncMapper& fmap;
 
-  map<const llvm::BasicBlock*, LlvmCfgNode*> copyMapping;
-  queue<tuple<const llvm::BasicBlock*, LlvmCfgNode*, unsigned int>> parseAndLinkTogether;
+  std::map<const llvm::BasicBlock*, LlvmCfgNode*> copyMapping;
+  std::queue<std::tuple<const llvm::BasicBlock*, LlvmCfgNode*, unsigned int>> parseAndLinkTogether;
 
   ICfgNode* entryPointCfg = nullptr;
   ICfgNode* mainCfg = nullptr;
@@ -101,7 +102,7 @@ private:
 public:
   void ParseModule(llvm::Module& module);
 
-  uptr<llvm::Module> OpenIrFile(string fileName);
+  uptr<llvm::Module> OpenIrFile(std::string fileName);
 
   void ParseAndOpenIrFile(boost::string_view fileName);
 
