@@ -22,5 +22,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#pragma warning(push, 3)
 #include <llvm/IR/Instruction.h>
 #include <llvm/IR/instructions.h>
+#pragma warning(pop)
