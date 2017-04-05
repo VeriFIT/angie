@@ -84,7 +84,6 @@ void VerificationLoop()
   }
 }
 
-
 template<typename FactoryT, typename StateT>
 void Verify(boost::string_view fileName)
 {

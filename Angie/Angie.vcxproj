@@ -142,6 +142,11 @@
     <ClInclude Include="..\src\precompllvm.hh" />
     <ClInclude Include="..\src\precompother.hh" />
     <ClInclude Include="..\src\Smg.hh" />
+    <ClInclude Include="..\src\Smg\Edge.hh" />
+    <ClInclude Include="..\src\Smg\Object.hh" />
+    <ClInclude Include="..\src\Smg\Graph.hh" />
+    <ClInclude Include="..\src\Smg\ObjectId.hh" />
+    <ClInclude Include="..\src\Smg\Smg_fwd.hh" />
     <ClInclude Include="..\src\StateStorage.hh" />
     <ClInclude Include="..\src\Type.hh" />
     <ClInclude Include="..\src\ValueContainerV1.hh" />
@@ -211,6 +216,10 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>precompall.hh</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="..\src\Smg\Edge.cc" />
+    <ClCompile Include="..\src\Smg\Object.cc" />
+    <ClCompile Include="..\src\Smg\Graph.cc" />
+    <ClCompile Include="..\src\Smg\ObjectId.cc" />
     <ClCompile Include="..\src\StateStorage.cc">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>

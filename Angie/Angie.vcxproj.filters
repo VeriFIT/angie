@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Smg">
+      <UniqueIdentifier>{27b2821f-47c9-40c8-94b4-b8abf94acd3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Smg">
+      <UniqueIdentifier>{d1a8e753-4ee9-4831-b5fa-5dd7206cc8d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\CMakeLists.txt" />
@@ -105,6 +111,21 @@
     <ClInclude Include="..\src\ValueId.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Smg\Edge.hh">
+      <Filter>Header Files\Smg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Smg\Object.hh">
+      <Filter>Header Files\Smg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Smg\Smg_fwd.hh">
+      <Filter>Header Files\Smg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Smg\Graph.hh">
+      <Filter>Header Files\Smg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Smg\ObjectId.hh">
+      <Filter>Header Files\Smg</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\console.cc">
@@ -155,8 +176,21 @@
     <ClCompile Include="..\src\main.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Smg\Edge.cc">
+      <Filter>Source Files\Smg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Smg\Object.cc">
+      <Filter>Source Files\Smg</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\ValueId.cc">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Smg\Graph.cc">
+      <Filter>Source Files\Smg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Smg\ObjectId.cc">
+      <Filter>Source Files\Smg</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Angie.licenseheader" />

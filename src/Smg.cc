@@ -19,15 +19,3 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 *******************************************************************************/
 /** @file Smg.cc */
-
-#include "IdImpl.hh"
-
-namespace Smg {
-namespace Impl {
-class ObjectIdToken;
-using ObjectId = Id<ObjectIdToken>;
-}
-}
-
-template<>
-Smg::Impl::ObjectId Smg::Impl::ObjectId::nextIdToGive(1);
