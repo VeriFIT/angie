@@ -26,17 +26,11 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "General.hh"
 #include "Type.hh"
 #include "IdImpl.hh"
+#include "ValueId.hh"
 
 #include "enum_flags.h"
 
 #include <boost/logic/tribool.hpp>
-
-
-class ValueIdToken;
-/// <summary>
-/// ValueId class is an type-safe encapsulation of integer-based IDs for values
-/// </summary>
-using ValueId = Id<ValueIdToken>;
 
 ENUM_FLAGS(AbstractionStatus)
 enum class AbstractionStatus {

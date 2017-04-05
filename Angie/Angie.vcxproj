@@ -145,6 +145,7 @@
     <ClInclude Include="..\src\StateStorage.hh" />
     <ClInclude Include="..\src\Type.hh" />
     <ClInclude Include="..\src\ValueContainerV1.hh" />
+    <ClInclude Include="..\src\ValueId.hh" />
     <ClInclude Include="..\src\Values.hh" />
     <ClInclude Include="..\src\ValuesZ3.hh" />
   </ItemGroup>
@@ -227,7 +228,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>precompall.hh</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="..\src\Values.cc">
+    <ClCompile Include="..\src\ValueId.cc">
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>precompall.hh</ForcedIncludeFiles>
     </ClCompile>

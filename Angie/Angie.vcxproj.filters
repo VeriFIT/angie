@@ -102,6 +102,9 @@
     <ClInclude Include="..\src\Smg.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ValueId.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\console.cc">
@@ -123,9 +126,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ValueContainerV1.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Values.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ValuesZ3.cc">
@@ -155,6 +155,8 @@
     <ClCompile Include="..\src\main.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ValueId.cc">
+      <Filter>Source Files</Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Angie.licenseheader" />

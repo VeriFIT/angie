@@ -24,6 +24,9 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
+#include "ValueId.hh"
+class IValueContainer;
+
 #define TYPE_KIND_LLVM  0
 #define TYPE_KIND_ANGIE 1
 
@@ -72,6 +75,9 @@ public:
   size_t GetSizeOf() const; // Returns type's allocation size
   size_t GetBitWidth() const; // Returns type's bit size
 
+  ValueId GetSizeOfV(IValueContainer& vc) const; // Returns type's allocation size
+  ValueId GetBitWidthV(IValueContainer& vc) const; // Returns type's bit size
+
   bool IsInteger() const;
   bool IsInteger(unsigned bitwidth) const;
   bool IsBool() const { return IsInteger(1u); }
@@ -89,6 +95,8 @@ public:
   Type GetPointerElementType() const;
   Type GetStructElementType(unsigned index) const;
   size_t GetStructElementOffset(unsigned index) const;
+
+  ValueId GetStructElementOffsetV(unsigned index, IValueContainer& vc) const;
 };
 
 #elif TYPE_KIND == TYPE_KIND_ANGIE
