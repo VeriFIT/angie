@@ -24,12 +24,18 @@
 //#include <gsl/gsl>
 #include <range/v3/all.hpp>
 
+class InvalidDereferenceException_smg : public std::logic_error {
+public:
+  InvalidDereferenceException_smg() : std::logic_error("") {}
+};
+
 namespace Smg {
 namespace Impl {
 
 class Graph {
 private:
 
+public:
   Object handles;
   std::map<ObjectId, uptr<Object>> objects;
 
@@ -175,7 +181,7 @@ public:
         // or there just should not be any HvEdges at all?
         if (object.hvEdges.size() == 0)
         { // Unknown!
-          throw InvalidDereferenceException();
+          throw InvalidDereferenceException_smg();
         }
         //TODO: read reinterpretation
         throw NotSupportedException(
