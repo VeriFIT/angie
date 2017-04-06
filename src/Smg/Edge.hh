@@ -58,7 +58,7 @@ protected:
 
 };
 
-std::ostream& operator<<(std::ostream& os, const EdgeBase& edge)
+inline std::ostream& operator<<(std::ostream& os, const EdgeBase& edge)
 {
   edge.Print(os);
   return os;

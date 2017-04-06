@@ -126,6 +126,9 @@
     <ClInclude Include="..\src\Smg\ObjectId.hh">
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Smg\Wrappers.hh">
+      <Filter>Header Files\Smg</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\console.cc">
@@ -189,6 +192,9 @@
       <Filter>Source Files\Smg</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Smg\ObjectId.cc">
+      <Filter>Source Files\Smg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Smg\Wrappers.cc">
       <Filter>Source Files\Smg</Filter>
     </ClCompile>
   </ItemGroup>
