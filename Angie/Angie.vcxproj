@@ -145,9 +145,16 @@
     <ClInclude Include="..\src\Smg.hh" />
     <ClInclude Include="..\src\SmgCrawler.hh" />
     <ClInclude Include="..\src\SmgPrinter.hh" />
+    <ClInclude Include="..\src\Smg\Edge.hh" />
+    <ClInclude Include="..\src\Smg\Object.hh" />
+    <ClInclude Include="..\src\Smg\Graph.hh" />
+    <ClInclude Include="..\src\Smg\ObjectId.hh" />
+    <ClInclude Include="..\src\Smg\Smg_fwd.hh" />
+    <ClInclude Include="..\src\Smg\Wrappers.hh" />
     <ClInclude Include="..\src\StateStorage.hh" />
     <ClInclude Include="..\src\Type.hh" />
     <ClInclude Include="..\src\ValueContainerV1.hh" />
+    <ClInclude Include="..\src\ValueId.hh" />
     <ClInclude Include="..\src\Values.hh" />
     <ClInclude Include="..\src\ValuesZ3.hh" />
   </ItemGroup>
@@ -215,6 +222,11 @@
     </ClCompile>
     <ClCompile Include="..\src\SmgCrawler.cc" />
     <ClCompile Include="..\src\SmgPrinter.cc" />
+    <ClCompile Include="..\src\Smg\Edge.cc" />
+    <ClCompile Include="..\src\Smg\Object.cc" />
+    <ClCompile Include="..\src\Smg\Graph.cc" />
+    <ClCompile Include="..\src\Smg\ObjectId.cc" />
+    <ClCompile Include="..\src\Smg\Wrappers.cc" />
     <ClCompile Include="..\src\StateStorage.cc">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -232,7 +244,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>precompall.hh</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="..\src\Values.cc">
+    <ClCompile Include="..\src\ValueId.cc">
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>precompall.hh</ForcedIncludeFiles>
     </ClCompile>

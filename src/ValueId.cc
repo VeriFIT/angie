@@ -18,9 +18,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 *******************************************************************************/
-/** @file Values.cc */
+/** @file ValueId.cc */
 
-#include "Values.hh"
+#include "ValueId.hh"
 
 template<>
 ValueId ValueId::nextIdToGive{};

@@ -18,11 +18,14 @@ You should have received a copy of the GNU Lesser General Public License
 along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 *******************************************************************************/
-/** @file precompllvm.hh */
+/** @file ValueId.hh */
 
 #pragma once
 
-#pragma warning(push, 3)
-#include <llvm/IR/Instruction.h>
-#include <llvm/IR/instructions.h>
-#pragma warning(pop)
+#include "IdImpl.hh"
+
+class ValueIdToken;
+/// <summary>
+/// ValueId class is an type-safe encapsulation of integer-based IDs for values
+/// </summary>
+using ValueId = Id<ValueIdToken>;

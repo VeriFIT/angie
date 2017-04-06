@@ -64,22 +64,20 @@ add_definitions(-DNOT_COMPILE_Z3)
 
 set(SOURCE_FILES
     src/AngieType.cc
-    src/console.cc
     src/CfgNodeBase.hh
+    src/console.cc
     src/Definitions.hh
     src/DummyOperations.hh
     src/DummyState.hh
     src/enum_flags.h
     src/Exceptions.cc
     src/Exceptions.hh
-    src/MemoryGraphAnalysis.hh
     src/ForwardNullAnalysis.hh
     src/FrontedValueMapper.hh
     src/General.hh
     src/ICfgNode.hh
     src/IdImpl.hh
     src/IOperation.hh
-    src/Operation.hh
     src/IState.hh
     src/laboratory.cc
     src/LlvmFrontend.cc
@@ -88,14 +86,24 @@ set(SOURCE_FILES
     src/LlvmGlobals.hh
     src/LlvmType.cc
     src/main.cc
-    src/Smg.hh
+    src/MemoryGraphAnalysis.hh
+    src/Operation.hh
+    src/Smg/Edge.cc
+    src/Smg/Edge.hh
+    src/Smg/Object.cc
+    src/Smg/Object.hh
+    src/Smg/Graph.cc
+    src/Smg/Graph.hh
+    src/Smg/Smg_fwd.hh
     src/Smg.cc
+    src/Smg.hh
     src/StateStorage.cc
     src/StateStorage.hh
     src/Type.hh
     src/ValueContainerV1.cc
     src/ValueContainerV1.hh
-    src/Values.cc
+    src/ValueId.cc
+    src/ValueId.hh
     src/Values.hh
     src/ValuesZ3.cc
     src/ValuesZ3.hh
