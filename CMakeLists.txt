@@ -95,6 +95,8 @@ set(SOURCE_FILES
     src/Smg/Graph.cc
     src/Smg/Graph.hh
     src/Smg/Smg_fwd.hh
+    src/Smg/Wrappers.cc
+    src/Smg/Wrappers.hh
     src/Smg.cc
     src/Smg.hh
     src/StateStorage.cc
