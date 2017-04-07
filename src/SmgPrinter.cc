@@ -21,6 +21,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 /** @file SmgPrinter.cc */
 
 #include "SmgPrinter.hh"
+#include "Smg/Wrappers.hh"
 #include "../memgraph/src/plotter.h"
 
 using namespace Smg; //TODO: replace with namespace Smg {

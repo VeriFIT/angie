@@ -151,6 +151,7 @@
     <ClInclude Include="..\src\Smg\ObjectId.hh" />
     <ClInclude Include="..\src\Smg\Smg_fwd.hh" />
     <ClInclude Include="..\src\Smg\Wrappers.hh" />
+    <ClInclude Include="..\src\Smg\Wrappers_fwd.hh" />
     <ClInclude Include="..\src\StateStorage.hh" />
     <ClInclude Include="..\src\Type.hh" />
     <ClInclude Include="..\src\ValueContainerV1.hh" />

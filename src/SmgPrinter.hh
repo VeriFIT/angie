@@ -23,6 +23,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "ISmgVisitor.hh"
+#include <string>
 
 // do not include memgraph\plotter.h to prevent header poisoning
 namespace memgraph {
