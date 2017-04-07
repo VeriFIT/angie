@@ -105,6 +105,28 @@ public:
   auto GetGraph() -> decltype(graph) { return graph; }
 };
 
+template <class ViewT, class OutT>
+class ObjectSeo : public SmgSet, public ranges::view_adaptor<ObjectSeo<ViewT, OutT>, ViewT> {
+private:
+  friend ranges::range_access;
+  class adaptor : public ranges::adaptor_base
+  {
+    Impl::Graph& graph;
+  public:
+    //adaptor() = default;
+    adaptor(Impl::Graph& g) : graph{g} {};
+    OutT read(ranges::range_iterator_t<ViewT> it) const { return {*it, graph}; }
+  };
+  adaptor begin_adaptor() const { return {GetGraph()}; }
+  adaptor end_adaptor() const { return {GetGraph()}; } 
+public:
+  ObjectSeo() = default;
+  ObjectSeo(ViewT&& rng, Impl::Graph& context)
+    : ObjectSeo::view_adaptor{std::forward<ViewT>(rng)}
+    , SmgSet(context)
+  {}
+};
+
 template <class ViewT>
 class ObjectSet : public SmgSet, public ranges::view_adaptor<ObjectSet<ViewT>, ViewT> {
 private:
@@ -197,13 +219,22 @@ ObjectSet<ViewT> objset(ViewT && rng, Impl::Graph& context)
   return {std::forward<ViewT>(rng), context};
 }
 
+template <class OutT, class ViewT>
+ObjectSeo<ViewT, OutT> objseo(ViewT && rng, Impl::Graph& context)
+{
+  return {std::forward<ViewT>(rng), context};
+}
+
+class PtEdge;
+class HvEdge;
+
 class Object {
 protected:
   Impl::Graph&  graph;
   Impl::Object& object;
 public:
-  auto GetPtOutEdges() { return objset(object.GetPtOutEdges(), graph); }
-  auto GetHvOutEdges() { return objset(object.GetHvOutEdges(), graph); }
+  auto GetPtOutEdges() { return objseo<PtEdge>(object.GetPtOutEdges(), graph); }
+  auto GetHvOutEdges() { return objseo<HvEdge>(object.GetHvOutEdges(), graph); }
   auto GetOutEdges()   { throw NotImplementedException(); }
   auto GetPtInEdges()  { throw NotImplementedException(); }
   ValueId GetSize()    { return object.GetSize(); }
