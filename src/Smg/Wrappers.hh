@@ -2,6 +2,8 @@
 
 #include "Graph.hh"
 
+class ISmgVisitor;
+
 namespace Smg {
 
 //template <typename ViewT, typename ObjT>
@@ -70,7 +72,6 @@ namespace Smg {
 //}
 
 using ObjectId = Impl::ObjectId;
-class ISmgVisitor;
 class Object;
 
 /*
@@ -93,7 +94,7 @@ class Graph {
   Impl::Graph& graph;
 public:
   //auto GetInEdges();
-  void Accept(ISmgVisitor&);
+  void Accept(ISmgVisitor& visitor);
   Graph(Impl::Graph& graph) : graph{graph} {}
 };
 
@@ -208,7 +209,7 @@ public:
   ValueId GetSize()    { return object.GetSize(); }
   ObjectId GetId()     { return object.id; }
 
-  void Accept(ISmgVisitor& visitor); 
+  void Accept(ISmgVisitor& visitor);
   Object(Impl::Graph& graph, Impl::Object& object) : graph{graph}, object{object} {}
 };
 ////These functions require access to whole graph, to see which edges ends in this object
@@ -236,13 +237,13 @@ protected:
   Impl::EdgeBase& edge;
 public:
   ValueId  GetSourceOffset() { return edge.sourceOffset; }
-  void Accept(ISmgVisitor);
   Edge(Impl::Graph& graph, Impl::EdgeBase& edge) : graph{graph}, edge{edge} {}
 };
 class HvEdge : public Edge {
 public:
   ValueId GetValue() { return edge.value; }
   Type    GetType()  { return edge.valueType; }
+  void Accept(ISmgVisitor& visitor);
 };
 class PtEdge : public HvEdge {
 protected:
@@ -251,6 +252,7 @@ public:
   Object   GetTargetObject()   { return Object{graph, *graph.objects[GetEdge().targetObjectId]}; }
   ObjectId GetTargetObjectId() { return                              GetEdge().targetObjectId; }
   ValueId  GetTargetOffset()   { return                              GetEdge().targetOffset; }
+  void Accept(ISmgVisitor& visitor);
 };
 
 //template <class ContainerT>
