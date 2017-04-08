@@ -52,7 +52,7 @@ void xx()
   //ranges::view::transform_fn
  
 
-  auto bb = Object{ig, ig.handles}.GetPtOutEdges();
+  auto bb = Object{ig.handles, ig}.GetPtOutEdges();
   auto bbo = bb.begin();
   auto bbi = *bbo;
 

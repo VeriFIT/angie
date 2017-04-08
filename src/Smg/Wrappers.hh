@@ -173,7 +173,7 @@ protected:
 public:
   auto GetPtOutEdges() { return objseo<Smg::PtEdge>(object.GetPtOutEdges(), graph); }
   auto GetHvOutEdges() { return objseo<Smg::HvEdge>(object.GetHvOutEdges(), graph); }
-  auto GetOutEdges()   { throw NotImplementedException(); }//{ return ranges::view::concat(GetPtOutEdges(), GetHvOutEdges()); }
+  auto GetOutEdges()   { return objseo<Smg::Edge>  (object.GetPtOutEdges(), graph); }
   auto GetPtInEdges()  { throw NotImplementedException(); }
   ValueId GetSize()    { return object.GetSize(); }
   ObjectId GetId()     { return object.id; }
