@@ -6,63 +6,6 @@ class ISmgVisitor;
 
 namespace Smg {
 
-//template <typename ViewT, typename ObjT>
-//class ObjectSet : public SmgSet, ranges::v3::view_facade<ObjectSet<ViewT, ObjT>> {
-//private:
-//  friend ranges::v3::range_access;
-//
-//  ViewT view_adaptor;
-//
-//  struct cursor
-//  {
-//  private:
-//    ranges::range_iterator_t<ViewT> iter;
-//  public:
-//    cursor() = default;
-//    cursor(ranges::range_iterator_t<ViewT> it)
-//      : iter(it)
-//    {}
-//    int const & read() const
-//    {
-//      return *iter;
-//    }
-//    bool equal(cursor const &that) const
-//    {
-//      return iter == that.iter;
-//    }
-//    void next()
-//    {
-//      ++iter;
-//    }
-//    void prev()
-//    {
-//      --iter;
-//    }
-//    std::ptrdiff_t distance_to(cursor const &that) const
-//    {
-//      return that.iter - iter;
-//    }
-//    void advance(std::ptrdiff_t n)
-//    {
-//      iter += n;
-//    }
-//  };
-//  cursor begin_cursor() const
-//  {
-//    return {view_adaptor.begin()};
-//  }
-//  cursor end_cursor() const
-//  {
-//    return {view_adaptor.end()};
-//  }
-//  public:
-//  ObjectSet() = default;
-//  ObjectSet(ViewT&& rng, Graph& context)
-//    : ObjectSet::view_adaptor{std::forward<ViewT>(rng)}
-//    , SmgSet(context)
-//  {}
-//};
-
 //class ValueWrapper {
 //  ValueId id;
 //  Type type;
@@ -102,7 +45,7 @@ class SmgSet{
   Impl::Graph& graph;
 public:
   SmgSet(decltype(graph) graph) : graph{graph} {}
-  auto GetGraph() -> decltype(graph) { return graph; }
+  auto GetGraph() const -> decltype(graph) { return graph; }
 };
 
 template <class ViewT, class OutT>
@@ -111,14 +54,16 @@ private:
   friend ranges::range_access;
   class adaptor : public ranges::adaptor_base
   {
-    Impl::Graph& graph;
+    Impl::Graph* const graph;
   public:
-    //adaptor() = default;
-    adaptor(Impl::Graph& g) : graph{g} {};
-    OutT read(ranges::range_iterator_t<ViewT> it) const { return {*it, graph}; }
+    adaptor() = default;
+    adaptor(Impl::Graph& g) : graph{&g} {};
+    OutT current(ranges::range_iterator_t<ViewT> it) const {
+      return {*it, *graph};
+    }
   };
   adaptor begin_adaptor() const { return {GetGraph()}; }
-  adaptor end_adaptor() const { return {GetGraph()}; } 
+  adaptor end_adaptor()   const { return {GetGraph()}; } 
 public:
   ObjectSeo() = default;
   ObjectSeo(ViewT&& rng, Impl::Graph& context)
@@ -131,14 +76,6 @@ template <class ViewT>
 class ObjectSet : public SmgSet, public ranges::view_adaptor<ObjectSet<ViewT>, ViewT> {
 private:
   friend ranges::range_access;
-  class adaptor : public ranges::adaptor_base
-  {
-  public:
-    adaptor() = default;
-    auto read(ranges::range_iterator_t<ViewT> it) const -> decltype(*it) { return *it; }
-  };
-  adaptor begin_adaptor() const { return {}; }
-  adaptor end_adaptor() const { return {}; } 
 public:
   typename std::remove_reference<ViewT>::type::iterator begin()
   {
@@ -225,23 +162,24 @@ ObjectSeo<ViewT, OutT> objseo(ViewT && rng, Impl::Graph& context)
   return {std::forward<ViewT>(rng), context};
 }
 
-class PtEdge;
+class Edge;
 class HvEdge;
+class PtEdge;
 
 class Object {
 protected:
-  Impl::Graph&  graph;
   Impl::Object& object;
+  Impl::Graph&  graph;
 public:
-  auto GetPtOutEdges() { return objseo<PtEdge>(object.GetPtOutEdges(), graph); }
-  auto GetHvOutEdges() { return objseo<HvEdge>(object.GetHvOutEdges(), graph); }
-  auto GetOutEdges()   { throw NotImplementedException(); }
+  auto GetPtOutEdges() { return objseo<Smg::PtEdge>(object.GetPtOutEdges(), graph); }
+  auto GetHvOutEdges() { return objseo<Smg::HvEdge>(object.GetHvOutEdges(), graph); }
+  auto GetOutEdges()   { throw NotImplementedException(); }//{ return ranges::view::concat(GetPtOutEdges(), GetHvOutEdges()); }
   auto GetPtInEdges()  { throw NotImplementedException(); }
   ValueId GetSize()    { return object.GetSize(); }
   ObjectId GetId()     { return object.id; }
 
-  void Accept(ISmgVisitor& visitor);
-  Object(Impl::Graph& graph, Impl::Object& object) : graph{graph}, object{object} {}
+  void Accept(ISmgVisitor& visitor) { object.Accept(visitor, graph); }
+  Object(Impl::Object& object, Impl::Graph& graph) : object{object}, graph{graph} {}
 };
 ////These functions require access to whole graph, to see which edges ends in this object
 //ImplEdgeEnumerable GetEdgesAll() const;
@@ -255,6 +193,7 @@ public:
   bool IsValid()     { throw NotImplementedException(); }
   bool IsFreed()     { throw NotImplementedException(); }
   bool IsNullified() { throw NotImplementedException(); }
+  Region(Impl::Region& object, Impl::Graph& graph) : Object{object, graph} {}
 };
 class Sls : public Object {
 public:
@@ -264,32 +203,39 @@ public:
 
 class Edge {
 protected:
-  Impl::Graph&    graph;
   Impl::EdgeBase& edge;
+  Impl::Graph&    graph;
 public:
   ValueId  GetSourceOffset() { return edge.sourceOffset; }
-  Edge(Impl::Graph& graph, Impl::EdgeBase& edge) : graph{graph}, edge{edge} {}
+  void Accept(ISmgVisitor& visitor) { edge.Accept(visitor, graph); }
+  Edge(Impl::EdgeBase& edge, Impl::Graph& graph) : edge{edge}, graph{graph} {}
 };
 class HvEdge : public Edge {
 public:
   ValueId GetValue() { return edge.value; }
   Type    GetType()  { return edge.valueType; }
-  void Accept(ISmgVisitor& visitor);
+  HvEdge(Impl::HvEdge& edge, Impl::Graph& graph) : Edge{edge, graph} {}
 };
 class PtEdge : public HvEdge {
 protected:
   Impl::PtEdge& GetEdge() { return static_cast<Impl::PtEdge&>(edge); }
 public:
-  Object   GetTargetObject()   { return Object{graph, *graph.objects[GetEdge().targetObjectId]}; }
-  ObjectId GetTargetObjectId() { return                              GetEdge().targetObjectId; }
-  ValueId  GetTargetOffset()   { return                              GetEdge().targetOffset; }
-  void Accept(ISmgVisitor& visitor);
+  Object   GetTargetObject()   { return Object{*graph.objects[GetEdge().targetObjectId], graph}; }
+  ObjectId GetTargetObjectId() { return                       GetEdge().targetObjectId;          }
+  ValueId  GetTargetOffset()   { return                       GetEdge().targetOffset;            }
+  PtEdge(Impl::PtEdge& edge, Impl::Graph& graph) : HvEdge{edge, graph} {}
 };
 
-//template <class ContainerT>
-//auto make_range(ContainerT& vect)
-//{
-//  return ranges::range<decltype(vect)::iterator>(vect.begin(), vect.end());
-//}
+// move to file Smg_Wrappers_delayed.hh
+
+// namespace Smg
+namespace Impl {
+
+void HvEdge::Accept(ISmgVisitor& visitor, Impl::Graph& ctx) { visitor.Visit(Smg::HvEdge{*this, ctx}); }
+void PtEdge::Accept(ISmgVisitor& visitor, Impl::Graph& ctx) { visitor.Visit(Smg::PtEdge{*this, ctx}); }
+void Object::Accept(ISmgVisitor& visitor, Impl::Graph& ctx) { visitor.Visit(Smg::Object{*this, ctx}); }
+void Region::Accept(ISmgVisitor& visitor, Impl::Graph& ctx) { visitor.Visit(Smg::Region{*this, ctx}); }
+
+} // namespace Smg::Impl
 
 } // namespace Smg

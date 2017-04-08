@@ -21,6 +21,8 @@
 //#include <gsl/gsl>
 #include <range/v3/all.hpp>
 
+#include "../ISmgVisitor.hh"
+
 namespace Smg {
 namespace Impl {
 
@@ -44,6 +46,8 @@ struct ModificationObserver<PtEdge> {
 class Object {
 
 public:
+
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
 
   ObjectId id;
   ObjectSize size;
@@ -188,6 +192,8 @@ public:
 };
 
 class Region : public Object {
+
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
 
 };
 
