@@ -1,0 +1,4 @@
+[submodule "memgraph"]
+	path = memgraph
+	url = https://github.com/michkot/MemGraph
+	branch = angie

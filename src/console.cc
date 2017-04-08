@@ -34,9 +34,10 @@ OptionCategory MyCategory("Angie options");
 //opt<string> OutputFilename("o", cat(MyCategory), desc("Specify output filename"), value_desc("filename"), init("-"));
 opt<string> InputFilename("f", cat(MyCategory), desc("LLVM IR file to perfrom analysis on"), value_desc("filename"), init(""));
 opt<bool>   Test("t", cat(MyCategory), desc("Enable test analysis"));
+opt<bool>   Lab ("l", cat(MyCategory), desc("Enable laboratory code"));
 
 // laboratory.cc
-extern void lab_main();
+extern int lab_main();
 extern std::vector<std::string> GetExamples();
 
 // main.cc
@@ -50,7 +51,12 @@ int main(int argc, char** argv)
   HideUnrelatedOptions(MyCategory);
   ParseCommandLineOptions(argc, argv);
 
-  if (Test)
+  if (Lab)
+  {
+    lab_main();
+    return 0;
+  }
+  else if (Test)
   {
     auto files = GetExamples();
     main_old(files);

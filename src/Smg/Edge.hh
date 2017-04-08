@@ -23,12 +23,16 @@
 //#include <gsl/gsl>
 #include <range/v3/all.hpp>
 
+#include "../ISmgVisitor.hh"
+
 namespace Smg {
 namespace Impl {
 
 class EdgeBase {
 
 public:
+
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx) = 0;
 
   ValueId sourceOffset;
   ValueId value;
@@ -67,6 +71,9 @@ inline std::ostream& operator<<(std::ostream& os, const EdgeBase& edge)
 class HvEdge : public EdgeBase {
 
 public:
+
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
+
   /*ctr*/ HvEdge(ValueId sourceOffset, ValueId value, Type type) :
     EdgeBase(sourceOffset, value, type)
   {
@@ -90,6 +97,8 @@ public:
 class PtEdge : public HvEdge {
 
 public:
+
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
 
   ObjectId targetObjectId; // optimization, could be replaced by map with value(address)<->object in Smg
   ValueId  targetOffset;

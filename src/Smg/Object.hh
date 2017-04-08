@@ -21,6 +21,8 @@
 //#include <gsl/gsl>
 #include <range/v3/all.hpp>
 
+#include "../ISmgVisitor.hh"
+
 namespace Smg {
 namespace Impl {
 
@@ -44,6 +46,8 @@ struct ModificationObserver<PtEdge> {
 class Object {
 
 public:
+
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
 
   ObjectId id;
   ObjectSize size;
@@ -147,8 +151,11 @@ public:
   ObjectSize GetSize() const { return size; }
 
   //Relies on GetPtOutEdges  //GetSucessors
-  const auto  GetOutEdges() const { return ::ranges::view::concat(hvEdges, ptEdges); }
+        auto  GetOutEdges()         { return ::ranges::view::concat(hvEdges, ptEdges); }
+  const auto  GetOutEdges()   const { return ::ranges::view::concat(hvEdges, ptEdges); }
+        auto& GetHvOutEdges()       { return hvEdges; }
   const auto& GetHvOutEdges() const { return hvEdges; }
+        auto& GetPtOutEdges()       { return ptEdges; }
   const auto& GetPtOutEdges() const { return ptEdges; }
 
   HvEdge* FindHvEdgeByValue(ValueId value) { return FindEdgeByValue(hvEdges, value); }
@@ -185,6 +192,8 @@ public:
 };
 
 class Region : public Object {
+
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
 
 };
 

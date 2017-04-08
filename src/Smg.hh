@@ -27,6 +27,12 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Smg {
 
+//template <class ContainerT>
+//auto make_range(ContainerT& vect)
+//{
+//  return ranges::range<decltype(vect)::iterator>(vect.begin(), vect.end());
+//}
+
 void xx()
 {
   IValueContainer* vc = new ValueContainer();
@@ -40,13 +46,28 @@ void xx()
   auto rng = ranges::range<decltype(vect)::iterator>(vect.begin(), vect.end());
   auto v = objset(std::move(rng), ig);
   auto y = objset(vect, ig);
+  auto z = objseo<Object>(vect, ig);
+  auto w = objseo<HvEdge>(o.GetHvOutEdges(), ig);
+
+  //ranges::view::transform_fn
  
-  //auto w = objset(o.GetHvOutEdges(), g);
-  
+
+  auto bb = Object{ig.handles, ig}.GetPtOutEdges();
+  auto bbo = bb.begin();
+  auto bbi = *bbo;
+
   //RANGES_FOR(auto& var, v)
   //{
   //  std::cout << var.id;
   //}
+  for(auto& varr : z)
+  {
+    std::cout << varr.GetId();
+  }
+  for(auto& varr : w)
+  {
+    std::cout << varr.GetSourceOffset();
+  }
   for(auto& varr : v)
   {
     std::cout << varr.id;

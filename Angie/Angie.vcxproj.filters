@@ -108,6 +108,15 @@
     <ClInclude Include="..\src\Smg.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\SmgCrawler.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmgPrinter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ISmgVisitor.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\ValueId.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -127,6 +136,9 @@
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Smg\Wrappers.hh">
+      <Filter>Header Files\Smg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Smg\Wrappers_fwd.hh">
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
   </ItemGroup>
@@ -150,6 +162,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ValueContainerV1.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ValueId.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ValuesZ3.cc">
@@ -177,6 +192,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\main.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmgCrawler.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmgPrinter.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Smg\Edge.cc">
