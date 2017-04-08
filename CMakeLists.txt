@@ -155,6 +155,8 @@ llvm_map_components_to_libnames(LLVM_LIBS core irreader support)
 
 set_source_files_properties( src/console.cc PROPERTIES COMPILE_FLAGS -fno-rtti)
 
-target_link_libraries(${PROJECT_NAME} ${LLVM_LIBS} ${Z3_LIBS})
+add_subdirectory(memgraph)
+
+target_link_libraries(${PROJECT_NAME} ${LLVM_LIBS} ${Z3_LIBS} memgraph)
 
 # end
