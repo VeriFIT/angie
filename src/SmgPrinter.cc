@@ -143,7 +143,7 @@ void SmgPrinter::Visit(Sls &s)
       ->setAttr("color", "red")
       ->setAttr("fontcolor", "red")
       ->setAttr("style", "dashed")
-      ->setAttr("label", "F#" + std::to_string(edge.GetValue) + "]");
+      ->setAttr("label", "F#" + std::to_string(edge.GetValue()) + "]");
     sub->addEdge(std::to_string(s.GetId()), "S" + std::to_string(s.GetId()) + std::to_string(edge.GetValue()))
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "black")

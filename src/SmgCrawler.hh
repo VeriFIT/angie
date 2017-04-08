@@ -22,6 +22,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include "Definitions.hh"
 #include "ISmgVisitor.hh"
 
 #include <set>

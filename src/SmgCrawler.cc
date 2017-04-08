@@ -21,6 +21,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 /** @file SmgCrawler.cc */
 
 #include "SmgCrawler.hh"
+#include "Smg/Wrappers.hh"
 
 using namespace Smg; //TODO: replace with namespace Smg {
 
