@@ -147,8 +147,11 @@ public:
   ObjectSize GetSize() const { return size; }
 
   //Relies on GetPtOutEdges  //GetSucessors
-  const auto  GetOutEdges() const { return ::ranges::view::concat(hvEdges, ptEdges); }
+        auto  GetOutEdges()         { return ::ranges::view::concat(hvEdges, ptEdges); }
+  const auto  GetOutEdges()   const { return ::ranges::view::concat(hvEdges, ptEdges); }
+        auto& GetHvOutEdges()       { return hvEdges; }
   const auto& GetHvOutEdges() const { return hvEdges; }
+        auto& GetPtOutEdges()       { return ptEdges; }
   const auto& GetPtOutEdges() const { return ptEdges; }
 
   HvEdge* FindHvEdgeByValue(ValueId value) { return FindEdgeByValue(hvEdges, value); }
