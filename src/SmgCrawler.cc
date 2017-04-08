@@ -56,22 +56,17 @@ void SmgCrawler::Visit(Object &o)
 {
   GetInnerVisitor().Visit(o);
   for (auto edge : o.GetOutEdges())
-  {
     edge.Accept(*this);
-  }
 }
-
 void SmgCrawler::Visit(Region &r)
 {
   GetInnerVisitor().Visit(r);
-
   for (auto edge : r.GetOutEdges())
     edge.Accept(*this);
 }
 void SmgCrawler::Visit(Sls &s)
 {
   GetInnerVisitor().Visit(s);
-
   for (auto edge : s.GetOutEdges())
     edge.Accept(*this);
 }
