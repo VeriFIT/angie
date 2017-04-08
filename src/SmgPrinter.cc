@@ -35,10 +35,10 @@ SmgPrinter::SmgPrinter() : graph{ new memgraph::Graph() }, plotter{ new memgraph
 
 }
 
-void SmgPrinter::Visit(HvEdge& hve){}
-void SmgPrinter::Visit(PtEdge &pte){}
+void SmgPrinter::Visit(HvEdge hve){}
+void SmgPrinter::Visit(PtEdge pte){}
 
-void SmgPrinter::Visit(Object &o)
+void SmgPrinter::Visit(Object o)
 {
   graph->addNode(std::to_string(o.GetId()))
     ->setAttr("shape", "box")
@@ -46,7 +46,7 @@ void SmgPrinter::Visit(Object &o)
     ->setAttr("fontcolor", "blue")
     ->setAttr("label", "O#" + std::to_string(o.GetId()) + " ");
 
-  for (HvEdge &edge : o.GetHvOutEdges())
+  for (HvEdge edge : o.GetHvOutEdges())
   {
     graph->addNode("V" + std::to_string(edge.GetValue()))
       ->setAttr("shape", "ellipse")
@@ -58,7 +58,7 @@ void SmgPrinter::Visit(Object &o)
       ->setAttr("label", std::to_string(edge.GetSourceOffset()));
   }
 
-  for (PtEdge &edge : o.GetPtOutEdges())
+  for (PtEdge edge : o.GetPtOutEdges())
   {
     graph->addNode("V" + std::to_string(edge.GetValue()))
       ->setAttr("shape", "ellipse")
@@ -74,7 +74,7 @@ void SmgPrinter::Visit(Object &o)
   }
 
 }
-void SmgPrinter::Visit(Region &r)
+void SmgPrinter::Visit(Region r)
 {
   memgraph::Subgraph *s;
   s = graph->addSubgraph("R" + std::to_string(r.GetId()));
@@ -91,7 +91,7 @@ void SmgPrinter::Visit(Region &r)
     ->setAttr("fontcolor", "black")
     ->setAttr("label", "R#" + std::to_string(r.GetId()) + " [SC_ON_HEAP, size = " + std::to_string(r.GetSize()) + " B, valid = " + std::to_string(r.IsValid()) + "]");
 
-  for (HvEdge &edge : r.GetHvOutEdges())
+  for (HvEdge edge : r.GetHvOutEdges())
   {
     s->addNode("R" + std::to_string(r.GetId()) + std::to_string(edge.GetValue()))
       ->setAttr("shape", "box")
@@ -104,7 +104,7 @@ void SmgPrinter::Visit(Region &r)
       ->setAttr("label", std::to_string(edge.GetSourceOffset()));
   }
 
-  for (PtEdge &edge : r.GetPtOutEdges())
+  for (PtEdge edge : r.GetPtOutEdges())
   {
     s->addNode("R" + std::to_string(r.GetId()) + std::to_string(edge.GetValue()))
       ->setAttr("shape", "box")
@@ -119,7 +119,7 @@ void SmgPrinter::Visit(Region &r)
       ->setAttr("label", std::to_string(edge.GetTargetOffset()));
   }
 }
-void SmgPrinter::Visit(Sls &s)
+void SmgPrinter::Visit(Sls s)
 {
   memgraph::Subgraph *sub;
   sub = graph->addSubgraph("SLS" + std::to_string(s.GetId()));
@@ -136,7 +136,7 @@ void SmgPrinter::Visit(Sls &s)
     ->setAttr("fontcolor", "orange")
     ->setAttr("label", "SLS#" + std::to_string(s.GetId()) + " [SC_ON_HEAP, size = " + std::to_string(s.GetSize()) + " B]");
 
-  for (HvEdge &edge : s.GetHvOutEdges())
+  for (HvEdge edge : s.GetHvOutEdges())
   {
     sub->addNode("S" + std::to_string(s.GetId()) + std::to_string(edge.GetValue()))
       ->setAttr("shape", "box")
@@ -150,7 +150,7 @@ void SmgPrinter::Visit(Sls &s)
       ->setAttr("label", std::to_string(edge.GetSourceOffset()));
   }
 
-  for (PtEdge &edge : s.GetPtOutEdges())
+  for (PtEdge edge : s.GetPtOutEdges())
   {
     sub->addNode("S" + std::to_string(s.GetId()) + std::to_string(edge.GetValue()))
       ->setAttr("shape", "box")
@@ -167,7 +167,7 @@ void SmgPrinter::Visit(Sls &s)
   }
 
 }
-void SmgPrinter::Visit(Graph &g)
+void SmgPrinter::Visit(Graph g)
 {
 
 }

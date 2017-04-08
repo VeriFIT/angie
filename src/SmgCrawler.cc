@@ -25,7 +25,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace Smg; //TODO: replace with namespace Smg {
 
-void SmgCrawler::CrawlSmg(Object &o)
+void SmgCrawler::CrawlSmg(Object o)
 {
   alreadyVisited.clear();
   for (auto edge : o.GetOutEdges())
@@ -34,12 +34,12 @@ void SmgCrawler::CrawlSmg(Object &o)
   }
 }
 
-void SmgCrawler::Visit(HvEdge &hve)
+void SmgCrawler::Visit(HvEdge hve)
 {
   GetInnerVisitor().Visit(hve);
 }
 
-void SmgCrawler::Visit(PtEdge &pte)
+void SmgCrawler::Visit(PtEdge pte)
 {
   GetInnerVisitor().Visit(pte);
 
@@ -52,25 +52,25 @@ void SmgCrawler::Visit(PtEdge &pte)
   }
 }
 
-void SmgCrawler::Visit(Object &o)
+void SmgCrawler::Visit(Object o)
 {
   GetInnerVisitor().Visit(o);
   for (auto edge : o.GetOutEdges())
     edge.Accept(*this);
 }
-void SmgCrawler::Visit(Region &r)
+void SmgCrawler::Visit(Region r)
 {
   GetInnerVisitor().Visit(r);
   for (auto edge : r.GetOutEdges())
     edge.Accept(*this);
 }
-void SmgCrawler::Visit(Sls &s)
+void SmgCrawler::Visit(Sls s)
 {
   GetInnerVisitor().Visit(s);
   for (auto edge : s.GetOutEdges())
     edge.Accept(*this);
 }
-void SmgCrawler::Visit(Graph &g)
+void SmgCrawler::Visit(Graph g)
 {
   GetInnerVisitor().Visit(g);
 }
