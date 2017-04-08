@@ -27,10 +27,10 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 class ISmgVisitor {
 public:
 //virtual void Visit(Smg::Edge&)   = 0;
-  virtual void Visit(Smg::HvEdge&) = 0;
-  virtual void Visit(Smg::PtEdge&) = 0;
-  virtual void Visit(Smg::Object&) = 0;
-  virtual void Visit(Smg::Region&) = 0;
-  virtual void Visit(Smg::Sls&)    = 0;
-  virtual void Visit(Smg::Graph&)  = 0;
+  virtual void Visit(Smg::HvEdge) = 0;
+  virtual void Visit(Smg::PtEdge) = 0;
+  virtual void Visit(Smg::Object) = 0;
+  virtual void Visit(Smg::Region) = 0;
+  virtual void Visit(Smg::Sls)    = 0;
+  virtual void Visit(Smg::Graph)  = 0;
 };
