@@ -27,54 +27,55 @@ using namespace Smg; //TODO: replace with namespace Smg {
 
 void SmgCrawler::CrawlSmg(Object &o)
 {
-	alreadyVisited.clear();
-	for (auto edge : o.GetOutEdges())
-	{
-		edge.Accept(*this);
-	}
+  alreadyVisited.clear();
+  for (auto edge : o.GetOutEdges())
+  {
+    edge.Accept(*this);
+  }
 }
 
 void SmgCrawler::Visit(HvEdge &hve)
 {
-	GetInnerVisitor().Visit(hve);
+  GetInnerVisitor().Visit(hve);
 }
 
 void SmgCrawler::Visit(PtEdge &pte)
 {
-	GetInnerVisitor().Visit(pte);
+  GetInnerVisitor().Visit(pte);
 
-	auto &object = pte.GetTargetObject();
-	if (alreadyVisited.find(object) == alreadyVisited.end())
-	{
-		//have not been here yet
-		alreadyVisited.emplace(object);
-		object.Accept(*this);
-	}
+  auto &object = pte.GetTargetObject();
+  if (alreadyVisited.find(object) == alreadyVisited.end())
+  {
+    //have not been here yet
+    alreadyVisited.emplace(object);
+    object.Accept(*this);
+  }
 }
 
 void SmgCrawler::Visit(Object &o)
 {
-	GetInnerVisitor().Visit(o);
-
-	for (auto edge : o.GetOutEdges())
-		edge.Accept(*this);
+  GetInnerVisitor().Visit(o);
+  for (auto edge : o.GetOutEdges())
+  {
+    edge.Accept(*this);
+  }
 }
 
 void SmgCrawler::Visit(Region &r)
 {
-	GetInnerVisitor().Visit(r);
+  GetInnerVisitor().Visit(r);
 
-	for (auto edge : r.GetOutEdges())
-		edge.Accept(*this);
+  for (auto edge : r.GetOutEdges())
+    edge.Accept(*this);
 }
 void SmgCrawler::Visit(Sls &s)
 {
-	GetInnerVisitor().Visit(s);
+  GetInnerVisitor().Visit(s);
 
-	for (auto edge : s.GetOutEdges())
-		edge.Accept(*this);
+  for (auto edge : s.GetOutEdges())
+    edge.Accept(*this);
 }
 void SmgCrawler::Visit(Graph &g)
 {
-	GetInnerVisitor().Visit(g);
+  GetInnerVisitor().Visit(g);
 }

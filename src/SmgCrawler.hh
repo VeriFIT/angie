@@ -38,12 +38,12 @@ public:
 
   void CrawlSmg(Smg::Object&); //walk throughout the SMG
 
-  void Visit(Smg::HvEdge&)	override;
-  void Visit(Smg::PtEdge&)	override;
-  void Visit(Smg::Object&)	override;
-  void Visit(Smg::Region&)	override;
-  void Visit(Smg::Sls&)     override;
-  void Visit(Smg::Graph&)   override;
+  void Visit(Smg::HvEdge&) override;
+  void Visit(Smg::PtEdge&) override;
+  void Visit(Smg::Object&) override;
+  void Visit(Smg::Region&) override;
+  void Visit(Smg::Sls&)    override;
+  void Visit(Smg::Graph&)  override;
 
 private:
   ISmgVisitor& GetInnerVisitor() { return innerVisitor; }
