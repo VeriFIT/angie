@@ -78,6 +78,7 @@ set(SOURCE_FILES
     src/ICfgNode.hh
     src/IdImpl.hh
     src/IOperation.hh
+    src/ISmgVisitor.hh
     src/IState.hh
     src/laboratory.cc
     src/LlvmFrontend.cc
@@ -90,15 +91,22 @@ set(SOURCE_FILES
     src/Operation.hh
     src/Smg/Edge.cc
     src/Smg/Edge.hh
-    src/Smg/Object.cc
-    src/Smg/Object.hh
     src/Smg/Graph.cc
     src/Smg/Graph.hh
+    src/Smg/Object.cc
+    src/Smg/Object.hh
+    src/Smg/ObjectId.cc
+    src/Smg/ObjectId.hh
     src/Smg/Smg_fwd.hh
     src/Smg/Wrappers.cc
     src/Smg/Wrappers.hh
+    src/Smg/Wrappers_fwd.hh
     src/Smg.cc
     src/Smg.hh
+    src/SmgCrawler.cc
+    src/SmgCrawler.hh
+    src/SmgPrinter.cc
+    src/SmgPrinter.hh
     src/StateStorage.cc
     src/StateStorage.hh
     src/Type.hh
