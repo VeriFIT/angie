@@ -27,11 +27,25 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <set>
 
+// TEMPLATE STRUCT less
+template<class _Ty = void>
+struct ref_less
+{	// functor for operator<
+  typedef _Ty first_argument_type;
+  typedef _Ty second_argument_type;
+  typedef bool result_type;
+
+  constexpr bool operator()(const ref_wr<_Ty> _Left, const ref_wr<_Ty> _Right) const
+  {	// apply operator< to operands
+    return (&static_cast<const _Ty&>(_Left) < &static_cast<const _Ty&>(_Right));
+  }
+};
+
 typedef uint64_t ObjectId;
 class SmgCrawler : public ISmgVisitor {
 private:
   ISmgVisitor &innerVisitor;
-  std::set<ref_wr<Smg::Object>> alreadyVisited;
+  std::set<ref_wr<Smg::Object>,ref_less<Smg::Object>> alreadyVisited;
 
 public:
   /*ctr*/SmgCrawler(ISmgVisitor &inner) : innerVisitor{inner}, alreadyVisited{} {}
