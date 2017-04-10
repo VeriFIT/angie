@@ -87,6 +87,8 @@ private:
 
   bool TryGetMappedCfgNode(const llvm::BasicBlock* bb, LlvmCfgNode** outNode);
 
+  void SetMappedCfgNode(const llvm::BasicBlock * bb, LlvmCfgNode * outNode);
+
   void LinkWithOrPlanProcessing(
     LlvmCfgNode* currentNode,
     const llvm::BasicBlock* nextBlock,

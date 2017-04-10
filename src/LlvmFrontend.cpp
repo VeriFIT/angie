@@ -63,6 +63,15 @@ public:
   virtual void PrintLocation() const override { innerInstruction.getDebugLoc().print(llvm::outs()); llvm::outs() << "\n"; llvm::outs().flush(); }
   virtual void GetDebugInfo() const override { innerInstruction.print(llvm::errs()); llvm::errs() << "\n"; llvm::errs().flush(); }
 
+  static LlvmCfgNode& CreateEmpty()
+  {
+    auto first = new StartCfgNode{};
+    auto last = new TerminalCfgNode{};
+    first->next = last;
+    last->prevs.push_back(*first);
+    return *(LlvmCfgNode*)first;
+  }
+
   static LlvmCfgNode& CreateNode(IOperation& op, OperationArgs args, const llvm::Instruction& inner)
   {
     LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, *new StartCfgNode{}, *new TerminalCfgNode{}};
@@ -568,6 +577,11 @@ bool LlvmCfgParser::TryGetMappedCfgNode(const llvm::BasicBlock* bb, LlvmCfgNode*
   return false;
 }
 
+void LlvmCfgParser::SetMappedCfgNode(const llvm::BasicBlock* bb, LlvmCfgNode* outNode)
+{
+  copyMapping[bb] = outNode;
+}
+
 void LlvmCfgParser::LinkWithOrPlanProcessing(
     LlvmCfgNode* currentNode,
     const llvm::BasicBlock* nextBlock,
@@ -596,17 +610,11 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
   //first BB instruction
   auto instrPtr = &entryBlock->front();
 
-  //get matching op
-  auto& op = GetOperationFor(*instrPtr);
-  auto args = GetOperArgsForInstr(*instrPtr);
-  //create first node of cfgpart
-  LlvmCfgNode& firstNode = LlvmCfgNode::CreateNode(op, args, *instrPtr);
+  //create empty CFG
+  LlvmCfgNode& zeroNode = LlvmCfgNode::CreateEmpty();
+  currentNode = &zeroNode;
 
-  //prepare for following instructions
-  currentNode = &firstNode;
-  instrPtr = instrPtr->getNextNode();
-
-  //all following instructions in BB except for the last one
+  //all instructions in BB except for the last one
   //add them to CFG
   while (!instrPtr->isTerminator())
   {
@@ -661,6 +669,8 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
 
   }
 
+  auto& firstNode = (LlvmCfgNode&)zeroNode.GetNext();
+  SetMappedCfgNode(entryBlock, &firstNode);
   return firstNode;
 }
 
