@@ -56,67 +56,67 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -o3")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANIT_FLAGS} -g")
 
 #file(GLOB SOURCE_FILES
-#    *.hh
-#    *.cc
+#    *.hpp
+#    *.cpp
 #)
 
 add_definitions(-DNOT_COMPILE_Z3)
 
 set(SOURCE_FILES
-    src/AngieType.cc
-    src/CfgNodeBase.hh
-    src/console.cc
-    src/Definitions.hh
-    src/DummyOperations.hh
-    src/DummyState.hh
+    src/AngieType.cpp
+    src/CfgNodeBase.hpp
+    src/console.cpp
+    src/Definitions.hpp
+    src/DummyOperations.hpp
+    src/DummyState.hpp
     src/enum_flags.h
-    src/Exceptions.cc
-    src/Exceptions.hh
-    src/ForwardNullAnalysis.hh
-    src/FrontedValueMapper.hh
-    src/General.hh
-    src/ICfgNode.hh
-    src/IdImpl.hh
-    src/IOperation.hh
-    src/ISmgVisitor.hh
-    src/IState.hh
-    src/laboratory.cc
-    src/LlvmFrontend.cc
-    src/LlvmFrontend.hh
-    src/LlvmGlobals.cc
-    src/LlvmGlobals.hh
-    src/LlvmType.cc
-    src/main.cc
-    src/MemoryGraphAnalysis.hh
-    src/Operation.hh
-    src/Smg/Edge.cc
-    src/Smg/Edge.hh
-    src/Smg/Graph.cc
-    src/Smg/Graph.hh
-    src/Smg/Object.cc
-    src/Smg/Object.hh
-    src/Smg/ObjectId.cc
-    src/Smg/ObjectId.hh
-    src/Smg/Smg_fwd.hh
-    src/Smg/Wrappers.cc
-    src/Smg/Wrappers.hh
-    src/Smg/Wrappers_fwd.hh
-    src/Smg.cc
-    src/Smg.hh
-    src/SmgCrawler.cc
-    src/SmgCrawler.hh
-    src/SmgPrinter.cc
-    src/SmgPrinter.hh
-    src/StateStorage.cc
-    src/StateStorage.hh
-    src/Type.hh
-    src/ValueContainerV1.cc
-    src/ValueContainerV1.hh
-    src/ValueId.cc
-    src/ValueId.hh
-    src/Values.hh
-    src/ValuesZ3.cc
-    src/ValuesZ3.hh
+    src/Exceptions.cpp
+    src/Exceptions.hpp
+    src/ForwardNullAnalysis.hpp
+    src/FrontedValueMapper.hpp
+    src/General.hpp
+    src/ICfgNode.hpp
+    src/IdImpl.hpp
+    src/IOperation.hpp
+    src/ISmgVisitor.hpp
+    src/IState.hpp
+    src/laboratory.cpp
+    src/LlvmFrontend.cpp
+    src/LlvmFrontend.hpp
+    src/LlvmGlobals.cpp
+    src/LlvmGlobals.hpp
+    src/LlvmType.cpp
+    src/main.cpp
+    src/MemoryGraphAnalysis.hpp
+    src/Operation.hpp
+    src/Smg/Edge.cpp
+    src/Smg/Edge.hpp
+    src/Smg/Graph.cpp
+    src/Smg/Graph.hpp
+    src/Smg/Object.cpp
+    src/Smg/Object.hpp
+    src/Smg/ObjectId.cpp
+    src/Smg/ObjectId.hpp
+    src/Smg/Smg_fwd.hpp
+    src/Smg/Wrappers.cpp
+    src/Smg/Wrappers.hpp
+    src/Smg/Wrappers_fwd.hpp
+    src/Smg.cpp
+    src/Smg.hpp
+    src/SmgCrawler.cpp
+    src/SmgCrawler.hpp
+    src/SmgPrinter.cpp
+    src/SmgPrinter.hpp
+    src/StateStorage.cpp
+    src/StateStorage.hpp
+    src/Type.hpp
+    src/ValueContainerV1.cpp
+    src/ValueContainerV1.hpp
+    src/ValueId.cpp
+    src/ValueId.hpp
+    src/Values.hpp
+    src/ValuesZ3.cpp
+    src/ValuesZ3.hpp
 )
 
 if(Z3)
@@ -124,8 +124,8 @@ if(Z3)
     add_definitions(-DUSE_Z3)
     # set(SOURCE_FILES
     #     ${SOURCE_FILES}
-    #     src/ValuesZ3.hh
-    #     src/ValuesZ3.cc
+    #     src/ValuesZ3.hpp
+    #     src/ValuesZ3.cpp
     # )
 endif()
 
@@ -153,7 +153,7 @@ include_directories(${GSL_INCLUDE_DIRS})
 # that we wish to use
 llvm_map_components_to_libnames(LLVM_LIBS core irreader support)
 
-set_source_files_properties( src/console.cc PROPERTIES COMPILE_FLAGS -fno-rtti)
+set_source_files_properties( src/console.cpp PROPERTIES COMPILE_FLAGS -fno-rtti)
 
 add_subdirectory(memgraph)
 

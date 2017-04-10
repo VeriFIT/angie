@@ -24,198 +24,198 @@
     <Text Include="..\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Definitions.hh">
+    <ClInclude Include="..\src\Definitions.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\DummyOperations.hh">
+    <ClInclude Include="..\src\DummyOperations.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\DummyState.hh">
+    <ClInclude Include="..\src\DummyState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\enum_flags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Exceptions.hh">
+    <ClInclude Include="..\src\Exceptions.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ForwardNullAnalysis.hh">
+    <ClInclude Include="..\src\ForwardNullAnalysis.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\FrontedValueMapper.hh">
+    <ClInclude Include="..\src\FrontedValueMapper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\General.hh">
+    <ClInclude Include="..\src\General.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ICfgNode.hh">
+    <ClInclude Include="..\src\ICfgNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\IOperation.hh">
+    <ClInclude Include="..\src\IOperation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\IState.hh">
+    <ClInclude Include="..\src\IState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\LlvmGlobals.hh">
+    <ClInclude Include="..\src\LlvmGlobals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\StateStorage.hh">
+    <ClInclude Include="..\src\StateStorage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Type.hh">
+    <ClInclude Include="..\src\Type.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ValueContainerV1.hh">
+    <ClInclude Include="..\src\ValueContainerV1.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Values.hh">
+    <ClInclude Include="..\src\Values.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ValuesZ3.hh">
+    <ClInclude Include="..\src\ValuesZ3.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\LlvmFrontend.hh">
+    <ClInclude Include="..\src\LlvmFrontend.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\IdImpl.hh">
+    <ClInclude Include="..\src\IdImpl.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\croaring\roaring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\croaring\roaring.hh">
+    <ClInclude Include="..\..\croaring\roaring.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\precompall.hh">
+    <ClInclude Include="..\src\precompall.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\precompllvm.hh">
+    <ClInclude Include="..\src\precompllvm.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\precompother.hh">
+    <ClInclude Include="..\src\precompother.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Operation.hh">
+    <ClInclude Include="..\src\Operation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\MemoryGraphAnalysis.hh">
+    <ClInclude Include="..\src\MemoryGraphAnalysis.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\CfgNodeBase.hh">
+    <ClInclude Include="..\src\CfgNodeBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Smg.hh">
+    <ClInclude Include="..\src\Smg.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SmgCrawler.hh">
+    <ClInclude Include="..\src\SmgCrawler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SmgPrinter.hh">
+    <ClInclude Include="..\src\SmgPrinter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ISmgVisitor.hh">
+    <ClInclude Include="..\src\ISmgVisitor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ValueId.hh">
+    <ClInclude Include="..\src\ValueId.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Smg\Edge.hh">
+    <ClInclude Include="..\src\Smg\Edge.hpp">
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Smg\Object.hh">
+    <ClInclude Include="..\src\Smg\Object.hpp">
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Smg\Smg_fwd.hh">
+    <ClInclude Include="..\src\Smg\Smg_fwd.hpp">
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Smg\Graph.hh">
+    <ClInclude Include="..\src\Smg\Graph.hpp">
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Smg\ObjectId.hh">
+    <ClInclude Include="..\src\Smg\ObjectId.hpp">
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Smg\Wrappers.hh">
+    <ClInclude Include="..\src\Smg\Wrappers.hpp">
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Smg\Wrappers_fwd.hh">
+    <ClInclude Include="..\src\Smg\Wrappers_fwd.hpp">
       <Filter>Header Files\Smg</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\console.cc">
+    <ClCompile Include="..\src\console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Exceptions.cc">
+    <ClCompile Include="..\src\Exceptions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\laboratory.cc">
+    <ClCompile Include="..\src\laboratory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LlvmGlobals.cc">
+    <ClCompile Include="..\src\LlvmGlobals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Smg.cc">
+    <ClCompile Include="..\src\Smg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\StateStorage.cc">
+    <ClCompile Include="..\src\StateStorage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ValueContainerV1.cc">
+    <ClCompile Include="..\src\ValueContainerV1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ValueId.cc">
+    <ClCompile Include="..\src\ValueId.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ValuesZ3.cc">
+    <ClCompile Include="..\src\ValuesZ3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LlvmType.cc">
+    <ClCompile Include="..\src\LlvmType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LlvmFrontend.cc">
+    <ClCompile Include="..\src\LlvmFrontend.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\AngieType.cc">
+    <ClCompile Include="..\src\AngieType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\croaring\roaring.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\precompllvm.cc">
+    <ClCompile Include="..\src\precompllvm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\precompother.cc">
+    <ClCompile Include="..\src\precompother.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\precompall.cc">
+    <ClCompile Include="..\src\precompall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\main.cc">
+    <ClCompile Include="..\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmgCrawler.cc">
+    <ClCompile Include="..\src\SmgCrawler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmgPrinter.cc">
+    <ClCompile Include="..\src\SmgPrinter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Smg\Edge.cc">
+    <ClCompile Include="..\src\Smg\Edge.cpp">
       <Filter>Source Files\Smg</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Smg\Object.cc">
+    <ClCompile Include="..\src\Smg\Object.cpp">
       <Filter>Source Files\Smg</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ValueId.cc">
+    <ClCompile Include="..\src\ValueId.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Smg\Graph.cc">
+    <ClCompile Include="..\src\Smg\Graph.cpp">
       <Filter>Source Files\Smg</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Smg\ObjectId.cc">
+    <ClCompile Include="..\src\Smg\ObjectId.cpp">
       <Filter>Source Files\Smg</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Smg\Wrappers.cc">
+    <ClCompile Include="..\src\Smg\Wrappers.cpp">
       <Filter>Source Files\Smg</Filter>
     </ClCompile>
   </ItemGroup>
