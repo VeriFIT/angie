@@ -85,7 +85,7 @@ install:
     - sh utils/install_main.sh boost
 
 #install range-v3
-    - sh utils/install_main.sh range-v3
+    - sh utils/install_main.sh range-v3-vs2015
 
 #install gsl
     - sh utils/install_main.sh gsl-lite
