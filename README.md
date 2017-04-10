@@ -51,8 +51,8 @@ export PREFIX=$PWD/dependencies
 # install missing libraries
 sh utils/install_main.sh gtest
 sh utils/install_main.sh boost
-# install range-v3-vs2015 [MS VC14+ support] or range-v3 [clang/gcc C++14]
-sh utils/install_main.sh range-v3
+# install range-v3-vs2015 [MS VC14+ workaround support] or range-v3 [clang/gcc ISO C++14]
+sh utils/install_main.sh range-v3-vs2015
 # install gsl [C++14] or gsl-lite [C++11, custom fork with macros disabled]
 sh utils/install_main.sh gsl-lite
 # export or '-D'set CMAKE_PREFIX_PATH or CMAKE_INCLUDE_PATH
