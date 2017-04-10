@@ -60,11 +60,11 @@ void xx()
   //{
   //  std::cout << var.id;
   //}
-  for(auto& varr : z)
+  for(auto varr : z)
   {
     std::cout << varr.GetId();
   }
-  for(auto& varr : w)
+  for(auto varr : w)
   {
     std::cout << varr.GetSourceOffset();
   }
