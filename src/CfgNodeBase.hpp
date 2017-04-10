@@ -91,4 +91,4 @@ protected:
 
 //TODO: Place for code comments of this ICfgNode block
 // add / check virtual destructors need
-// add mass deleter for Cfg? (mem leaks)
+// add mass deleter for CFG? (memory leaks)

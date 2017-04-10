@@ -153,7 +153,7 @@ class FnaOperationRet : public IOperation {
 class FnaOperationGetElementPtr : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
   {
-    // consider packing and aligment!!!
+    // consider packing and alignment!!!
 
     //auto numOfIndexes = args.size() - 2;
 

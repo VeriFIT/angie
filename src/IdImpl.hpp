@@ -59,14 +59,14 @@ public:
   Id operator++()    { id++; return *this; } // prefix
   Id operator++(int) { auto copy = *this; id++; return copy; } // postfix
 
-  // Implementation of all comparsion operators (only the operator< is needed for most STD functionality) 
+  // Implementation of all comparison operators (only the operator< is needed for most STD functionality) 
   //REVIEW: to use or not use the canonical way to implement the rest of operators
-  //   canoncial way is to use the other already defined operators
+  //   canonical way is to use the other already defined operators
 
-  constexpr bool operator==(const Id& other) const { return this->id == other.id; } // canonicaly implemented
+  constexpr bool operator==(const Id& other) const { return this->id == other.id; } // canonically implemented
   constexpr bool operator!=(const Id& other) const { return this->id != other.id; }
-  constexpr bool operator< (const Id& other) const { return this->id < other.id; }  // canonicaly implemented
-  constexpr bool operator> (const Id& other) const { return this->id > other.id; }
+  constexpr bool operator< (const Id& other) const { return this->id <  other.id; }  // canonically implemented
+  constexpr bool operator> (const Id& other) const { return this->id >  other.id; }
   constexpr bool operator<=(const Id& other) const { return this->id <= other.id; }
   constexpr bool operator>=(const Id& other) const { return this->id >= other.id; }
 

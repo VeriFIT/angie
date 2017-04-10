@@ -66,8 +66,8 @@ enum class BinaryOpKind : int16_t {
   Div      = 0x0004,
   Rem      = 0x0005,
 
-  Shl      = 0x0006, // Bitshift left
-  Shr      = 0x0007, // Bitshift right, unsigned(logical) or signed(arithmetic) 
+  Shl      = 0x0006, // Bit-shift left
+  Shr      = 0x0007, // Bit-shift right, unsigned(logical) or signed(arithmetic) 
 
   And      = 0x0008, // Bitwise AND
   Or       = 0x0009, // Bitwise OR

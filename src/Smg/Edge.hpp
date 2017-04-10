@@ -36,7 +36,7 @@ public:
 
   ValueId sourceOffset;
   ValueId value;
-  Type    valueType; // potential place for memory optimisation, union with objecttype for PtEdge
+  Type    valueType; // potential place for memory optimisation, union with object type for PtEdge
 
   virtual void Print(std::ostream& os) const = 0;
   std::string ToString() const
@@ -90,7 +90,7 @@ public:
     os << "srcOffset: " << sourceOffset << ", value: " << value;
   }
 
-  // TODO: using for the priate copy and move constructors and operator
+  // TODO: using for the private copy and move constructors and operator
 
 };
 

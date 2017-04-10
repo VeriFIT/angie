@@ -26,7 +26,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "General.hpp"
 #include "IOperation.hpp"
 
-class IState; //forward delcaration -- include colision ICfgNode vs IState
+class IState; //forward declaration -- include collision ICfgNode vs IState
 class StatesManager;
 
 class CfgNode;
@@ -59,7 +59,7 @@ public:
   virtual StatesManager& GetStatesManager() = 0;
   virtual void PrintInstruction() const = 0;
   virtual void PrintLocation() const = 0;
-  virtual void GetDebugInfo() const = 0; //TODO@review: maybe find a btter name for this method?
+  virtual void GetDebugInfo() const = 0; //TODO@review: maybe find a better name for this method?
   virtual OperationArgs GetArguments() const = 0;
 
   virtual void Execute(IState& s, const OperationArgs& args) override = 0;
@@ -122,18 +122,18 @@ public:
   virtual const ref_vector<ICfgNode>& GetPrevs() const override { return prevs; }
 
   virtual StatesManager& GetStatesManager() override { throw NotSupportedException{}; }
-  //! It might be worth implementing theese as no-ops -> autonomous end of analysis
+  //! It might be worth implementing these as no-ops -> autonomous end of analysis
   virtual void PrintInstruction() const override  { return; }
-  //! It might be worth implementing theese as no-ops -> autonomous end of analysis
+  //! It might be worth implementing these as no-ops -> autonomous end of analysis
   virtual void PrintLocation() const override { return; }
-  //! It might be worth implementing theese as no-ops -> autonomous end of analysis
+  //! It might be worth implementing these as no-ops -> autonomous end of analysis
   virtual void GetDebugInfo() const override { return; }
-  //! It might be worth implementing theese as no-ops -> autonomous end of analysis
+  //! It might be worth implementing these as no-ops -> autonomous end of analysis
   virtual OperationArgs GetArguments() const override { return OperationArgs{}; }
 
   virtual bool IsTerminalNode() override { return true; }
 
-  //! It might be worth implementing theese as no-ops -> autonomous end of analysis
+  //! It might be worth implementing these as no-ops -> autonomous end of analysis
   virtual void Execute(IState& s, const OperationArgs& args) override { return; }
 
 private:

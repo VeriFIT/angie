@@ -29,7 +29,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "FrontedValueMapper.hpp"
 
 
-class ICfgNode; //forward delcaration -- include colision ICfgNode vs IState
+class ICfgNode; //forward declaration -- include collision ICfgNode vs IState
 //#include "ICfgNode.hpp"
 
 enum class StateCondition {
@@ -66,7 +66,7 @@ public:
 
   // meaning: All paths(states) leading from this state were prepared for processing or already processed
   virtual void SetExplored() = 0;
-  // meaning: Succesors of this state are un-processed
+  // meaning: Successors of this state are unprocessed
   virtual bool IsNew() const = 0;
 
   virtual IValueContainer& GetVc() = 0;

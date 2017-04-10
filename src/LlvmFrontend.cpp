@@ -40,13 +40,13 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/utility/string_view.hpp>
 
-//std::string dbgstr;
-//llvm::raw_string_ostream dbgstr_rso(dbgstr);
+////std::string dbgstr;
+////llvm::raw_string_ostream dbgstr_rso(dbgstr);
 
 class LlvmCfgNode : public CfgNode {
 private:
   const llvm::Instruction& innerInstruction;
-  //const OperationArgs
+  ////const OperationArgs
 
   /*ctr*/ LlvmCfgNode(IOperation& op, OperationArgs args,
     const llvm::Instruction& inner,
@@ -80,7 +80,7 @@ public:
     return *newNode;
   }
 
-  //beware - adding a node after terminal node here(after inproper cast) would not raise exception
+  //beware - adding a node after terminal node here(after improper cast) would not raise exception
   //same applies for similar linking manipulation
 
   LlvmCfgNode& InsertNewAfter(IOperation& op, OperationArgs args, const llvm::Instruction& inner)
@@ -101,7 +101,7 @@ public:
   static void LinkTogetherTrue(ICfgNode& prev, ICfgNode& next)
   {
     if (prev.next->next != nullptr)
-      throw std::runtime_error("prev Node has a succesor other then terminal node");
+      throw std::runtime_error("prev Node has a successor other then terminal node");
     prev.next = &next;
     next.prevs.push_back(next);
   }
@@ -109,7 +109,7 @@ public:
   static void LinkTogetherFalse(ICfgNode& prev, ICfgNode& next)
   {
     if (prev.nextFalse->next != nullptr)
-      throw std::runtime_error("prev Node has a succesor other then terminal node");
+      throw std::runtime_error("prev Node has a successor other then terminal node");
     prev.nextFalse = &next;
     next.prevs.push_back(next);
   }
@@ -119,7 +119,7 @@ public:
     LinkTogetherTrue(prev, next);
   }
 
-  //target index specifies target when multi-target node is concenrned
+  //target index specifies target when multi-target node is concerned
   //0 -> true
   //1 -> false
   //as per LLVM's getSuccessor()
@@ -191,8 +191,8 @@ OperArg LlvmCfgParser::GetFlagsOperArg(CastOpKind kind, ArithFlags flags)
 
 IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
 {
-  //instr.print(llvm::errs()/*, true*/);
-  //llvm::errs() << "\n";
+  ////instr.print(llvm::errs()/*, true*/);
+  ////llvm::errs() << "\n";
 
   // Create correct operation
   IOperation* op;
@@ -757,18 +757,18 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   auto argc       = &*argIt++;
   auto argv       = &*argIt;
 
-  //auto argc       = llvm::BinaryOperator::CreateXor(
-  //  llvm::Constant::getNullValue(argcType),
-  //  llvm::Constant::getNullValue(argcType),
-  //  "",
-  //  entryBlock
-  //  );
-  //auto argv       = llvm::BinaryOperator::CreateXor(
-  //  llvm::Constant::getNullValue(argvType),
-  //  llvm::Constant::getNullValue(argvType),
-  //  "",
-  //  entryBlock
-  //  );
+  ////auto argc       = llvm::BinaryOperator::CreateXor(
+  ////  llvm::Constant::getNullValue(argcType),
+  ////  llvm::Constant::getNullValue(argcType),
+  ////  "",
+  ////  entryBlock
+  ////  );
+  ////auto argv       = llvm::BinaryOperator::CreateXor(
+  ////  llvm::Constant::getNullValue(argvType),
+  ////  llvm::Constant::getNullValue(argvType),
+  ////  "",
+  ////  entryBlock
+  ////  );
 
   // -----------
 

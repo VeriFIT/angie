@@ -29,7 +29,6 @@ class IState;
 
 class IOperation {
 public:
-  //vektor kontext po provedeni, pristi instrukce
   virtual void Execute(IState& originalState, const OperationArgs& args) = 0;
 };
 
@@ -42,7 +41,7 @@ public:
 };
 
 //not a true factory, shares one instance
-//might be chaned to uptr<..> then it would be true factory
+//might be changed to uptr<..> then it would be true factory
 class IOperationFactory {
 public:
   // Terminator operations

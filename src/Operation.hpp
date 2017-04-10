@@ -53,14 +53,14 @@ public:
 class PossibleNullDereferenceException : public AnalysisErrorException {
 public:
   /*ctr*/ PossibleNullDereferenceException()
-    : AnalysisErrorException("Possible null dereference exception occured - getElementPtr.")
+    : AnalysisErrorException("Possible null dereference exception occurred - getElementPtr.")
   {
   }
 };
 
-//TODO: maybe remove use of IState& lastSt from templated helpers, we can acces that via succesor
+//TODO: maybe remove use of IState& lastSt from templated helpers, we can access that via successor
 //TODO: maybe replace dynamic_cast with static_cast ?
-//TODO: comment about executing last instruction -> it is ok now, TerminalNode implements no-op Execute()
+//TODO: comment about executing last instruction -> it is OK now, TerminalNode implements no-op Execute()
 
 template<typename StateT, typename OperArgsT, typename branching = std::false_type>
 class OperationHelpers;

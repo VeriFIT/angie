@@ -131,5 +131,4 @@ void playground()
   ////o.CreateHvEdge(11, 12, 13);
 
   return;
-  //gsl::
 }

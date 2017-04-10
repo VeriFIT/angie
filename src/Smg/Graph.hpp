@@ -112,7 +112,7 @@ public:
   ValueId AllocateObject(Type type, MemorySpace ms = MemorySpace::Heap)
   {
     // assign a new ObjectId and new ValueId representing the resultant pointer
-    //TODO: different aquisition of ValueId based on MemorySpace
+    //TODO: different acquisition of ValueId based on MemorySpace
 
     auto ptrToTypeT = Type::CreatePointerTo(type);
 
@@ -185,7 +185,7 @@ public:
         }
         //TODO: read reinterpretation
         throw NotSupportedException(
-          "HvEdges for such offset does not yet exists and read re-interpretation is not yet supproted"
+          "HvEdges for such offset does not yet exists and read re-interpretation is not yet supported"
         );
       }
     }
@@ -220,7 +220,7 @@ public:
   }
   void WriteValue(const PtEdge& ptrEdge, ValueId value, Type type)
   {
-    // The pointer target type and the type of value beeing written must not differ
+    // The pointer target type and the type of value being written must not differ
     assert(ptrEdge.valueType.GetPointerElementType() == type);
 
     // The object has to be valid for an operation
@@ -260,7 +260,8 @@ public:
         // Find out whether it is undefined-unknown or abstracted-unknown
         auto status = GetVc().GetAbstractionStatus(value);
         std::cout << AbstractionStatusToString(status) << std::endl;
-        //throw std::runtime_error{"Writing unknown pointer value"}; //HACK!, need this for argv 
+        //HACK: need this for argv 
+        ////throw std::runtime_error{"Writing unknown pointer value"}; 
       }
     }
 
