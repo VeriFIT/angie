@@ -43,8 +43,8 @@ void xx()
   vect.push_back(o);
 
   //auto rnx = ranges::view::all(vect);
-  auto rng = ranges::range<decltype(vect)::iterator>(vect.begin(), vect.end());
-  auto v = objset(std::move(rng), ig);
+  //auto rng = ranges::range<decltype(vect)::iterator>(vect.begin(), vect.end()); // ranges::range does not exist in latest range-v3
+  //auto v = objset(std::move(rng), ig);
   auto y = objset(vect, ig);
   auto z = objseo<Object>(vect, ig);
   auto w = objseo<HvEdge>(o.GetHvOutEdges(), ig);
@@ -68,15 +68,15 @@ void xx()
   {
     std::cout << varr.GetSourceOffset();
   }
-  for(auto& varr : v)
-  {
-    std::cout << varr.id;
-  }
-  for(auto& varr : rng)
-  {
-      std::cout << varr.id;
-  }
-  for(Impl::Object& varr : v)
+  //for(auto& varr : v)
+  //{
+  //  std::cout << varr.id;
+  //}
+  //for(auto& varr : rng)
+  //{
+  //    std::cout << varr.id;
+  //}
+  for(Impl::Object& varr : y)
   {
     std::cout << varr.id;
   }
