@@ -58,7 +58,7 @@ private:
   public:
     adaptor() = default;
     adaptor(Impl::Graph& g) : graph{&g} {};
-    OutT current(ranges::range_iterator_t<ViewT> it) const {
+    OutT get(ranges::range_iterator_t<ViewT> it) const {
       return {*it, *graph};
     }
   };
