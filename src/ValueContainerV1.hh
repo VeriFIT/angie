@@ -79,7 +79,7 @@ private:
   
   void InsertConstraint(BinaryConstraint);
   void DeleteConstraint(ConstraintId constrId);
-  const std::vector<ConstraintId> &GetConstraintIdVector(ValueId id) const;
+  const std::vector<ConstraintId> GetConstraintIdVector(ValueId id) const;
   bool IsConstant(ValueId first) const { auto res = constantContainer.find(first); return res != constantContainer.end(); }
   inline uint64_t RipBits(size_t numOfBits, uint64_t in) const;
   inline int64_t SignExtend64(size_t numOfBits, uint64_t in) const;
@@ -96,6 +96,7 @@ public:
   boost::tribool IsInternalRepEq(ValueId first, ValueId second) const override;
   boost::tribool IsZero(ValueId first) const override;
   bool           IsUnknown(ValueId first) const override;
+    
 
   // Creates new boolean(1bit integer) value expressing the constraint
   ValueId Cmp(ValueId first, ValueId second, Type type, CmpFlags flags) override;

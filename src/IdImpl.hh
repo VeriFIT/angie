@@ -50,7 +50,7 @@ public:
            ~Id() = default;
 
   // Conversion methods
-  explicit operator uint64_t() const { return id; }
+  operator uint64_t() const { return id; } //HACK: temporary change for debugging SmgPrinter
 
   // Creator methods
   static Id GetNextId() { return nextIdToGive++; }

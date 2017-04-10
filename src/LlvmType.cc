@@ -26,6 +26,8 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "LlvmGlobals.hh"
 
+#include "Values.hh"
+
 //#include <innerMap>
 //#include <vector>
 //#include <memory>
@@ -164,6 +166,19 @@ size_t LlvmType::GetStructElementOffset(unsigned index) const
   auto layout = llvmDataLayout.getStructLayout(structType);
 
   return layout->getElementOffset(index);
+}
+
+ValueId LlvmType::GetSizeOfV(IValueContainer& vc) const
+{
+  return vc.CreateConstIntVal(GetSizeOf());
+}
+ValueId LlvmType::GetBitWidthV(IValueContainer& vc) const
+{
+  return vc.CreateConstIntVal(GetBitWidth());
+}
+ValueId LlvmType::GetStructElementOffsetV(unsigned index, IValueContainer& vc) const
+{
+  return vc.CreateConstIntVal(GetStructElementOffset(index));
 }
 
 #endif // #if TYPE_KIND ==

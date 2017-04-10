@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-Copyright (C) 2017 Michal Kotoun
+Copyright (C) 2017 Michal Charvát
 
 This file is a part of Angie project.
 
@@ -18,11 +18,36 @@ You should have received a copy of the GNU Lesser General Public License
 along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 *******************************************************************************/
-/** @file precompllvm.hh */
+/** @file SmgPrinter.hh */
 
 #pragma once
 
-#pragma warning(push, 3)
-#include <llvm/IR/Instruction.h>
-#include <llvm/IR/instructions.h>
-#pragma warning(pop)
+#include "ISmgVisitor.hh"
+#include <string>
+
+// do not include memgraph\plotter.h to prevent header poisoning
+namespace memgraph {
+class Graph;
+class Plotter;
+}
+
+class SmgPrinter : public ISmgVisitor
+{
+private:
+  memgraph::Graph *graph;
+  memgraph::Plotter *plotter;
+
+public:
+  /*ctr*/SmgPrinter();
+  ~SmgPrinter() { delete plotter; } //plotter deletes graph it contains (for some reason)
+
+  void Visit(Smg::HvEdge) override;
+  void Visit(Smg::PtEdge) override;
+  void Visit(Smg::Object) override;
+  void Visit(Smg::Region) override;
+  void Visit(Smg::Sls)    override;
+  void Visit(Smg::Graph)  override;
+
+  std::string GetDot() const;
+
+};

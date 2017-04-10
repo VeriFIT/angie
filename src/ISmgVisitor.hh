@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-Copyright (C) 2017 Michal Kotoun
+Copyright (C) 2017 Michal Charvát
 
 This file is a part of Angie project.
 
@@ -18,11 +18,19 @@ You should have received a copy of the GNU Lesser General Public License
 along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 *******************************************************************************/
-/** @file precompllvm.hh */
+/** @file ISmgVisitor.hh */
 
 #pragma once
 
-#pragma warning(push, 3)
-#include <llvm/IR/Instruction.h>
-#include <llvm/IR/instructions.h>
-#pragma warning(pop)
+#include "Smg/Wrappers_fwd.hh"
+
+class ISmgVisitor {
+public:
+//virtual void Visit(Smg::Edge&)   = 0;
+  virtual void Visit(Smg::HvEdge) = 0;
+  virtual void Visit(Smg::PtEdge) = 0;
+  virtual void Visit(Smg::Object) = 0;
+  virtual void Visit(Smg::Region) = 0;
+  virtual void Visit(Smg::Sls)    = 0;
+  virtual void Visit(Smg::Graph)  = 0;
+};

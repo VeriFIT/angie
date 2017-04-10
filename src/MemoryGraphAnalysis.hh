@@ -95,6 +95,11 @@ public:
       //! We assume an invalid read if the address was not written to previously
       throw InvalidDereferenceException();
     }
+    catch(InvalidDereferenceException_smg e)
+    {
+      //! We assume an invalid read if the address was not written to previously
+      throw InvalidDereferenceException();
+    }
   }
 
   ValueId Alloca(Type type, ValueId count)
