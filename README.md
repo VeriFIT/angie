@@ -21,7 +21,9 @@ The program is licensed under GNU LGPLv3+ and makes use of
 \[[Range-v3-VS2015](https://github.com/microsoft/Range-V3-VS2015)\], 
 [GSL](https://github.com/Microsoft/GSL) 
 \[[GSL-lite](https://github.com/microsoft/Range-V3-VS2015)\]
-\[[V11-GSL](https://github.com/viboes/GSL)\]
+\[[V11-GSL](https://github.com/viboes/GSL)\],
+[MemGraph](https://github.com/Moouseer/MemGraph)
+\[[stripped fork](https://github.com/michkot/MemGraph)\]
 and possibly also 
 [Z3](https://github.com/Z3Prover/z3), 
 [CRoaring](https://github.com/RoaringBitmap/CRoaring). 
