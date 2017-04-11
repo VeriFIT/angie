@@ -204,7 +204,9 @@ public:
         // Find out whether it is undefined-unknown or abstracted-unknown
         auto status = GetVc().GetAbstractionStatus(ptr);
         std::cout << AbstractionStatusToString(status) << std::endl;
-        throw std::runtime_error{"Reading unknown pointer value"}; //HACK!, need this for argv 
+        //HACK: need this for argv 
+        ////throw std::runtime_error{"Writing unknown pointer value"}; 
+        return ValueId{(uint64_t)-1};
       }
     }
 
