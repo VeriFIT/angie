@@ -331,6 +331,11 @@ class MemGraphOpCast : public BasicOperation<MemoryGraphAnalysisState, CastOpArg
     }
     else if(opts.opKind == CastOpKind::Extend)      
       newState.LinkLocalVar(args.GetTarget(), lhs); //TODO: hack!
+    else if (opts.opKind == CastOpKind::Truncate)
+    {
+      auto trunc = newState.GetVc().TruncateInt(lhs, srcType, tarType);
+      newState.LinkLocalVar(args.GetTarget(), trunc); //TODO: hack!
+    }
     else
       throw NotImplementedException();
   }
