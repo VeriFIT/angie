@@ -25,6 +25,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "Definitions.hpp"
 #include "General.hpp"
 #include "IOperation.hpp"
+#include "IdImpl.hpp"
 
 class IState; //forward declaration -- include collision ICfgNode vs IState
 class StatesManager;
@@ -61,6 +62,7 @@ public:
   /*dst*/ virtual ~ICfgNode() noexcept = default;
 
 protected:
+  Id<class CfgNodeIdToken> id = decltype(id)::GetNextId();
   ICfgNode* next;
   ICfgNode* nextFalse = nullptr;
   ref_vector<ICfgNode> prevs;

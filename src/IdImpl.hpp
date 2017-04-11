@@ -36,7 +36,7 @@ template<>
 SomeId SomeId::nextIdToGive{};
 */
 
-template<typename T>
+template<typename Token, typename UnderlyingT = uint64_t, UnderlyingT FIRST_ID = 0>
 class Id {
 private:
   // Fields
@@ -45,9 +45,9 @@ private:
 public:
   uint64_t id;
   // Constructors
-  constexpr Id()            : id{ 0 }  { }
-  explicit  Id(uint64_t id) : id{ id } { }
-           ~Id() = default;
+  constexpr           Id()            : id{ 0 }  { }
+  constexpr explicit  Id(uint64_t id) : id{ id } { }
+                     ~Id() = default;
 
   // Conversion methods
   operator uint64_t() const { return id; } //HACK: temporary change for debugging SmgPrinter
@@ -71,5 +71,8 @@ public:
   constexpr bool operator>=(const Id& other) const { return this->id >= other.id; }
 
   // Friend printer
-  friend std::ostream& operator<<(std::ostream& os, const Id<T>& idValue) { return os << idValue.id; }
+  friend std::ostream& operator<<(std::ostream& os, const Id<Token, UnderlyingT, FIRST_ID>& idValue) { return os << idValue.id; }
 };
+
+template<typename Token, typename UnderlyingT, UnderlyingT FIRST_ID>
+Id<Token, UnderlyingT, FIRST_ID> Id<Token, UnderlyingT, FIRST_ID>::nextIdToGive(FIRST_ID);

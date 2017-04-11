@@ -19,8 +19,3 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 *******************************************************************************/
 /** @file ValueId.cpp */
-
-#include "ValueId.hpp"
-
-template<>
-ValueId ValueId::nextIdToGive{};
