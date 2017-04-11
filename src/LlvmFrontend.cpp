@@ -244,6 +244,11 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
         break;
       }
     }
+    if (func->getName() == "malloc")
+    {
+      op = &opFactory.Malloc();
+      break;
+    }
     op = &opFactory.Call();
     break;
   }

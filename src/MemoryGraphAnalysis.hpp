@@ -254,6 +254,18 @@ class MemGraphOpAlloca : public BasicOperation<MemoryGraphAnalysisState> {
   }
 };
 
+class MemGraphOpMalloc : public BasicOperation<MemoryGraphAnalysisState> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
+  {
+    auto size = newState.GetAnyVar(args.GetOperand(0));
+
+    ValueId size64        = newState.GetVc().ExtendInt(size, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
+    ValueId retVal        = newState.Malloc(size64);
+
+    newState.LinkLocalVar(args.GetTarget(), retVal);
+  }
+};
+
 class MemGraphOpMemset : public BasicOperation<MemoryGraphAnalysisState> {
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override
   {
@@ -379,6 +391,7 @@ private:
   IOperation* cmp      = new BasicOperationCmp();
   IOperation* trunc    = new BasicOperationTruncate();
   IOperation* extend   = new BasicOperationExtend();
+  IOperation* malloc   = new MemGraphOpMalloc();
   IOperation* allocaop = new MemGraphOpAlloca();
   IOperation* memset   = new MemGraphOpMemset();
 
@@ -410,7 +423,7 @@ public:
   virtual IOperation& Memset() override { return *memset; }
   virtual IOperation& Memcpy() override { return *nsop; }
   virtual IOperation& Memmove() override { return *nsop; }
-  virtual IOperation& Malloc() override { return *nsop; }
+  virtual IOperation& Malloc() override { return *malloc; }
   virtual IOperation& Free() override { return *nsop; }
 
   virtual IOperation & NotSupportedInstr() override { return *nsop; }
