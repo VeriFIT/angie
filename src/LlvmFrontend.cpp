@@ -748,15 +748,11 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   auto params     = mainFType->params();
   auto ftype      = llvm::FunctionType::get(returnType, params, false);
 
-  auto entryFunc  = llvm::Function::Create(mainFType, llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__entry", &module);
+  auto entryFunc  = llvm::Function::Create(ftype, llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__entry", &module);
   auto entryBlock = llvm::BasicBlock::Create(ctx, "", entryFunc);
-  auto argcType   = mainFType->getParamType(0);
-  auto argvType   = mainFType->getParamType(1);
 
-  auto argIt      = entryFunc->args().begin();
-  auto argc       = &*argIt++;
-  auto argv       = &*argIt;
-
+  ////auto argcType   = mainFType->getParamType(0);
+  ////auto argvType   = mainFType->getParamType(1);
   ////auto argc       = llvm::BinaryOperator::CreateXor(
   ////  llvm::Constant::getNullValue(argcType),
   ////  llvm::Constant::getNullValue(argcType),
@@ -770,12 +766,19 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   ////  entryBlock
   ////  );
 
-  // -----------
-
+  auto argIt      = entryFunc->args().begin();
+  auto argc       = &*argIt++;
+  auto argv       = &*argIt;
   auto mainArgs   = llvm::SmallVector<llvm::Value*, 2> {
     argc,
     argv
-    };
+  };
+
+  //TODO: in future :) need to replace static main_call args creation & registration with range-based
+  ////auto mainArgs   = llvm::ArrayRef<llvm::Value*>{&*entryFunc->arg_begin(), &*entryFunc->arg_end()};
+
+  // -----------
+
   auto mainCall   = llvm::CallInst::Create(mainFunc, mainArgs, "", entryBlock);
 
   // -----------
