@@ -27,11 +27,11 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Smg {
 
-//template <class ContainerT>
-//auto make_range(ContainerT& vect)
-//{
-//  return ranges::range<decltype(vect)::iterator>(vect.begin(), vect.end());
-//}
+////template <class ContainerT>
+////auto make_range(ContainerT& vect)
+////{
+////  return ranges::range<decltype(vect)::iterator>(vect.begin(), vect.end());
+////}
 
 void xx()
 {
@@ -42,24 +42,24 @@ void xx()
   std::vector<decltype(o)> vect{};
   vect.push_back(o);
 
-  //auto rnx = ranges::view::all(vect);
-  //auto rng = ranges::range<decltype(vect)::iterator>(vect.begin(), vect.end()); // ranges::range does not exist in latest range-v3
-  //auto v = objset(std::move(rng), ig);
+  ////auto rnx = ranges::view::all(vect);
+  ////auto rng = ranges::range<decltype(vect)::iterator>(vect.begin(), vect.end()); // ranges::range does not exist in latest range-v3
+  ////auto v = objset(std::move(rng), ig);
   auto y = objset(vect, ig);
   auto z = objseo<Object>(vect, ig);
   auto w = objseo<HvEdge>(o.GetHvOutEdges(), ig);
 
-  //ranges::view::transform_fn
+  ////ranges::view::transform_fn
  
 
   auto bb = Object{ig.handles, ig}.GetPtOutEdges();
   auto bbo = bb.begin();
   auto bbi = *bbo;
 
-  //RANGES_FOR(auto& var, v)
-  //{
-  //  std::cout << var.id;
-  //}
+  ////RANGES_FOR(auto& var, v)
+  ////{
+  ////  std::cout << var.id;
+  ////}
   for(auto varr : z)
   {
     std::cout << varr.GetId();
@@ -68,14 +68,14 @@ void xx()
   {
     std::cout << varr.GetSourceOffset();
   }
-  //for(auto& varr : v)
-  //{
-  //  std::cout << varr.id;
-  //}
-  //for(auto& varr : rng)
-  //{
-  //    std::cout << varr.id;
-  //}
+  ////for(auto& varr : v)
+  ////{
+  ////  std::cout << varr.id;
+  ////}
+  ////for(auto& varr : rng)
+  ////{
+  ////    std::cout << varr.id;
+  ////}
   for(Impl::Object& varr : y)
   {
     std::cout << varr.id;
@@ -118,17 +118,17 @@ void playground()
 
   o.hvEdges.push_back(HvEdge{v0, v2   , int32});
   o.ptEdges.push_back(PtEdge{v4, vPtr1, int32Ptr, o2, v0});
-  //auto all = o.GetOutEdges();
-  //for(auto& x : all)
-  //{
-  //  std::cout << x << std::endl;
-  //}
+  ////auto all = o.GetOutEdges();
+  ////for(auto& x : all)
+  ////{
+  ////  std::cout << x << std::endl;
+  ////}
 
-  ////o.FindPtEdge(4);
-  //o.FindHvEdge(ValueId{1});
-  //const Object& o2 = o;
-  //o2.FindHvEdge(ValueId{1});
-  ////o.CreateHvEdge(11, 12, 13);
+  //////o.FindPtEdge(4);
+  ////o.FindHvEdge(ValueId{1});
+  ////const Object& o2 = o;
+  ////o2.FindHvEdge(ValueId{1});
+  //////o.CreateHvEdge(11, 12, 13);
 
   return;
 }

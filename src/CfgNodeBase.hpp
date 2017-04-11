@@ -68,24 +68,24 @@ protected:
   }
   //
   //  // ---------------------- for dev needs only ---------------------------- //
-  //public:
-  //  virtual void GetDebugInfo() const override { throw NotImplementedException{}; }
-  //
-  //  static CfgNode& CreateNode(IOperation& op)
-  //  {
-  //    CfgNode* newNode = new CfgNode{op, *new StartCfgNode{}, *new TerminalCfgNode{}};
-  //    ((ICfgNode&)newNode->prevs[0]).next = newNode;
-  //    newNode->next->prevs.push_back(*newNode);
-  //    return *newNode;
-  //  }
-  //
-  //  //beware - adding a node after terminal node here(after inproper cast) would not raise exception
-  //  CfgNode& InsertNewAfter(IOperation& op)
-  //  {
-  //    CfgNode* newNode = new CfgNode{op, *this, *this->next};
-  //    this->next = newNode;
-  //    return *newNode;
-  //  }
+  ////public:
+  ////  virtual void GetDebugInfo() const override { throw NotImplementedException{}; }
+  ////
+  ////  static CfgNode& CreateNode(IOperation& op)
+  ////  {
+  ////    CfgNode* newNode = new CfgNode{op, *new StartCfgNode{}, *new TerminalCfgNode{}};
+  ////    ((ICfgNode&)newNode->prevs[0]).next = newNode;
+  ////    newNode->next->prevs.push_back(*newNode);
+  ////    return *newNode;
+  ////  }
+  ////
+  ////  //beware - adding a node after terminal node here(after improper cast) would not raise exception
+  ////  CfgNode& InsertNewAfter(IOperation& op)
+  ////  {
+  ////    CfgNode* newNode = new CfgNode{op, *this, *this->next};
+  ////    this->next = newNode;
+  ////    return *newNode;
+  ////  }
   //  // ---------------------- for dev needs only ---------------------------- //
 };
 

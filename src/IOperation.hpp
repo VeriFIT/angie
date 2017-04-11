@@ -53,19 +53,19 @@ public:
   virtual IOperation& Invoke() = 0;
 
   virtual IOperation& BinOp() = 0;
-  //// Binary integers operations
-  //virtual IOperation& Add() = 0;
-  //virtual IOperation& Sub() = 0;
-  //virtual IOperation& Mul() = 0;
-  //virtual IOperation& Div() = 0;
-  //virtual IOperation& Rem() = 0;
+  // Binary integers operations
+  ////virtual IOperation& Add() = 0;
+  ////virtual IOperation& Sub() = 0;
+  ////virtual IOperation& Mul() = 0;
+  ////virtual IOperation& Div() = 0;
+  ////virtual IOperation& Rem() = 0;
 
-  //// Bitwise binary operations
-  //virtual IOperation& Shl() = 0;
-  //virtual IOperation& Shr() = 0;
-  //virtual IOperation& And() = 0;
-  //virtual IOperation& Or() = 0;
-  //virtual IOperation& Xor() = 0;
+  // Bitwise binary operations
+  ////virtual IOperation& Shl() = 0;
+  ////virtual IOperation& Shr() = 0;
+  ////virtual IOperation& And() = 0;
+  ////virtual IOperation& Or() = 0;
+  ////virtual IOperation& Xor() = 0;
 
   // Conversion operations
   virtual IOperation& Cast() = 0;

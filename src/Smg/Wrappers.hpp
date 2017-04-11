@@ -6,13 +6,13 @@ class ISmgVisitor;
 
 namespace Smg {
 
-//class ValueWrapper {
-//  ValueId id;
-//  Type type;
-//  IValueContainer& vc;
-//
-//  ValueWrapper operator+(const ValueWrapper& rhs) { vc.Add(id, rhs.id, type,  }
-//}
+////class ValueWrapper {
+////  ValueId id;
+////  Type type;
+////  IValueContainer& vc;
+////
+////  ValueWrapper operator+(const ValueWrapper& rhs) { vc.Add(id, rhs.id, type,  }
+////}
 
 using ObjectId = Impl::ObjectId;
 class Object;
@@ -92,63 +92,63 @@ public:
   {}
 };
 
-//
-//template <class ViewT>
-//class ObjectSet : public SmgSet, ranges::v3::view_facade<ObjectSet<ViewT>> {
-//private:
-//  friend ranges::v3::range_access;
-//
-//  ViewT& container;
-//
-//  struct cursor
-//  {
-//  private:
-//    ranges::range_iterator_t<ViewT> iter;
-//  public:
-//    cursor() = default;
-//    cursor(ranges::range_iterator_t<ViewT> it)
-//      : iter(it)
-//    {}
-//    int const & read() const
-//    {
-//      return *iter;
-//    }
-//    bool equal(cursor const &that) const
-//    {
-//      return iter == that.iter;
-//    }
-//    void next()
-//    {
-//      ++iter;
-//    }
-//    void prev()
-//    {
-//      --iter;
-//    }
-//    std::ptrdiff_t distance_to(cursor const &that) const
-//    {
-//      return that.iter - iter;
-//    }
-//    void advance(std::ptrdiff_t n)
-//    {
-//      iter += n;
-//    }
-//  };
-//  cursor begin_cursor() const
-//  {
-//    return {container.begin()};
-//  }
-//  cursor end_cursor() const
-//  {
-//    return {container.end()};
-//  }
-//  public:
-//  ObjectSet() = default;
-//  ObjectSet(ViewT& rng, Graph& context)
-//    : container{rng}
-//    , SmgSet(context)
-//  {}
-//};
+////
+////template <class ViewT>
+////class ObjectSet : public SmgSet, ranges::v3::view_facade<ObjectSet<ViewT>> {
+////private:
+////  friend ranges::v3::range_access;
+////
+////  ViewT& container;
+////
+////  struct cursor
+////  {
+////  private:
+////    ranges::range_iterator_t<ViewT> iter;
+////  public:
+////    cursor() = default;
+////    cursor(ranges::range_iterator_t<ViewT> it)
+////      : iter(it)
+////    {}
+////    int const & read() const
+////    {
+////      return *iter;
+////    }
+////    bool equal(cursor const &that) const
+////    {
+////      return iter == that.iter;
+////    }
+////    void next()
+////    {
+////      ++iter;
+////    }
+////    void prev()
+////    {
+////      --iter;
+////    }
+////    std::ptrdiff_t distance_to(cursor const &that) const
+////    {
+////      return that.iter - iter;
+////    }
+////    void advance(std::ptrdiff_t n)
+////    {
+////      iter += n;
+////    }
+////  };
+////  cursor begin_cursor() const
+////  {
+////    return {container.begin()};
+////  }
+////  cursor end_cursor() const
+////  {
+////    return {container.end()};
+////  }
+////  public:
+////  ObjectSet() = default;
+////  ObjectSet(ViewT& rng, Graph& context)
+////    : container{rng}
+////    , SmgSet(context)
+////  {}
+////};
 
 template <class ViewT>
 ObjectSet<ViewT> objset(ViewT && rng, Impl::Graph& context)

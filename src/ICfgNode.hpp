@@ -32,20 +32,6 @@ class StatesManager;
 class CfgNode;
 class LlvmCfgNode;
 
-
-//class INavigation {
-//public:
-//  virtual bool HasTwoNext();
-//  virtual INavigation& GetNext();
-//  virtual INavigation& GetNextTrue();
-//  virtual INavigation& GetNextFalse();
-//  virtual const ref_vector<INavigation> GetPrevs(); //?
-//
-//  virtual void GetDebugInfo();
-//  virtual OperationArgs GetArguments();
-//};
-
-
 class ICfgNode : public IOperation {
   friend CfgNode;
   friend LlvmCfgNode;

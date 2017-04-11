@@ -53,12 +53,12 @@ public:
     handles(g.handles),
     vc(g.vc)
   {
-    //objects = ranges::transform(
-    //  g.objects, 
-    //  [](const decltype(objects)::value_type& kvp) { 
-    //    return decltype(objects)::value_type{kvp.first, std::make_unique<Object>(*kvp.second)}; 
-    //    }
-    //  );
+    ////objects = ranges::transform(
+    ////  g.objects, 
+    ////  [](const decltype(objects)::value_type& kvp) { 
+    ////    return decltype(objects)::value_type{kvp.first, std::make_unique<Object>(*kvp.second)}; 
+    ////    }
+    ////  );
     for (const auto& kvp : g.objects)
     {
       objects.emplace(kvp.first, std::make_unique<Object>(*kvp.second));
@@ -67,7 +67,7 @@ public:
 
 
   IValueContainer* vc;
-  //gsl::not_null<IValueContainer*> vc;
+  ////gsl::not_null<IValueContainer*> vc;
   IValueContainer& GetVc() { return *vc; }
 
   // Returns PtEdge [object, offset, type] corresponding to given pointer value
@@ -132,34 +132,34 @@ public:
     return ptr;
   }
 
-  //template<typename UniqueOrderedMap, typename ModifiedValueType>
-  //ValueId CreateOrModifyManual(
-  //  UniqueOrderedMap& map,
-  //  UniqueOrderedMap::key_type&& key,
-  //  UniqueOrderedMap::mapped_type&& newValue
-  //  ModifiedValueType&& value,
-  //  ModifiedValueType* accessor = &UniqueOrderedMap::key_type
-  //  )
-  //{
-  //  // src: http://stackoverflow.com/a/101980
-
-  //  decltype(map)::iterator lb = map.lower_bound(arg.id);
-
-  //  if (lb != map.end() && !(map.key_comp()(arg.id, lb->first)))
-  //  {
-  //    // key already exists
-  //    // update lb->second if you care to
-  //    lb->second::*accessor = std::forward<ModifiedValueType&&>(value);
-  //    return lb->second;
-  //  }
-  //  else
-  //  {
-  //    // the key does not exist in the innerMap
-  //    // add it to the innerMap, use hint
-  //    map.insert(lb, arg.id, std::forward<mapped_type&&>(newValue));
-  //    return newValue;
-  //  }
-  //}
+  ////template<typename UniqueOrderedMap, typename ModifiedValueType>
+  ////ValueId CreateOrModifyManual(
+  ////  UniqueOrderedMap& map,
+  ////  UniqueOrderedMap::key_type&& key,
+  ////  UniqueOrderedMap::mapped_type&& newValue
+  ////  ModifiedValueType&& value,
+  ////  ModifiedValueType* accessor = &UniqueOrderedMap::key_type
+  ////  )
+  ////{
+  ////  // src: http://stackoverflow.com/a/101980
+  ////
+  ////  decltype(map)::iterator lb = map.lower_bound(arg.id);
+  ////
+  ////  if (lb != map.end() && !(map.key_comp()(arg.id, lb->first)))
+  ////  {
+  ////    // key already exists
+  ////    // update lb->second if you care to
+  ////    lb->second::*accessor = std::forward<ModifiedValueType&&>(value);
+  ////    return lb->second;
+  ////  }
+  ////  else
+  ////  {
+  ////    // the key does not exist in the innerMap
+  ////    // add it to the innerMap, use hint
+  ////    map.insert(lb, arg.id, std::forward<mapped_type&&>(newValue));
+  ////    return newValue;
+  ////  }
+  ////}
 
   ValueId ReadValue(ValueId ptr, Type ptrType, Type tarType)
   {
