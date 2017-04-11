@@ -1,3 +1,6 @@
+# Hidden folders
+.*/
+
 # Build results
 
 [Bb]in/
@@ -21,6 +24,8 @@ temp/*
 *.obj
 *.o
 *.so
+*.ilk
+*.pdb
 
 # Visual Studio
 *.VC.db
