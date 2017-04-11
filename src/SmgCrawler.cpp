@@ -44,10 +44,10 @@ void SmgCrawler::Visit(PtEdge pte)
   GetInnerVisitor().Visit(pte);
 
   auto object = pte.GetTargetObject();
-  if (alreadyVisited.find(object) == alreadyVisited.end())
+  if (alreadyVisited.find(object.GetId()) == alreadyVisited.end())
   {
     //have not been here yet
-    alreadyVisited.emplace(object);
+    alreadyVisited.emplace(object.GetId());
     object.Accept(*this);
   }
 }
@@ -73,4 +73,6 @@ void SmgCrawler::Visit(Sls s)
 void SmgCrawler::Visit(Graph g)
 {
   GetInnerVisitor().Visit(g);
+  for (auto edge : Object(g.graph.handles, g.graph).GetPtOutEdges())
+    edge.Accept(*this);
 }

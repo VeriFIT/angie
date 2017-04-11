@@ -1,6 +1,10 @@
 #pragma once
 
+#include "ObjectId.hpp"
+
 namespace Smg {
+
+using ObjectId = Impl::ObjectId;
 
 class Graph;
 

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Graph.hpp"
+#include "ObjectId.hpp"
+#include "Wrappers_fwd.hpp"
 
 class ISmgVisitor;
 
@@ -13,8 +15,6 @@ namespace Smg {
 ////
 ////  ValueWrapper operator+(const ValueWrapper& rhs) { vc.Add(id, rhs.id, type,  }
 ////}
-
-using ObjectId = Impl::ObjectId;
 class Object;
 
 /*
@@ -34,10 +34,9 @@ BaseEdge
 */
 
 class Graph {
-  Impl::Graph& graph;
 public:
-  //auto GetInEdges();
-  void Accept(ISmgVisitor& visitor);
+  Impl::Graph& graph;
+  void Accept(ISmgVisitor& visitor) { visitor.Visit(*this); }
   Graph(Impl::Graph& graph) : graph{graph} {}
 };
 
