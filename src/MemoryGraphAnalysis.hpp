@@ -288,28 +288,54 @@ class MemGraphOpGetElementPtr : public BasicOperation<MemoryGraphAnalysisState> 
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override
   {
     // consider packing and aligment!!!
+    auto& vc = newState.GetVc();
+    ValueId offsetVal;
 
-    //auto numOfIndexes = args.size() - 2;
+    auto source = args.GetOperand(0);
+    auto sourceId = newState.GetAnyVar(source);
+    auto elementType = source.type.GetPointerElementType();
 
-    //auto lvl0Size = args.GetOperand(0).type.GetPointerElementType().GetSizeOf();
-
-    //if (args.GetOperand(0).type.IsStruct())
-    //{
-    //  auto lvl1Size = args.GetOperand(0).type.GetPointerElementType().GetStructElementOffset(/*and here index*/);
-    //}
-
-    auto source          = args.GetOperand(0);
-    auto sourceId        = newState.GetAnyVar   (source);
-    uint64_t offset      = static_cast<uint64_t>(args.GetOptions().idTypePair.id); //HACK relaying on ValueId == constant value stored by that id    
-
+    // opt
     //! We assume, that getelementptr instruction is always generated as forerunner of load/store op.
-    if (newState.GetVc().IsZero(sourceId))
+    if (vc.IsZero(sourceId))
     {
       throw PossibleNullDereferenceException();
     }
 
-    ValueId offsetVal     = newState.GetVc().CreateConstIntVal(offset, PTR_TYPE);
-    ValueId retVal        = newState.CreateDerivedPointer(sourceId, offsetVal, args.GetTarget().type);
+    // possible opt
+    //HACK relaying on ValueId == constant value stored by that id    
+    ////offset = static_cast<uint64_t>(args.GetOptions().idTypePair.id); 
+    
+    auto numOfIndexes = args.GetOperandCount() - 1;
+    // lvl0: array/pointer athimetic indexation
+    auto fIdx0 = args.GetOperand(1);
+    auto vIdx0 = newState.GetAnyVar(fIdx0);
+
+    // Do the math
+    auto vL0Size = elementType.GetSizeOfV(vc);
+    offsetVal = vc.Mul(vIdx0, vL0Size, PTR_TYPE, ArithFlags::Default);
+
+    if (numOfIndexes > 1)
+    {
+      // lvl1 indexing should be only possible on structs right now
+      assert(elementType.IsStruct());
+      auto fIdx1 = args.GetOperand(2);
+      auto vIdx1 = newState.GetAnyVar(fIdx1);
+      // structure field index must be a constant
+      assert(vc.GetAbstractionStatus(vIdx1) == AbstractionStatus::Constant);
+      auto fieldIndex = vc.GetConstantIntInnerVal(vIdx1);
+
+      // Do the math
+      auto vL1Offset = elementType.GetStructElementOffsetV(fieldIndex, vc);
+      offsetVal = vc.Add(offsetVal, vL1Offset, PTR_TYPE, ArithFlags::Default);
+
+      if (numOfIndexes > 2)
+      {
+        throw NotSupportedException("Only 2 levels (L0 and L1) of indexation via GEP are supported.");
+      }
+    }
+
+    ValueId retVal = newState.CreateDerivedPointer(sourceId, offsetVal, args.GetTarget().type);
 
     newState.LinkLocalVar(args.GetTarget(), retVal);
   }
