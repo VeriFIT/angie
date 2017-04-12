@@ -114,25 +114,25 @@ public:
 template<typename StateT, typename OperArgsT = OperationArgs>
 class BasicOperation : public IOperation, OperationHelpers<StateT, OperArgsT> {
 public:
-  virtual void Execute(IState& lastSt, const OperationArgs& args) override final
+  virtual void Execute(IState& state, const OperationArgs& args) override final
   {
     // check whether this non-branching operation is placed in non-branching node
-    assert(!lastSt.GetNode().IsBranching()); 
+    assert(!state.GetNode().IsBranching()); 
 
-    uptr<IState> successor = lastSt.CreateSuccessor(lastSt.GetNode().GetNext());
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
+    uptr<IState> successor = state.CreateSuccessor(state.GetNode().GetNext());
+    this->SafelyExecuteAndEnque(state, std::move(successor), args);
   }
 };
 
 template<typename StateT, typename OperArgsT = OperationArgs>
 class OperationRet : public IOperation, OperationHelpers<StateT, OperArgsT> {
-  void Execute(IState& lastSt, const OperArgsT& args)
+  void Execute(IState& state, const OperArgsT& args)
   {
     // check whether this non-branching operation is placed in non-branching node
-    assert(!lastSt.GetNode().IsBranching());
+    assert(!state.GetNode().IsBranching());
 
-    uptr<IState> successor = lastSt.CreateSuccessor(lastSt.GetStackRetNode());
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
+    uptr<IState> successor = state.CreateSuccessor(state.GetStackRetNode());
+    this->SafelyExecuteAndEnque(state, std::move(successor), args);
   }
 };
 
@@ -140,27 +140,27 @@ template<typename StateT>
 class OperationCall : public IOperation, OperationHelpers<StateT, CallOpArgs> {
 public:
 
-  virtual void Execute(IState& lastSt, const OperationArgs& args) override
+  virtual void Execute(IState& state, const OperationArgs& args) override
   {
-    Execute(lastSt, static_cast<const CallOpArgs&>(args));
+    Execute(state, static_cast<const CallOpArgs&>(args));
   }
 
 private:
 
-  void Execute(IState& lastSt, const CallOpArgs& args)
+  void Execute(IState& state, const CallOpArgs& args)
   {
     // check whether this non-branching operation is placed in non-branching node
-    assert(!lastSt.GetNode().IsBranching());
+    assert(!state.GetNode().IsBranching());
 
     uptr<IState> successor;
     {
-      auto& nextJump = lastSt.GetFuncMapping().GetFunction(lastSt.GetValue(args.GetOptions())).cfg;
-      successor = lastSt.CreateSuccessor(nextJump);
+      auto& nextJump = state.GetFuncMapping().GetFunction(state.GetValue(args.GetOptions())).cfg;
+      successor = state.CreateSuccessor(nextJump);
 
       // Prepares the instruction-after-call to be pushed on the stack
-      (*successor).SetStackRetNode(lastSt.GetNode().GetNext());
+      (*successor).SetStackRetNode(state.GetNode().GetNext());
     }
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
+    this->SafelyExecuteAndEnque(state, std::move(successor), args);
   }
 };
 
@@ -169,19 +169,19 @@ class OperationBranch : public IOperation, OperationHelpers<StateT, OperArgsT, s
 public:
 
   // Override this again to switch to branching implementation
-  virtual void Execute(IState& lastSt, const OperationArgs& args) override final
+  virtual void Execute(IState& state, const OperationArgs& args) override final
   {
     // check whether this branching operation is placed in branching node
     assert(state.GetNode().IsBranching()); 
 
     uptr<IState> successor;
-    successor = lastSt.CreateSuccessor(lastSt.GetNode().GetNextTrue());
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args, true);
+    successor = state.CreateSuccessor(state.GetNode().GetNextTrue());
+    this->SafelyExecuteAndEnque(state, std::move(successor), args, true);
 
-    successor = lastSt.CreateSuccessor(lastSt.GetNode().GetNextFalse());
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args, false);
+    successor = state.CreateSuccessor(state.GetNode().GetNextFalse());
+    this->SafelyExecuteAndEnque(state, std::move(successor), args, false);
 
-    lastSt.SetExplored();
+    state.SetExplored();
     return;
   }
 };

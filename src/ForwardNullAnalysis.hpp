@@ -34,21 +34,21 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "FrontedValueMapper.hpp"
 #include "Operation.hpp"
 
-class ForwardNullAnalysisState : public StateBase {
+class ForwardNullAnalysisState : public State {
 private:
 
 public:
 
   /*ctr*/ ForwardNullAnalysisState(
       //ICfgNode& lastCfgNode, 
-      ICfgNode& nextCfgNode,
+      ICfgNode& node,
       IValueContainer& vc,
       Mapper& globalMapping,
       FuncMapper& funcMapping
       ) :
-    StateBase(
+    State(
       //lastCfgNode, 
-      nextCfgNode, 
+      node, 
       vc, 
       globalMapping,
       funcMapping)
@@ -63,12 +63,12 @@ public:
   /*ctr*/ ForwardNullAnalysisState(
       const ForwardNullAnalysisState& state, 
       //ICfgNode& lastCfgNode, 
-      ICfgNode& nextCfgNode
+      ICfgNode& node
       ) :
-    StateBase(
+    State(
       state, 
       //lastCfgNode, 
-      nextCfgNode),
+      node),
     stackCurrentAddr(state.stackCurrentAddr),
     hasValue(state.hasValue)
   {
@@ -133,7 +133,7 @@ public:
     int i = 0;
     for (auto& param : func.params.GetArgs())
     {
-      newState.LinkLocalVar(param.idTypePair, newState.GetValue(args.GetOperand(i)));
+      newState.AssignValue(param.idTypePair, newState.GetValue(args.GetOperand(i)));
       i++;
     }
 
@@ -175,7 +175,7 @@ class FnaOperationGetElementPtr : public BasicOperation<ForwardNullAnalysisState
     
     ValueId offsetVal     = newState.GetVc().CreateConstIntVal(offset, PTR_TYPE);
     ValueId retVal        = newState.GetVc().Add(lhs, offsetVal, PTR_TYPE, ArithFlags::Default);
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -191,7 +191,7 @@ class FnaOperationAlloca : public BasicOperation<ForwardNullAnalysisState> {
     ValueId retVal        = newState.GetVc().Add(newState.stackCurrentAddr, size64, PTR_TYPE, ArithFlags::Default);
 
     newState.stackCurrentAddr = retVal;
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -207,7 +207,7 @@ class FnaOperationLoad : public BasicOperation<ForwardNullAnalysisState> {
     auto target = newState.GetValue(args.GetOperand(0));
     ValueId value = newState.Load(target);
 
-    newState.LinkLocalVar(args.GetTarget(), value);
+    newState.AssignValue(args.GetTarget(), value);
   }
 };
 
@@ -258,9 +258,9 @@ class FnaOperationCast : public BasicOperation<ForwardNullAnalysisState, CastOpA
     //auto srcType     = args.GetOperand(0).type;
     
     if (opts.opKind == CastOpKind::BitCast)
-      newState.LinkLocalVar(args.GetTarget(), lhs);
+      newState.AssignValue(args.GetTarget(), lhs);
     else if(opts.opKind == CastOpKind::Extend)      
-      newState.LinkLocalVar(args.GetTarget(), lhs); //TODO: hack!
+      newState.AssignValue(args.GetTarget(), lhs); //TODO: hack!
     else
       throw NotImplementedException();
   }

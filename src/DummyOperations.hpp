@@ -38,19 +38,19 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 //public:
 //  virtual void Execute(IState& s, const vector<OperArg>& args) override
 //  {
-//    if (s.nextCfgNode.IsBranching())
+//    if (s.node.IsBranching())
 //    {
-//      s.nextCfgNode.GetStatesManager().InsertAndEnqueue(
-//        make_unique<DummyState>(s.nextCfgNode, s.nextCfgNode.GetNextTrue())
+//      s.node.GetStatesManager().InsertAndEnqueue(
+//        make_unique<DummyState>(s.node, s.node.GetNextTrue())
 //      );
-//      s.nextCfgNode.GetStatesManager().InsertAndEnqueue(
-//        make_unique<DummyState>(s.nextCfgNode, s.nextCfgNode.GetNextFalse())
+//      s.node.GetStatesManager().InsertAndEnqueue(
+//        make_unique<DummyState>(s.node, s.node.GetNextFalse())
 //      );
 //    }
 //    else
 //    {
-//      s.nextCfgNode.GetStatesManager().InsertAndEnqueue(
-//        make_unique<DummyState>(s.nextCfgNode, s.nextCfgNode.GetNext())
+//      s.node.GetStatesManager().InsertAndEnqueue(
+//        make_unique<DummyState>(s.node, s.node.GetNext())
 //      );
 //    }
 //

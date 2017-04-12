@@ -35,18 +35,18 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Smg.hpp"
 
-class MemoryGraphAnalysisState : public StateBase {
+class MemoryGraphAnalysisState : public State {
 public:
 
   /*ctr*/ MemoryGraphAnalysisState(
-    ICfgNode& nextCfgNode,
+    ICfgNode& node,
     IValueContainer& vc,
     Mapper& globalMapping,
     FuncMapper& funcMapping
   ) :
-    StateBase(
+    State(
       //lastCfgNode, 
-      nextCfgNode, 
+      node, 
       vc, 
       globalMapping,
       funcMapping),
@@ -57,11 +57,11 @@ public:
   // copy ctr ??? or what
   /*ctr*/ MemoryGraphAnalysisState(
     const MemoryGraphAnalysisState& state, 
-    ICfgNode& nextCfgNode
+    ICfgNode& node
   ) :
-    StateBase(
+    State(
       state, 
-      nextCfgNode),
+      node),
     graph(state.graph),
     stack(state.stack)
   {
@@ -222,7 +222,7 @@ class MemGraphOpLoad : public BasicOperation<MemoryGraphAnalysisState> {
     auto ptrId = newState.GetValue(ptr);
     ValueId value = newState.Load(ptrId, ptr.type, reg.type);
 
-    newState.LinkLocalVar(reg, value);
+    newState.AssignValue(reg, value);
   }
 };
 
@@ -250,7 +250,7 @@ class MemGraphOpAlloca : public BasicOperation<MemoryGraphAnalysisState> {
     ValueId count64       = newState.GetVc().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
     ValueId retVal        = newState.Alloca(type.GetPointerElementType(), count64);
 
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -262,7 +262,7 @@ class MemGraphOpMalloc : public BasicOperation<MemoryGraphAnalysisState> {
     ValueId size64        = newState.GetVc().ExtendInt(size, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
     ValueId retVal        = newState.Malloc(size64);
 
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -337,7 +337,7 @@ class MemGraphOpGetElementPtr : public BasicOperation<MemoryGraphAnalysisState> 
 
     ValueId retVal = newState.CreateDerivedPointer(sourceId, offsetVal, args.GetTarget().type);
 
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -352,15 +352,15 @@ class MemGraphOpCast : public BasicOperation<MemoryGraphAnalysisState, CastOpArg
 
     if (opts.opKind == CastOpKind::BitCast)
     {
-      newState.LinkLocalVar(args.GetTarget(), lhs);
+      newState.AssignValue(args.GetTarget(), lhs);
       newState.CreateDerivedPointer(lhs, newState.GetVc().GetZero(PTR_TYPE), tarType);
     }
     else if(opts.opKind == CastOpKind::Extend)      
-      newState.LinkLocalVar(args.GetTarget(), lhs); //TODO: hack!
+      newState.AssignValue(args.GetTarget(), lhs); //TODO: hack!
     else if (opts.opKind == CastOpKind::Truncate)
     {
       auto trunc = newState.GetVc().TruncateInt(lhs, srcType, tarType);
-      newState.LinkLocalVar(args.GetTarget(), trunc); //TODO: hack!
+      newState.AssignValue(args.GetTarget(), trunc); //TODO: hack!
     }
     else
       throw NotImplementedException();
@@ -387,7 +387,7 @@ class FnaxOperationCall : public OperationCall<MemoryGraphAnalysisState> {
     i = 0;
     for (auto& param : func.params.GetArgs())
     {      
-      newState.LinkLocalVar(
+      newState.AssignValue(
         param.idTypePair, 
         callArgs[i]
         );

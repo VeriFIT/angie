@@ -28,6 +28,9 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "Values.hpp"
 #include "FrontedValueMapper.hpp"
 
+#include "IdImpl.hpp"
+
+using StateId = Id<class StateIdToken, int64_t, 0>;
 
 class ICfgNode; //forward declaration -- include collision ICfgNode vs IState
 //#include "ICfgNode.hpp"
@@ -47,6 +50,9 @@ class IState {
 public:
   virtual ~IState() {}
 
+  virtual StateId       GetId()         const = 0;
+  virtual StateId::type GetGeneration() const = 0;
+
   virtual uptr<IState> CreateSuccessor(ICfgNode& nextStep) const = 0;
 
   // informace o posledni provedene op. na ktere je stav zalozen?
@@ -57,11 +63,12 @@ public:
   
   // optional, all states that participated on creating this state (JOIN)
   // might be changed to Get/Set property
-  virtual ref_span<IState> GetPredecessors() = 0;
+  virtual ref_span<const IState> GetPredecessors() const = 0;
   // optional, all states that are based on this state
   // might be changed to Get/Set property
-  virtual ref_span<IState> GetSuccessors() = 0;
+  virtual ref_span<const IState> GetSuccessors() const = 0;
 
+  // possibly useless now
   // meaning: All paths(states) leading from this state were prepared for processing or already processed
   virtual void SetExplored() = 0;
   //TODO@michkot: find a better name for this
@@ -88,79 +95,76 @@ public:
   virtual void      SetStackRetNode(ICfgNode& node) { throw NotImplementedException(); }
 };
 
-class StateBase : public IState {
+class State : public IState {
 private:
+
+  StateId id = StateId::GetNextId();
+  StateId::type generation;
 
   StateStatus condition = StateStatus::New;
 
-  Mapper&     globalMapping;
-  FuncMapper& funcMapping;
+  Mapper&          globalMapping;
+  FuncMapper&      funcMapping;
   IValueContainer& vc; 
   //TODO: VC should be copied when stated is cloned?! -> how about other parts of program, like Smg,... each has own reference
   // ... we will probaly end up with thread local "current VC reference" and the owner will be state
 
-  //ICfgNode& lastCfgNode;
-  ICfgNode& nextCfgNode; 
+  ICfgNode& node; 
+
+  ref_vector<const IState> predecessors;
+  ref_vector<const IState> successors{1};
 
 protected:
 
   Mapper      localMapping;
 
   // Basic constructor
-  /*ctr*/ StateBase(
+  /*ctr*/ State(
     //ICfgNode& lastCfgNode, 
-    ICfgNode& nextCfgNode,
+    ICfgNode& node,
     IValueContainer& vc,
     Mapper& globalMapping,
     FuncMapper& funcMapping
   ) :
     //lastCfgNode(lastCfgNode), 
-    nextCfgNode(nextCfgNode),
+    node(node),
     vc(vc),
     globalMapping(globalMapping),
-    funcMapping(funcMapping)
+    funcMapping(funcMapping),
+    generation(0)
   {
   }
 
   // Clone constructor
-  /*ctr*/ StateBase(
-    const StateBase& state, 
+  /*ctr*/ State(
+    const State& state, 
     //ICfgNode& lastCfgNode, 
-    ICfgNode& nextCfgNode
+    ICfgNode& node
   ) :
     //lastCfgNode(lastCfgNode), 
-    nextCfgNode(nextCfgNode),
+    node(node),
     vc(state.vc),
     globalMapping(state.globalMapping),
     funcMapping(state.funcMapping),
-    localMapping(state.localMapping)
+    localMapping(state.localMapping),
+    generation(state.generation + 1),
+    predecessors{state}
   {
   }
 
 public:
 
-  virtual StateStatus GetStatus() const override { return condition; }
-  virtual ICfgNode& GetNode() const override { return nextCfgNode; }
-  virtual ref_span<IState> GetPredecessors() override { throw NotImplementedException(); }
-  virtual ref_span<IState> GetSuccessors() override { throw NotImplementedException(); }
-  virtual void SetExplored() override { condition = StateStatus::Explored; }
-  virtual bool IsNew() const override { return condition == StateStatus::New; }
+  virtual StateId     GetId()       const override { return id; }
+  virtual StateStatus GetStatus()   const override { return condition; }
+  virtual ICfgNode&   GetNode()     const override { return node; }
+  virtual void        SetExplored()       override {        condition = StateStatus::Explored; }
+  virtual bool        IsNew()       const override { return condition == StateStatus::New; }
 
-  //virtual ref_span<IState> GetPredecessors() override
-  //{
-  //  return ref_span<IState>(previousStates);
-  //}
-
-  //------------------------------------
-
+  virtual ref_span<const IState> GetPredecessors() const override { return {predecessors}; }
+  virtual ref_span<const IState> GetSuccessors()   const override { return {successors}; }
 
   virtual IValueContainer& GetVc() override final { return vc; }
 
-  virtual FuncMapper& GetFuncMapping() const override { return funcMapping; }
-
-  //TODO: rename / refactor..
-
-  //TODO: GetAnyValue, GetValue ?
   virtual ValueId GetValue(FrontendIdTypePair var) const override
   {
     try { return globalMapping.GetValueId(var.id); }
@@ -170,10 +174,12 @@ public:
   {
     try { localMapping.LinkToValueId(var.id, value); }
     catch (std::exception e) { return localMapping.LinkToValueId(var.id, value); }
-    
+
   }
 
-  //------------------------------------
+  //TODO@michkot: move to analysis context
+  virtual FuncMapper& GetFuncMapping() const override { return funcMapping; }
+  
 
 
 };
