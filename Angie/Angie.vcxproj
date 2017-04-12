@@ -139,6 +139,7 @@
     <ClInclude Include="..\..\croaring\roaring.hpp" />
     <ClInclude Include="..\src\Operation.hpp" />
     <ClInclude Include="..\src\MemoryGraphAnalysis.hpp" />
+    <ClInclude Include="..\src\OsUtils.hpp" />
     <ClInclude Include="..\src\precompall.hpp" />
     <ClInclude Include="..\src\precompllvm.hpp" />
     <ClInclude Include="..\src\precompother.hpp" />
@@ -200,6 +201,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\src\OsUtils.cpp" />
     <ClCompile Include="..\src\precompall.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>

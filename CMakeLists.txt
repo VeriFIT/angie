@@ -89,6 +89,8 @@ set(SOURCE_FILES
     src/main.cpp
     src/MemoryGraphAnalysis.hpp
     src/Operation.hpp
+    src/OsUtils.hpp
+    src/OsUtils.cpp
     src/Smg/Edge.cpp
     src/Smg/Edge.hpp
     src/Smg/Graph.cpp
