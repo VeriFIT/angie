@@ -41,8 +41,8 @@ public:
 
 public:
 
-  Graph(IValueContainer* vc) :
-    vc(vc)
+  Graph(IValueContainer& vc) :
+    vc(&vc)
   {
     auto& obj = objects.emplace(ObjectId{0}, std::make_unique<Object>()).first.operator*().second.operator*();
     obj.id = ObjectId{0};
