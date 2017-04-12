@@ -147,6 +147,9 @@
     <ClInclude Include="..\src\SmgUtils.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Analysis.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\console.cpp">

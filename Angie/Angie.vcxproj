@@ -119,6 +119,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Analysis.hpp" />
     <ClInclude Include="..\src\CfgNodeBase.hpp" />
     <ClInclude Include="..\src\Definitions.hpp" />
     <ClInclude Include="..\src\DummyOperations.hpp" />
