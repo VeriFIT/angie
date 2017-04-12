@@ -25,6 +25,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "Smg/Graph.hpp"
 #include "Smg/Wrappers.hpp"
 
+#include "SmgUtils.hh"
 
 
 void playground()
