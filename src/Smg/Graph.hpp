@@ -36,15 +36,15 @@ class Graph {
 private:
 
 public:
-  Object handles;
-  std::map<ObjectId, uptr<Object>> objects;
+  Region handles;
+  std::map<ObjectId, uptr<Region>> objects;
 
 public:
 
   Graph(IValueContainer& vc) :
     vc(&vc)
   {
-    auto& obj = objects.emplace(ObjectId{0}, std::make_unique<Object>()).first.operator*().second.operator*();
+    auto& obj = objects.emplace(ObjectId{0}, std::make_unique<Region>()).first.operator*().second.operator*();
     obj.id = ObjectId{0};
     obj.size = ValueId{0};
     handles.CreatePtEdge(PtEdge{ValueId{0}, ValueId{0}, Type::CreateCharPointerType(), ObjectId{0}, GetVc().GetZero(PTR_TYPE)});
@@ -56,12 +56,12 @@ public:
     ////objects = ranges::transform(
     ////  g.objects, 
     ////  [](const decltype(objects)::value_type& kvp) { 
-    ////    return decltype(objects)::value_type{kvp.first, std::make_unique<Object>(*kvp.second)}; 
+    ////    return decltype(objects)::value_type{kvp.first, std::make_unique<Region>(*kvp.second)}; 
     ////    }
     ////  );
     for (const auto& kvp : g.objects)
     {
-      objects.emplace(kvp.first, std::make_unique<Object>(*kvp.second));
+      objects.emplace(kvp.first, std::make_unique<Region>(*kvp.second));
     }
   }
 
@@ -109,7 +109,7 @@ public:
   };
 
   // Returns a pointer to newly allocated object
-  ValueId AllocateObject(Type type, MemorySpace ms = MemorySpace::Heap)
+  ValueId AllocateRegion(Type type, MemorySpace ms = MemorySpace::Heap)
   {
     // assign a new ObjectId and new ValueId representing the resultant pointer
     //TODO: different acquisition of ValueId based on MemorySpace
@@ -119,9 +119,9 @@ public:
     ObjectId oid = ObjectId::GetNextId();
     ValueId  ptr = GetVc().CreateVal(ptrToTypeT);//ValueId ::GetNextId();
 
-                                                 // move from new uptr<Object>
+                                                 // move from new uptr<Region>
                                                  // create new object and place it into map
-    auto& obj = objects.emplace(oid, std::make_unique<Object>()).first.operator*().second.operator*();
+    auto& obj = objects.emplace(oid, std::make_unique<Region>()).first.operator*().second.operator*();
 
     // initialize the object
     obj.id = oid;

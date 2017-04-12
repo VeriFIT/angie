@@ -8,7 +8,7 @@ namespace Smg {
 namespace Impl {
 
 class EdgeBase;
-class Object;
+class Region;
 class Graph;
 
 using ObjectSize = ValueId;

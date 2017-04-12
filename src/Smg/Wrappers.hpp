@@ -170,11 +170,11 @@ protected:
   Impl::Object& object;
   Impl::Graph&  graph;
 public:
+  Impl::Object& GetObject(){ return static_cast<Impl::Object&>(object); }
   auto GetPtOutEdges() { return objseo<Smg::PtEdge>(object.GetPtOutEdges(), graph); }
   auto GetHvOutEdges() { return objseo<Smg::HvEdge>(object.GetHvOutEdges(), graph); }
   auto GetOutEdges()   { return objseo<Smg::Edge>  (object.GetPtOutEdges(), graph); }
   auto GetPtInEdges()  { throw NotImplementedException(); }
-  ValueId GetSize()    { return object.GetSize(); }
   ObjectId GetId()     { return object.id; }
 
   void Accept(ISmgVisitor& visitor) { object.Accept(visitor, graph); }
@@ -189,13 +189,16 @@ public:
 //ImplObjectEnumerable GetPredecessorObjects() const;
 class Region : public Object {
 public:
-  bool IsValid()     { throw NotImplementedException(); }
-  bool IsFreed()     { throw NotImplementedException(); }
-  bool IsNullified() { throw NotImplementedException(); }
+  Impl::Region& GetObject(){ return static_cast<Impl::Region&>(object); }
+  bool IsValid()     { return GetObject().isValid; }
+  bool IsFreed()     { return GetObject().isFreed; }
+  bool IsNullified() { return GetObject().isNullified; }
+  ValueId GetSize()  { return GetObject().GetSize(); }
   Region(Impl::Region& object, Impl::Graph& graph) : Object{object, graph} {}
 };
 class Sls : public Object {
 public:
+  ValueId  GetSize()  { throw NotImplementedException(); }
   uint16_t GetLevel() { throw NotImplementedException(); }
   uint16_t GetRank()  { throw NotImplementedException(); }
 };

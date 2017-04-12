@@ -50,7 +50,6 @@ public:
   virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
 
   ObjectId id;
-  ObjectSize size;
   std::vector<HvEdge> hvEdges;
   std::vector<PtEdge> ptEdges;
   int32_t refCounter{0};
@@ -146,9 +145,7 @@ private:
 public:
 
   virtual ~Object() = default;
-
   ObjectId GetId() const { return id; }
-  ObjectSize GetSize() const { return size; }
 
   //Relies on GetPtOutEdges  //GetSucessors
         auto  GetOutEdges()         { return ::ranges::view::concat(hvEdges, ptEdges); }
@@ -188,12 +185,22 @@ public:
   {
     return CreateOrModifyEdge(ptEdges, std::forward<ValueId>(offset), std::forward<Args>(args)...);
   }
-
 };
 
 class Region : public Object {
 
+public:
+
+  bool isValid = true;
+  bool isNullified = false;
+  bool isFreed = false;
+
   virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
+
+  ObjectSize size;
+
+public:
+  ObjectSize GetSize() const { return size; }
 
 };
 
