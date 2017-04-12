@@ -73,7 +73,8 @@ public:
       localStates.push_back(state);
 
       // here we should utilize priorities
-      worklist.push_back(state);
+      // now DFS
+      worklist.push_front(state);
     }
   }
 
