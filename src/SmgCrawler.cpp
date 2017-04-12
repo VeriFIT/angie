@@ -28,10 +28,7 @@ using namespace Smg; //TODO: replace with namespace Smg {
 void SmgCrawler::CrawlSmg(Object o)
 {
   alreadyVisited.clear();
-  for (auto edge : o.GetOutEdges())
-  {
-    edge.Accept(*this);
-  }
+  o.Accept(*this);
 }
 
 void SmgCrawler::Visit(HvEdge hve)
