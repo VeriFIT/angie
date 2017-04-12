@@ -7,13 +7,16 @@
 
 #include "OsUtils.hpp"
 
-void ShowSmg(Smg::Impl::Graph& g, const char* viewer = "explorer");
+void ShowSmg(Smg::Impl::Graph& g, bool stack = false, const char* viewer = "explorer");
 
-void ShowSmg(Smg::Impl::Graph& g, const char* viewer)
+void ShowSmg(Smg::Impl::Graph& g, bool stack, const char* viewer)
 {
   SmgPrinter printer{};
   SmgCrawler crawler{printer};
-  Smg::Graph{g}.Accept(crawler);
+  if (!stack)
+    Smg::Graph{g}.Accept(crawler);
+  else
+    crawler.CrawlSmg(Smg::Object{g.handles,g});
   auto plot_string = printer.GetDot();
 
   std::string temp = OsUtils::GetEnv("TEMP");
