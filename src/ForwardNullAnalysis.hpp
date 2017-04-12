@@ -128,12 +128,12 @@ public:
     // that is, "base address", here base address of function, beeing in unknown (abstract) value
     // and other addresses somehow based on this address
 
-    auto& func = newState.GetFuncMapping().GetFunction(newState.GetAnyVar(args.GetOptions()));
+    auto& func = newState.GetFuncMapping().GetFunction(newState.GetValue(args.GetOptions()));
 
     int i = 0;
     for (auto& param : func.params.GetArgs())
     {
-      newState.LinkLocalVar(param.idTypePair, newState.GetAnyVar(args.GetOperand(i)));
+      newState.LinkLocalVar(param.idTypePair, newState.GetValue(args.GetOperand(i)));
       i++;
     }
 
@@ -164,7 +164,7 @@ class FnaOperationGetElementPtr : public BasicOperation<ForwardNullAnalysisState
     //  auto lvl1Size = args.GetOperand(0).type.GetPointerElementType().GetStructElementOffset(/*and here index*/);
     //}
     
-    auto     lhs    = newState.GetAnyVar   (args.GetOperand(0));
+    auto     lhs    = newState.GetValue   (args.GetOperand(0));
     uint64_t offset = static_cast<uint64_t>(args.GetOptions().idTypePair.id); //HACK relaying on ValueId == constant value stored by that id    
 
     //! We assume, that getelementptr instruction is always generated as forerunner of load/store op.
@@ -182,7 +182,7 @@ class FnaOperationGetElementPtr : public BasicOperation<ForwardNullAnalysisState
 class FnaOperationAlloca : public BasicOperation<ForwardNullAnalysisState> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const OperationArgs& args) override
   {
-    auto count = newState.GetAnyVar(args.GetOperand(0));
+    auto count = newState.GetValue(args.GetOperand(0));
     auto type  = args.GetTarget().type;
 
     ValueId elementSize64 = newState.GetVc().CreateConstIntVal(type.GetPointerElementType().GetSizeOf(), PTR_TYPE);
@@ -204,7 +204,7 @@ class FnaOperationLoad : public BasicOperation<ForwardNullAnalysisState> {
     // it in fact means just to bind an existing value to another FrontendValueId
     // which value is to be loaded is but entirely up to the specific analysis
     
-    auto target = newState.GetAnyVar(args.GetOperand(0));
+    auto target = newState.GetValue(args.GetOperand(0));
     ValueId value = newState.Load(target);
 
     newState.LinkLocalVar(args.GetTarget(), value);
@@ -218,8 +218,8 @@ class FnaOperationStore : public BasicOperation<ForwardNullAnalysisState> {
     // this operation should somehow Store a value in register to certain address in memory
     // the way for the operation to handle such a "write" is completely analysis specific
     
-    auto value  = newState.GetAnyVar(args.GetOperand(0));
-    auto target = newState.GetAnyVar(args.GetOperand(1));
+    auto value  = newState.GetValue(args.GetOperand(0));
+    auto target = newState.GetValue(args.GetOperand(1));
 
     newState.Store(value, target);
   }
@@ -232,9 +232,9 @@ class FnaOperationMemset : public BasicOperation<ForwardNullAnalysisState> {
     // this operation should somehow Store a value in register to certain address in memory
     // the way for the operation to handle such a "write" is completely analysis specific
     
-    auto target = newState.GetAnyVar(args.GetOperand(0));
-    auto value  = newState.GetAnyVar(args.GetOperand(1));
-    auto len    = newState.GetAnyVar(args.GetOperand(2));
+    auto target = newState.GetValue(args.GetOperand(0));
+    auto value  = newState.GetValue(args.GetOperand(1));
+    auto len    = newState.GetValue(args.GetOperand(2));
 
     auto& vc = newState.GetVc();
     auto i = vc.CreateConstIntVal(0, PTR_TYPE);
@@ -251,7 +251,7 @@ class FnaOperationMemset : public BasicOperation<ForwardNullAnalysisState> {
 class FnaOperationCast : public BasicOperation<ForwardNullAnalysisState, CastOpArgs> {
   virtual void ExecuteOnNewState(ForwardNullAnalysisState& newState, const CastOpArgs& args) override  
   {
-    auto lhs           = newState.GetAnyVar(args.GetOperand(0));
+    auto lhs           = newState.GetValue(args.GetOperand(0));
     auto opts          = args.GetOptions();
     //ArithFlags flags = static_cast<ArithFlags>(static_cast<uint64_t>(args[1].id) & 0xffff);
     //auto tarType     = args.GetTarget().type;

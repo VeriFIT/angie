@@ -35,7 +35,7 @@ private:
   StatesManager states;
 
 public:
-  virtual bool HasTwoNext() override { return nextFalse != nullptr; }
+  virtual bool IsBranching() override { return nextFalse != nullptr; }
   virtual ICfgNode& GetNext() const override { return *next; }
   virtual ICfgNode& GetNextTrue() const override
   {

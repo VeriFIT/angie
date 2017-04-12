@@ -38,7 +38,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 //public:
 //  virtual void Execute(IState& s, const vector<OperArg>& args) override
 //  {
-//    if (s.nextCfgNode.HasTwoNext())
+//    if (s.nextCfgNode.IsBranching())
 //    {
 //      s.nextCfgNode.GetStatesManager().InsertAndEnqueue(
 //        make_unique<DummyState>(s.nextCfgNode, s.nextCfgNode.GetNextTrue())

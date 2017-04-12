@@ -26,14 +26,9 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "General.hpp"
 #include "IState.hpp"
 
-class NewStateCfgNodePair {
-public:
-  uptr<IState> c; // newly created program state
-  ICfgNode& l; // next node/operation to apply
-
-  /*ctr*/ NewStateCfgNodePair(uptr<IState> c, ICfgNode& l) : c{move(c)}, l{l} {}
-};
-
+/// <summary>
+/// Priorities to add new states into worklist with [DFS/BFS strategies, ...]
+/// </summary>
 enum class WorklistPriority {
   Standard = 0
 };

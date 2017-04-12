@@ -77,8 +77,8 @@ void VerificationLoop()
       if (!state.IsNew())
         continue;
 
-      state.GetNextStep().GetDebugInfo();
-      state.GetNextStep().Execute(state);
+      state.GetNode().GetDebugInfo();
+      state.GetNode().Execute(state);
     }
 
   }

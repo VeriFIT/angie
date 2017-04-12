@@ -219,7 +219,7 @@ class MemGraphOpLoad : public BasicOperation<MemoryGraphAnalysisState> {
     auto ptr = args.GetOperand(0);
     auto reg = args.GetTarget();
 
-    auto ptrId = newState.GetAnyVar(ptr);
+    auto ptrId = newState.GetValue(ptr);
     ValueId value = newState.Load(ptrId, ptr.type, reg.type);
 
     newState.LinkLocalVar(reg, value);
@@ -234,8 +234,8 @@ class MemGraphOpStore : public BasicOperation<MemoryGraphAnalysisState> {
     // the way for the operation to handle such a "write" is completely analysis specific
     auto value = args.GetOperand(0);
 
-    auto valueId  = newState.GetAnyVar(value);
-    auto target = newState.GetAnyVar(args.GetOperand(1));
+    auto valueId  = newState.GetValue(value);
+    auto target = newState.GetValue(args.GetOperand(1));
 
     newState.Store(target, valueId, value.type);
   }
@@ -244,7 +244,7 @@ class MemGraphOpStore : public BasicOperation<MemoryGraphAnalysisState> {
 class MemGraphOpAlloca : public BasicOperation<MemoryGraphAnalysisState> {
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
   {
-    auto count = newState.GetAnyVar(args.GetOperand(0));
+    auto count = newState.GetValue(args.GetOperand(0));
     auto type  = args.GetTarget().type;
 
     ValueId count64       = newState.GetVc().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
@@ -257,7 +257,7 @@ class MemGraphOpAlloca : public BasicOperation<MemoryGraphAnalysisState> {
 class MemGraphOpMalloc : public BasicOperation<MemoryGraphAnalysisState> {
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
   {
-    auto size = newState.GetAnyVar(args.GetOperand(0));
+    auto size = newState.GetValue(args.GetOperand(0));
 
     ValueId size64        = newState.GetVc().ExtendInt(size, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
     ValueId retVal        = newState.Malloc(size64);
@@ -272,9 +272,9 @@ class MemGraphOpMemset : public BasicOperation<MemoryGraphAnalysisState> {
     // this operation should somehow Store a value in register to certain address in memory
     // the way for the operation to handle such a "write" is completely analysis specific
 
-    auto target = newState.GetAnyVar(args.GetOperand(0));
-    auto value  = newState.GetAnyVar(args.GetOperand(1));
-    auto len    = newState.GetAnyVar(args.GetOperand(2));
+    auto target = newState.GetValue(args.GetOperand(0));
+    auto value  = newState.GetValue(args.GetOperand(1));
+    auto len    = newState.GetValue(args.GetOperand(2));
 
     newState.Memset(target, value, len);
   }
@@ -292,7 +292,7 @@ class MemGraphOpGetElementPtr : public BasicOperation<MemoryGraphAnalysisState> 
     ValueId offsetVal;
 
     auto source = args.GetOperand(0);
-    auto sourceId = newState.GetAnyVar(source);
+    auto sourceId = newState.GetValue(source);
     auto elementType = source.type.GetPointerElementType();
 
     // opt
@@ -309,7 +309,7 @@ class MemGraphOpGetElementPtr : public BasicOperation<MemoryGraphAnalysisState> 
     auto numOfIndexes = args.GetOperandCount() - 1;
     // lvl0: array/pointer athimetic indexation
     auto fIdx0 = args.GetOperand(1);
-    auto vIdx0 = newState.GetAnyVar(fIdx0);
+    auto vIdx0 = newState.GetValue(fIdx0);
 
     // Do the math
     auto vL0Size = elementType.GetSizeOfV(vc);
@@ -320,7 +320,7 @@ class MemGraphOpGetElementPtr : public BasicOperation<MemoryGraphAnalysisState> 
       // lvl1 indexing should be only possible on structs right now
       assert(elementType.IsStruct());
       auto fIdx1 = args.GetOperand(2);
-      auto vIdx1 = newState.GetAnyVar(fIdx1);
+      auto vIdx1 = newState.GetValue(fIdx1);
       // structure field index must be a constant
       assert(vc.GetAbstractionStatus(vIdx1) == AbstractionStatus::Constant);
       auto fieldIndex = vc.GetConstantIntInnerVal(vIdx1);
@@ -344,7 +344,7 @@ class MemGraphOpGetElementPtr : public BasicOperation<MemoryGraphAnalysisState> 
 class MemGraphOpCast : public BasicOperation<MemoryGraphAnalysisState, CastOpArgs> {
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const CastOpArgs& args) override  
   {
-    auto lhs           = newState.GetAnyVar(args.GetOperand(0));
+    auto lhs           = newState.GetValue(args.GetOperand(0));
     auto opts          = args.GetOptions();
     //ArithFlags flags = static_cast<ArithFlags>(static_cast<uint64_t>(args[1].id) & 0xffff);
     auto tarType     = args.GetTarget().type;
@@ -374,13 +374,13 @@ class FnaxOperationCall : public OperationCall<MemoryGraphAnalysisState> {
     auto callTargetId = args.GetOptions().id;
     auto callTargetType = args.GetOptions().type;
     
-    auto& func = newState.GetFuncMapping().GetFunction(newState.GetAnyVar(args.GetOptions()));
+    auto& func = newState.GetFuncMapping().GetFunction(newState.GetValue(args.GetOptions()));
 
     std::vector<ValueId> callArgs;
     int i = 0;
     for (auto& param : func.params.GetArgs())
     {      
-      callArgs.push_back(newState.GetAnyVar(args.GetOperand(i)));
+      callArgs.push_back(newState.GetValue(args.GetOperand(i)));
       i++;
     } 
     newState.StackPush(args.GetTarget().id);
@@ -401,7 +401,7 @@ class MemGraphOpRet : public OperationRet<MemoryGraphAnalysisState> {
   {
     if (args.GetArgs().size() > 2)
     {
-      auto retVal = newState.GetAnyVar(args.GetOperand(0));
+      auto retVal = newState.GetValue(args.GetOperand(0));
       newState.StackPop(retVal);
     }
     else

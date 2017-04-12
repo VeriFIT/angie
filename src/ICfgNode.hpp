@@ -37,7 +37,7 @@ class ICfgNode : public IOperation {
   friend CfgNode;
   friend LlvmCfgNode;
 public:
-  virtual bool HasTwoNext() { return false; }
+  virtual bool IsBranching() { return false; }
   virtual ICfgNode& GetNext() const = 0;
   virtual ICfgNode& GetNextTrue() const = 0;
   virtual ICfgNode& GetNextFalse() const = 0;
