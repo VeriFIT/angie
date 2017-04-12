@@ -109,6 +109,7 @@ set(SOURCE_FILES
     src/SmgCrawler.hpp
     src/SmgPrinter.cpp
     src/SmgPrinter.hpp
+    src/SmgUtils.hpp
     src/StateStorage.cpp
     src/StateStorage.hpp
     src/Type.hpp

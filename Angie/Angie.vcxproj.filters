@@ -224,6 +224,9 @@
     <ClCompile Include="..\src\Smg\Wrappers.cpp">
       <Filter>Source Files\Smg</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\OsUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Angie.licenseheader" />
