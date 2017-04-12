@@ -50,7 +50,7 @@ public:
       vc, 
       globalMapping,
       funcMapping),
-    graph{&vc}
+    graph{vc}
   {
   }
 
