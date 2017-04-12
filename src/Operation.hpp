@@ -249,11 +249,20 @@ public:
   virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args, bool br) override
   {
     auto lhs = newState.GetAnyVar(args.GetOperand(0));
-    newState.GetAnyVar(args.GetOperand(0));
     if (br)
+    {
+      // if this state can not happen
+      if (newState.GetVc().IsFalse(lhs, Type::CreateIntegerType(1)))
+        throw AnalysisErrorException("Branch: can not go true");
       newState.GetVc().AssumeTrue(lhs);
+    }
     else
+    {
+      // if this state can not happen
+      if (newState.GetVc().IsTrue(lhs, Type::CreateIntegerType(1)))
+        throw AnalysisErrorException("Branch: can not go false");
       newState.GetVc().AssumeFalse(lhs);
+    }
   }
 };
 
