@@ -43,14 +43,15 @@ private:
   static Id nextIdToGive;
 
 public:
-  uint64_t id;
+  using type = UnderlyingT;
+  UnderlyingT id;
   // Constructors
   constexpr           Id()            : id{ 0 }  { }
-  constexpr explicit  Id(uint64_t id) : id{ id } { }
+  constexpr explicit  Id(UnderlyingT id) : id{ id } { }
                      ~Id() = default;
 
   // Conversion methods
-  operator uint64_t() const { return id; } //HACK: temporary change for debugging SmgPrinter
+  operator UnderlyingT() const { return id; } //HACK: temporary change for debugging SmgPrinter
 
   // Creator methods
   static Id GetNextId() { return nextIdToGive++; }
