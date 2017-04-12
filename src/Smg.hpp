@@ -32,6 +32,8 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "SmgPrinter.hpp"
 #include "SmgCrawler.hpp"
 
+#include "SmgUtils.hh"
+
 void playground()
 {  
   ValueContainer vc{};
@@ -83,8 +85,6 @@ void playground()
     ValueId  vPtr8{100 +8};
     std::vector<ValueId> vPtrs 
       = {vPtr1,vPtr2,vPtr3,vPtr4,vPtr5,vPtr6,vPtr7,vPtr8};
-
-#define AL_O std::make_unique<Object>()
     
     int i = 0;
     for (auto oid : oids)
@@ -111,11 +111,12 @@ void playground()
 
   }
 
-  SmgPrinter printer{};
-  SmgCrawler crawler{printer};
+  //SmgPrinter printer{};
+  //SmgCrawler crawler{printer};
+  //g.Accept(crawler);
+  //auto plot_string = printer.GetDot();
 
-  g.Accept(crawler);
-  auto plot_string = printer.GetDot();
+  ShowSmg(ig);
 
   return;
 }
