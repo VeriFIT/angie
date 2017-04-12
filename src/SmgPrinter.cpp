@@ -48,27 +48,27 @@ void SmgPrinter::Visit(Object o)
 
   for (HvEdge edge : o.GetHvOutEdges())
   {
-    graph->addNode("V" + std::to_string(edge.GetValue()))
+    graph->addNode("V" + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("shape", "ellipse")
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "green")
-      ->setAttr("label", "V#" + std::to_string(edge.GetValue()) + "]");
-    graph->addEdge(std::to_string(o.GetId()), "V" + std::to_string(edge.GetValue()))
+      ->setAttr("label", "V#" + std::to_string((int64_t)edge.GetValue()));
+    graph->addEdge(std::to_string(o.GetId()), "V" + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("color", "blue")
       ->setAttr("label", std::to_string(edge.GetSourceOffset()));
   }
 
   for (PtEdge edge : o.GetPtOutEdges())
   {
-    graph->addNode("V" + std::to_string(edge.GetValue()))
+    graph->addNode("V" + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("shape", "ellipse")
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "green")
-      ->setAttr("label", "V#" + std::to_string(edge.GetValue()) + "]");
-    graph->addEdge(std::to_string(o.GetId()), "V" + std::to_string(edge.GetValue()))
+      ->setAttr("label", "V#" + std::to_string((int64_t)edge.GetValue()));
+    graph->addEdge(std::to_string(o.GetId()), "V" + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("color", "black")
       ->setAttr("label", std::to_string(edge.GetSourceOffset()));
-    graph->addEdge("V" + std::to_string(edge.GetValue()), std::to_string(edge.GetTargetObject().GetId()))
+    graph->addEdge("V" + std::to_string((int64_t)edge.GetValue()), std::to_string(edge.GetTargetObject().GetId()))
       ->setAttr("color", "blue")
       ->setAttr("label", std::to_string(edge.GetTargetOffset()));
   }
@@ -78,7 +78,7 @@ void SmgPrinter::Visit(Region r)
 {
   memgraph::Subgraph *s;
   s = graph->addSubgraph("R" + std::to_string(r.GetId()));
-  s->setAttr("rank", "same")
+  s //->setAttr("rank", "same")
     ->setAttr("label", "")
     ->setAttr("color", "black")
     ->setAttr("fontcolor", "black")
@@ -89,16 +89,16 @@ void SmgPrinter::Visit(Region r)
     ->setAttr("shape", "box")
     ->setAttr("color", "black")
     ->setAttr("fontcolor", "black")
-    ->setAttr("label", "R#" + std::to_string(r.GetId()) + " [SC_ON_HEAP, size = " + std::to_string(r.GetSize()) + " B, valid = " + std::to_string(r.IsValid()) + "]");
+    ->setAttr("label", "R#" + std::to_string(r.GetId()) + "\n[sz=" + std::to_string(r.GetSize()) + "B,va=" + std::to_string(r.IsValid()));
 
   for (HvEdge edge : r.GetHvOutEdges())
   {
-    s->addNode("R" + std::to_string(r.GetId()) + std::to_string(edge.GetValue()))
+    s->addNode("R" + std::to_string(r.GetId()) + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("shape", "box")
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "black")
-      ->setAttr("label", "F#" + std::to_string(edge.GetValue()) + "]");
-    s->addEdge(std::to_string(r.GetId()), std::string("R") + std::to_string(r.GetId()) + std::to_string(edge.GetValue()))
+      ->setAttr("label", "F#" + std::to_string((int64_t)edge.GetValue()));
+    s->addEdge(std::to_string(r.GetId()), std::string("R") + std::to_string(r.GetId()) + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "blue")
       ->setAttr("label", std::to_string(edge.GetSourceOffset()));
@@ -106,15 +106,15 @@ void SmgPrinter::Visit(Region r)
 
   for (PtEdge edge : r.GetPtOutEdges())
   {
-    s->addNode("R" + std::to_string(r.GetId()) + std::to_string(edge.GetValue()))
+    s->addNode("R" + std::to_string(r.GetId()) + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("shape", "box")
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "black")
-      ->setAttr("label", "F#" + std::to_string(edge.GetValue()) + "]");
-    s->addEdge(std::to_string(r.GetId()), "R" + std::to_string(r.GetId()) + std::to_string(edge.GetValue()))
+      ->setAttr("label", "F#" + std::to_string((int64_t)edge.GetValue()));
+    s->addEdge(std::to_string(r.GetId()), "R" + std::to_string(r.GetId()) + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("color", "black")
       ->setAttr("label", std::to_string(edge.GetSourceOffset()));
-    s->addEdge("R" + std::to_string(r.GetId()) + std::to_string(edge.GetValue()), std::to_string(edge.GetTargetObject().GetId()))
+    s->addEdge("R" + std::to_string(r.GetId()) + std::to_string((int64_t)edge.GetValue()), std::to_string(edge.GetTargetObject().GetId()))
       ->setAttr("color", "blue")
       ->setAttr("label", std::to_string(edge.GetTargetOffset()));
   }
@@ -138,13 +138,13 @@ void SmgPrinter::Visit(Sls s)
 
   for (HvEdge edge : s.GetHvOutEdges())
   {
-    sub->addNode("S" + std::to_string(s.GetId()) + std::to_string(edge.GetValue()))
+    sub->addNode("S" + std::to_string(s.GetId()) + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("shape", "box")
       ->setAttr("color", "red")
       ->setAttr("fontcolor", "red")
       ->setAttr("style", "dashed")
-      ->setAttr("label", "F#" + std::to_string(edge.GetValue()) + "]");
-    sub->addEdge(std::to_string(s.GetId()), "S" + std::to_string(s.GetId()) + std::to_string(edge.GetValue()))
+      ->setAttr("label", "F#" + std::to_string((int64_t)edge.GetValue()));
+    sub->addEdge(std::to_string(s.GetId()), "S" + std::to_string(s.GetId()) + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "black")
       ->setAttr("label", std::to_string(edge.GetSourceOffset()));
@@ -152,16 +152,16 @@ void SmgPrinter::Visit(Sls s)
 
   for (PtEdge edge : s.GetPtOutEdges())
   {
-    sub->addNode("S" + std::to_string(s.GetId()) + std::to_string(edge.GetValue()))
+    sub->addNode("S" + std::to_string(s.GetId()) + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("shape", "box")
       ->setAttr("color", "red")
       ->setAttr("fontcolor", "red")
       ->setAttr("style", "dashed")
-      ->setAttr("label", "F#" + std::to_string(edge.GetValue()) + "]");
-    sub->addEdge(std::to_string(s.GetId()), "S" + std::to_string(s.GetId()) + std::to_string(edge.GetValue()))
+      ->setAttr("label", "F#" + std::to_string((int64_t)edge.GetValue()));
+    sub->addEdge(std::to_string(s.GetId()), "S" + std::to_string(s.GetId()) + std::to_string((int64_t)edge.GetValue()))
       ->setAttr("color", "black")
       ->setAttr("label", std::to_string(edge.GetSourceOffset()));
-    sub->addEdge("S" + std::to_string(s.GetId()) + std::to_string(edge.GetValue()), std::to_string(edge.GetTargetObject().GetId()))
+    sub->addEdge("S" + std::to_string(s.GetId()) + std::to_string((int64_t)edge.GetValue()), std::to_string(edge.GetTargetObject().GetId()))
       ->setAttr("color", "blue")
       ->setAttr("label", std::to_string(edge.GetTargetOffset()));
   }
