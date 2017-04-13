@@ -43,6 +43,7 @@ struct ModificationObserver<PtEdge> {
 // contains virtual methods' declarations
 
 // Base implementation of Object
+// Base implementation of Object
 class Object {
 
 public:
@@ -149,26 +150,26 @@ public:
 
   //Relies on GetPtOutEdges  //GetSucessors
         auto  GetOutEdges()         { return ::ranges::view::concat(hvEdges, ptEdges); }
-  const auto  GetOutEdges()   const { return ::ranges::view::concat(hvEdges, ptEdges); }
+  const auto  GetOutEdges() const   { return ::ranges::view::concat(hvEdges, ptEdges); }
         auto& GetHvOutEdges()       { return hvEdges; }
   const auto& GetHvOutEdges() const { return hvEdges; }
         auto& GetPtOutEdges()       { return ptEdges; }
   const auto& GetPtOutEdges() const { return ptEdges; }
 
-  HvEdge* FindHvEdgeByValue(ValueId value) { return FindEdgeByValue(hvEdges, value); }
-  const HvEdge* FindHvEdgeByValue(ValueId value) const { return FindEdgeByValue(hvEdges, value); }
+        HvEdge* FindHvEdgeByValue     (ValueId value )       { return FindEdgeByValue (hvEdges, value ); }
+  const HvEdge* FindHvEdgeByValue     (ValueId value ) const { return FindEdgeByValue (hvEdges, value ); }
 
-  PtEdge* FindPtEdgeByValue(ValueId value) { return FindEdgeByValue(ptEdges, value); }
-  const PtEdge* FindPtEdgeByValue(ValueId value) const { return FindEdgeByValue(ptEdges, value); }
+        PtEdge* FindPtEdgeByValue     (ValueId value )       { return FindEdgeByValue (ptEdges, value ); }
+  const PtEdge* FindPtEdgeByValue     (ValueId value ) const { return FindEdgeByValue (ptEdges, value ); }
 
-  HvEdge* FindHvEdgeByOffset(ValueId offset) { return FindEdgeByOffset(hvEdges, offset); }
-  const HvEdge* FindHvEdgeByOffset(ValueId offset) const { return FindEdgeByOffset(hvEdges, offset); }
+        HvEdge* FindHvEdgeByOffset    (ValueId offset)       { return FindEdgeByOffset(hvEdges, offset); }
+  const HvEdge* FindHvEdgeByOffset    (ValueId offset) const { return FindEdgeByOffset(hvEdges, offset); }
 
-  PtEdge* FindPtEdgeByOffset(ValueId offset) { return FindEdgeByOffset(ptEdges, offset); }
-  const PtEdge* FindPtEdgeByOffset(ValueId offset) const { return FindEdgeByOffset(ptEdges, offset); }
-
-  PtEdge* FindPtEdgeByValueType(ValueId value, Type type) { return FindEdgeByValueType(ptEdges, value, type); }
-  const PtEdge* FindPtEdgeByValueType(ValueId value, Type type) const { return FindEdgeByValueType(ptEdges, value, type); }
+        PtEdge* FindPtEdgeByOffset    (ValueId offset)       { return FindEdgeByOffset(ptEdges, offset); }
+  const PtEdge* FindPtEdgeByOffset    (ValueId offset) const { return FindEdgeByOffset(ptEdges, offset); }
+  
+        PtEdge* FindPtEdgeByValueType (ValueId value, Type type)       { return FindEdgeByValueType (ptEdges, value, type); }
+  const PtEdge* FindPtEdgeByValueType (ValueId value, Type type) const { return FindEdgeByValueType (ptEdges, value, type); }
 
   template<typename... Args>
   HvEdge& CreateHvEdge(Args&&... args) { return CreateEdge(hvEdges, std::forward<Args>(args)...); }
@@ -177,14 +178,10 @@ public:
 
   template<typename... Args>
   HvEdge& CreateOrModifyHvEdge(ValueId offset, Args&&... args)
-  {
-    return CreateOrModifyEdge(hvEdges, std::forward<ValueId>(offset), std::forward<Args>(args)...);
-  }
+  { return CreateOrModifyEdge(hvEdges, std::forward<ValueId>(offset), std::forward<Args>(args)...); }
   template<typename... Args>
   PtEdge& CreateOrModifyPtEdge(ValueId offset, Args&&... args)
-  {
-    return CreateOrModifyEdge(ptEdges, std::forward<ValueId>(offset), std::forward<Args>(args)...);
-  }
+  { return CreateOrModifyEdge(ptEdges, std::forward<ValueId>(offset), std::forward<Args>(args)...); }
 };
 
 class Region : public Object {

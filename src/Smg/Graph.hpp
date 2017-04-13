@@ -79,7 +79,7 @@ public:
     assert(objectHandle != nullptr); //TODO: maybe an exception?
     return *objectHandle;
   }
-
+  
   // Returns PtEdge [object, offset, type] corresponding to given pointer value and type
   // The given pointer must be bound to an existing object, otherwise it is an undefined behaviour!
   const PtEdge& FindPtEdge(ValueId ptr, Type type)
@@ -94,8 +94,8 @@ public:
   auto CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type)
   {
     auto& baseEdge = FindPtEdge(basePtr);
-    auto derivedOffset = GetVc().Add(baseEdge.targetOffset, offset, PTR_TYPE, ArithFlags::Default);
-    auto derivedValue = GetVc().Add(basePtr, derivedOffset, PTR_TYPE, ArithFlags::Default);
+    auto derivedOffset = GetVc().Add(baseEdge.targetOffset, offset       , PTR_TYPE, ArithFlags::Default);
+    auto derivedValue  = GetVc().Add(basePtr              , derivedOffset, PTR_TYPE, ArithFlags::Default);
     auto& derEdge = handles.CreatePtEdge(PtEdge{baseEdge, derivedValue, type, derivedOffset});
     //std::vector<int>().em
     return std::make_pair<decltype(derivedValue), ref_wr<std::decay<decltype(derEdge)>::type>>(std::move(derivedValue), derEdge);
@@ -119,8 +119,8 @@ public:
     ObjectId oid = ObjectId::GetNextId();
     ValueId  ptr = GetVc().CreateVal(ptrToTypeT);//ValueId ::GetNextId();
 
-                                                 // move from new uptr<Region>
-                                                 // create new object and place it into map
+    // move from new uptr<Region>
+    // create new object and place it into map
     auto& obj = objects.emplace(oid, std::make_unique<Region>()).first.operator*().second.operator*();
 
     // initialize the object
@@ -166,8 +166,8 @@ public:
     auto& ptrEdge = FindPtEdge(ptr, ptrType);
 
     auto  objectId = ptrEdge.targetObjectId;
-    auto& object = *objects.at(objectId);
-    auto  offset = ptrEdge.targetOffset;
+    auto& object   = *objects.at(objectId);
+    auto  offset   = ptrEdge.targetOffset;
 
     if (!tarType.IsPointer()) // type is just a value, so it is just a plain HV edge
     {
@@ -186,7 +186,7 @@ public:
         //TODO: read reinterpretation
         throw NotSupportedException(
           "HvEdges for such offset does not yet exists and read re-interpretation is not yet supported"
-        );
+          );
       }
     }
     else /* type is pointer && and is known pointer; debug if second fails */
@@ -228,8 +228,8 @@ public:
     // The object has to be valid for an operation
     // The flag should be stored inside the object, because the edge is unique to [object, offset, type]
     auto  objectId = ptrEdge.targetObjectId;
-    auto& object = *objects.at(objectId);
-    auto  offset = ptrEdge.targetOffset;
+    auto& object   = *objects.at(objectId);
+    auto  offset   = ptrEdge.targetOffset;
 
     if (!type.IsPointer()) // type is just a value, so it is just a plain HV edge
     {
@@ -268,6 +268,7 @@ public:
     }
 
   }
+
 
 };
 
