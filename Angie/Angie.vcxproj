@@ -146,7 +146,7 @@
     <ClInclude Include="..\src\Smg.hpp" />
     <ClInclude Include="..\src\SmgCrawler.hpp" />
     <ClInclude Include="..\src\SmgPrinter.hpp" />
-    <ClInclude Include="..\src\SmgUtils.hh" />
+    <ClInclude Include="..\src\SmgUtils.hpp" />
     <ClInclude Include="..\src\Smg\Edge.hpp" />
     <ClInclude Include="..\src\Smg\Object.hpp" />
     <ClInclude Include="..\src\Smg\Graph.hpp" />

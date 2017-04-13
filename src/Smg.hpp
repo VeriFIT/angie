@@ -32,7 +32,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "SmgPrinter.hpp"
 #include "SmgCrawler.hpp"
 
-#include "SmgUtils.hh"
+#include "SmgUtils.hpp"
 
 void playground()
 {  
