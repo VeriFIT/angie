@@ -52,3 +52,6 @@ using ref_span = ::gsl::span<std::reference_wrapper<T>>;
 
 #define STL_UNWRAP(stl_obj) decltype(stl_obj)::value_type::type
 #define STL_ITEM_T(stl_obj) decltype(stl_obj)::value_type
+
+template<typename T> 
+T& deconst_cast(const T& const_value) { return const_cast<T&>(const_value); }
