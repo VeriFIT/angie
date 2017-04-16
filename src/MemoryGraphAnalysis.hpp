@@ -81,14 +81,14 @@ public:
 
   void Store(ValueId where, ValueId what, Type ofType)
   {
-    graph.WriteValue(where, what, ofType);
+    graph.WriteValue(where, what, ofType, GetVc());
   }
 
   ValueId Load(ValueId ptr, Type ptrType, Type tarType)
   {
     try
     {
-      return graph.ReadValue(ptr, ptrType, tarType);
+      return graph.ReadValue(ptr, ptrType, tarType, GetVc());
     }
     catch(std::out_of_range e)
     {
@@ -113,7 +113,7 @@ public:
     {
       throw NotSupportedException("Alloca with count != 1 is not supported");
     }
-    return graph.AllocateRegion(type);
+    return graph.AllocateRegion(type, GetVc());
   }
 
   ValueId Malloc(ValueId size)
@@ -124,7 +124,7 @@ public:
       throw NotSupportedException("Malloc with abstract size is not supported");
     }
     auto byteArrayT = Type::CreateArrayOf(INT8_TYPE, vc.GetConstantIntInnerVal(size));
-    return graph.AllocateRegion(byteArrayT);
+    return graph.AllocateRegion(byteArrayT, GetVc());
   }
 
   ValueId Calloc(ValueId size)
@@ -163,13 +163,13 @@ public:
       throw NotSupportedException("Memclear with abstract size is not supported");
     }
     auto byteArrayT = Type::CreateArrayOf(INT8_TYPE, vc.GetConstantIntInnerVal(size));
-    auto& edge = graph.CreateDerivedPointer(target, vc.GetZero(PTR_TYPE), Type::CreatePointerTo(byteArrayT)).second;
-    graph.WriteValue(edge, vc.GetZero(INT8_TYPE), byteArrayT);
+    auto& edge = graph.CreateDerivedPointer(target, vc.GetZero(PTR_TYPE), Type::CreatePointerTo(byteArrayT), GetVc()).second;
+    graph.WriteValue(edge, vc.GetZero(INT8_TYPE), byteArrayT, GetVc());
   }
 
   ValueId CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type)
   {
-    return graph.CreateDerivedPointer(basePtr, offset, type).first;
+    return graph.CreateDerivedPointer(basePtr, offset, type, GetVc()).first;
   }
 
   std::vector<std::tuple<Mapper,FrontendValueId,ICfgNode&>> stack;
