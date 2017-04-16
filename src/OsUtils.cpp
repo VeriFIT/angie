@@ -19,11 +19,21 @@ void Exec(boost::string_view str)
   std::system(str.data());
 }
 
+void ExecNoWait(boost::string_view str)
+{
+
+#ifdef _WIN32
+  std::system(("start /b cmd /c \"" + str.to_string() + "\"").data());
+#else
+  std::runtime_error("ExecNoWait is only supported on Windows");
+#endif // _WIN32
+}
+
 void PasteToClipboard(boost::string_view str)
 {
-  #if ! defined _WIN32
+#if ! defined _WIN32
   std::runtime_error("PasteToClipboard is only supported on Windows");
-  #else
+#else
   if (!OpenClipboard(0))
   {
     std::runtime_error("Cannot open the Clipboard");
@@ -49,7 +59,7 @@ void PasteToClipboard(boost::string_view str)
     return;
   }
   CloseClipboard();
-  #endif
+#endif
 }
 
 void WriteToFile(boost::string_view str, boost::string_view filename)

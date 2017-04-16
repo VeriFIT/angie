@@ -11,6 +11,7 @@
 namespace OsUtils {
 std::string GetEnv(boost::string_view str);
 void Exec(boost::string_view str);
+void ExecNoWait(boost::string_view str);
 void PasteToClipboard(boost::string_view str);
 void WriteToFile(boost::string_view str, boost::string_view file);
 };
