@@ -27,6 +27,7 @@
 class InvalidDereferenceException_smg : public std::logic_error {
 public:
   InvalidDereferenceException_smg() : std::logic_error("") {}
+  InvalidDereferenceException_smg(const char* s) : std::logic_error(s) {}
 };
 
 namespace Smg {
@@ -124,6 +125,7 @@ public:
 
     handles.CreatePtEdge(PtEdge{ValueId{0}, ptr, ptrToTypeT, oid, vc.GetZero(PTR_TYPE)});
 
+    //TODO: should allocation be allowed to fail, to model malloc, etc. returning null?
 
     return ptr;
   }
@@ -180,7 +182,7 @@ public:
           throw InvalidDereferenceException_smg();
         }
         //TODO: read reinterpretation
-        throw NotSupportedException(
+        throw InvalidDereferenceException_smg(
           "HvEdges for such offset does not yet exists and read re-interpretation is not yet supported"
           );
       }
