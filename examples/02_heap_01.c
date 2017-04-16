@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 
 void body()
 {
-  const int count = 4;
+  const int count = 3;
   single_list_struct *segments = malloc(sizeof(single_list_struct) * count);
 
   for (int i = 0; i < count; ++i)
