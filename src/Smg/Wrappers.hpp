@@ -57,6 +57,8 @@ private:
   public:
     adaptor() = default;
     adaptor(Impl::Graph& g) : graph{&g} {};
+
+    static_assert(sizeof(decltype(&ranges::adaptor_base::get(ranges::range_iterator_t<ViewT>{}))) != 0, "we are hiding method get");
     OutT get(ranges::range_iterator_t<ViewT> it) const {
       return {*it, *graph};
     }
