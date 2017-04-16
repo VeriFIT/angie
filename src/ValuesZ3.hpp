@@ -96,6 +96,7 @@ public:
 
   virtual void PrintDebug() const override;
 
+  virtual uptr<IValueContainer> Clone() override { return std::make_unique<Z3ValueContainer>(*this); }
 protected:
 
   virtual ValueId GetZero(Type type) const override { throw NotImplementedException(); }
