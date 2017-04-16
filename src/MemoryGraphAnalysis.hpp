@@ -205,6 +205,26 @@ public:
     stack.pop_back();
   }
 
+  boost::tribool SmgIsCmp(ValueId first, ValueId second, Type type, CmpFlags flags)
+  {
+    if (!(graph.ExistsPtEdge(first) && graph.ExistsPtEdge(second)))
+      return boost::indeterminate;
+
+    //HACK: this is not sound, when we de-allocate, newly created pointer with new ID can alias the previous one
+    switch (flags)
+    {
+    case CmpFlags::Eq:
+      return first == second;
+      break;
+    case CmpFlags::Neq:
+      return first != second;
+      break;
+    default:
+      throw std::logic_error("not supported");
+      break;
+    }
+  }
+
 };
 
 class MemGraphOpLoad : public BasicOperation<MemoryGraphAnalysisState> {
@@ -411,6 +431,42 @@ class MemGraphOpRet : public OperationRet<MemoryGraphAnalysisState> {
   }
 };
 
+class MemGraphOpCmp : public BasicOperation<MemoryGraphAnalysisState, CmpOpArgs> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const CmpOpArgs& args) override final
+  {
+    auto lhs         = newState.GetValue(args.GetOperand(0));
+    auto rhs         = newState.GetValue(args.GetOperand(1));
+    auto srcType     = args.GetOperand(0).type;
+    auto flags       = args.GetOptions();
+
+    auto& vc = newState.GetVc();
+    auto result = vc.IsCmp(lhs, rhs, srcType, flags);
+
+    ValueId retVal;
+
+    // if the cmp did not yield a resu
+    if (boost::indeterminate(result))
+    {
+      // try to handle it as pointer
+      result = newState.SmgIsCmp(lhs, rhs, srcType, flags);
+      if (boost::indeterminate(result))
+      {
+        retVal = vc.CreateVal(Type::CreateIntegerType(1));
+      }
+      else
+      {
+        retVal = vc.CreateConstIntVal(static_cast<uint64_t>(result.value));
+      }
+    }
+    else
+    {
+      retVal = vc.CreateConstIntVal(static_cast<uint64_t>(result.value));
+    }
+
+    newState.AssignValue(args.GetTarget(), retVal);
+  }
+};
+
 class MemGraphOpFactory : public IOperationFactory {
 private:
 
@@ -419,7 +475,7 @@ private:
   IOperation* load     = new MemGraphOpLoad();
   IOperation* store    = new MemGraphOpStore();
   IOperation* binop    = new BasicOperationBinOp();
-  IOperation* cmp      = new BasicOperationCmp();
+  IOperation* cmp      = new MemGraphOpCmp();
   IOperation* trunc    = new BasicOperationTruncate();
   IOperation* extend   = new BasicOperationExtend();
   IOperation* malloc   = new MemGraphOpMalloc();
