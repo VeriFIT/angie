@@ -27,5 +27,5 @@ void ShowSmg(Smg::Impl::Graph& g, bool stack, const char* viewer)
     "dot -Tsvg -o" + svgFileName + " -Kdot < " + dotFileName + " && " + viewer + " " + svgFileName;
 
   OsUtils::WriteToFile(plot_string, dotFileName);
-  OsUtils::Exec(command);
+  OsUtils::ExecNoWait(command);
 }
