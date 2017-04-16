@@ -96,6 +96,7 @@ public:
 
   virtual void PrintDebug() const override;
 
+  virtual uint64_t GetConstantIntInnerVal  (ValueId value) const override { throw NotImplementedException(); }
   virtual uptr<IValueContainer> Clone() override { return std::make_unique<Z3ValueContainer>(*this); }
 protected:
 
