@@ -63,10 +63,10 @@ public:
   
   // optional, all states that participated on creating this state (JOIN)
   // might be changed to Get/Set property
-  virtual ref_span<const IState> GetPredecessors() const = 0;
+  virtual gsl::span<const std::reference_wrapper<const IState>> GetPredecessors() const = 0;
   // optional, all states that are based on this state
   // might be changed to Get/Set property
-  virtual ref_span<const IState> GetSuccessors() const = 0;
+  virtual gsl::span<const std::reference_wrapper<const IState>> GetSuccessors() const = 0;
 
   // possibly useless now
   // meaning: All paths(states) leading from this state were prepared for processing or already processed
@@ -111,8 +111,8 @@ private:
 
   ICfgNode& node; 
 
-  ref_vector<const IState> predecessors;
-  ref_vector<const IState> successors{1};
+  std::vector<std::reference_wrapper<const IState>> predecessors;
+  std::vector<std::reference_wrapper<const IState>> successors;
 
 protected:
 
@@ -148,7 +148,7 @@ protected:
     funcMapping(state.funcMapping),
     localMapping(state.localMapping),
     generation(state.generation + 1),
-    predecessors{state}
+    predecessors{ref_wr<const IState>(state)}
   {
   }
 
@@ -160,10 +160,10 @@ public:
   virtual void        SetExplored()       override {        condition = StateStatus::Explored; }
   virtual bool        IsNew()       const override { return condition == StateStatus::New; }
 
-  virtual ref_span<const IState> GetPredecessors() const override { return {predecessors}; }
-  virtual ref_span<const IState> GetSuccessors()   const override { return {successors}; }
 
   virtual IValueContainer& GetVc() override final { return vc; }
+  virtual gsl::span<const std::reference_wrapper<const IState>> GetPredecessors() const override { return {predecessors}; }
+  virtual gsl::span<const std::reference_wrapper<const IState>> GetSuccessors()   const override { return {successors}; }
 
   virtual ValueId GetValue(FrontendIdTypePair var) const override
   {
