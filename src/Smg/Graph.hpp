@@ -41,17 +41,15 @@ public:
 
 public:
 
-  Graph(IValueContainer& vc) :
-    vc(&vc)
+  Graph(IValueContainer& vc)
   {
     auto& obj = objects.emplace(ObjectId{0}, std::make_unique<Region>()).first.operator*().second.operator*();
     obj.id = ObjectId{0};
     obj.size = ValueId{0};
-    handles.CreatePtEdge(PtEdge{ValueId{0}, ValueId{0}, Type::CreateCharPointerType(), ObjectId{0}, GetVc().GetZero(PTR_TYPE)});
+    handles.CreatePtEdge(PtEdge{ValueId{0}, ValueId{0}, Type::CreateCharPointerType(), ObjectId{0}, vc.GetZero(PTR_TYPE)});
   }
   Graph(const Graph& g) :
-    handles(g.handles),
-    vc(g.vc)
+    handles(g.handles)
   {
     ////objects = ranges::transform(
     ////  g.objects, 
@@ -66,9 +64,6 @@ public:
   }
 
 
-  IValueContainer* vc;
-  ////gsl::not_null<IValueContainer*> vc;
-  IValueContainer& GetVc() { return *vc; }
 
   // Returns PtEdge [object, offset, type] corresponding to given pointer value
   // The given pointer must be bound to an existing object, otherwise it is an undefined behaviour!
@@ -91,11 +86,11 @@ public:
   }
 
   // Returns new pointer to different field [baseOffset + offset, type] of the same object
-  auto CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type)
+  auto CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type, IValueContainer& vc)
   {
     auto& baseEdge = FindPtEdge(basePtr);
-    auto derivedOffset = GetVc().Add(baseEdge.targetOffset, offset       , PTR_TYPE, ArithFlags::Default);
-    auto derivedValue  = GetVc().Add(basePtr              , derivedOffset, PTR_TYPE, ArithFlags::Default);
+    auto derivedOffset = vc.Add(baseEdge.targetOffset, offset       , PTR_TYPE, ArithFlags::Default);
+    auto derivedValue  = vc.Add(basePtr              , derivedOffset, PTR_TYPE, ArithFlags::Default);
     auto& derEdge = handles.CreatePtEdge(PtEdge{baseEdge, derivedValue, type, derivedOffset});
     //std::vector<int>().em
     return std::make_pair<decltype(derivedValue), ref_wr<std::decay<decltype(derEdge)>::type>>(std::move(derivedValue), derEdge);
@@ -109,7 +104,7 @@ public:
   };
 
   // Returns a pointer to newly allocated object
-  ValueId AllocateRegion(Type type, MemorySpace ms = MemorySpace::Heap)
+  ValueId AllocateRegion(Type type, IValueContainer& vc, MemorySpace ms = MemorySpace::Heap)
   {
     // assign a new ObjectId and new ValueId representing the resultant pointer
     //TODO: different acquisition of ValueId based on MemorySpace
@@ -117,7 +112,7 @@ public:
     auto ptrToTypeT = Type::CreatePointerTo(type);
 
     ObjectId oid = ObjectId::GetNextId();
-    ValueId  ptr = GetVc().CreateVal(ptrToTypeT);//ValueId ::GetNextId();
+    ValueId  ptr = vc.CreateVal(ptrToTypeT);//ValueId ::GetNextId();
 
     // move from new uptr<Region>
     // create new object and place it into map
@@ -125,9 +120,10 @@ public:
 
     // initialize the object
     obj.id = oid;
-    obj.size = GetVc().CreateConstIntVal(type.GetSizeOf());
+    obj.size = vc.CreateConstIntVal(type.GetSizeOf());
 
-    handles.CreatePtEdge(PtEdge{ValueId{0}, ptr, ptrToTypeT, oid, GetVc().GetZero(PTR_TYPE)});
+    handles.CreatePtEdge(PtEdge{ValueId{0}, ptr, ptrToTypeT, oid, vc.GetZero(PTR_TYPE)});
+
 
     return ptr;
   }
@@ -161,7 +157,7 @@ public:
   ////  }
   ////}
 
-  ValueId ReadValue(ValueId ptr, Type ptrType, Type tarType)
+  ValueId ReadValue(ValueId ptr, Type ptrType, Type tarType, IValueContainer& vc)
   {
     auto& ptrEdge = FindPtEdge(ptr, ptrType);
 
@@ -202,7 +198,7 @@ public:
         // Or fallback to HvEdge scenario
         // Or use undefined value / special meaning value
         // Find out whether it is undefined-unknown or abstracted-unknown
-        auto status = GetVc().GetAbstractionStatus(ptr);
+        auto status = vc.GetAbstractionStatus(ptr);
         std::cout << AbstractionStatusToString(status) << std::endl;
         //HACK: need this for argv 
         ////throw std::runtime_error{"Writing unknown pointer value"}; 
@@ -214,13 +210,13 @@ public:
 
   // Type is potentially not needed, because the targetPtr must be a pointer to correctly typed edge
   // We use it here to skip the ptrEdge.valueType.GetPointerElementType()
-  void WriteValue(ValueId ptr, ValueId value, Type type)
+  void WriteValue(ValueId ptr, ValueId value, Type type, IValueContainer& vc)
   {
     auto& ptrEdge = FindPtEdge(ptr, Type::CreatePointerTo(type));
 
-    WriteValue(ptrEdge, value, type);
+    WriteValue(ptrEdge, value, type, vc);
   }
-  void WriteValue(const PtEdge& ptrEdge, ValueId value, Type type)
+  void WriteValue(const PtEdge& ptrEdge, ValueId value, Type type, IValueContainer& vc)
   {
     // The pointer target type and the type of value being written must not differ
     assert(ptrEdge.valueType.GetPointerElementType() == type);
@@ -260,7 +256,7 @@ public:
         // Or fallback to HvEdge scenario
         // Or use undefined value / special meaning value
         // Find out whether it is undefined-unknown or abstracted-unknown
-        auto status = GetVc().GetAbstractionStatus(value);
+        auto status = vc.GetAbstractionStatus(value);
         std::cout << AbstractionStatusToString(status) << std::endl;
         //HACK: need this for argv 
         ////throw std::runtime_error{"Writing unknown pointer value"}; 
