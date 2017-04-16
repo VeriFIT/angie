@@ -203,6 +203,14 @@ protected:
 
   // Zero in all possible interpretations 
   virtual ValueId GetZero() const { throw NotImplementedException(); }
+
+protected:
+  // This is polymorphic class, hide ctors
+  IValueContainer()                        = default;
+  IValueContainer(const IValueContainer&)  = default;
+  IValueContainer(      IValueContainer&&) = default;
+  IValueContainer& operator=(const IValueContainer&) = default;
+  IValueContainer& operator=(IValueContainer&&) = default;
 };
 
 //inline std::ostream& operator<<(std::ostream& os, const IValueContainer& vc) { vc.Print(os); return os; }
