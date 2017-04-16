@@ -76,7 +76,7 @@ public:
   // Usefull when states placed in worklist might be affected by meta-operation
   virtual bool IsNew() const = 0;
 
-  virtual IValueContainer& GetVc() = 0;
+  virtual IValueContainer& GetVc() = 0; // not const since VC is part of the state
   virtual FuncMapper& GetFuncMapping() const = 0;
 
   virtual ValueId GetValue (FrontendIdTypePair var) const = 0;
@@ -105,7 +105,7 @@ private:
 
   Mapper&          globalMapping;
   FuncMapper&      funcMapping;
-  IValueContainer& vc; 
+  uptr<IValueContainer> vc; 
   //TODO: VC should be copied when stated is cloned?! -> how about other parts of program, like Smg,... each has own reference
   // ... we will probaly end up with thread local "current VC reference" and the owner will be state
 
@@ -128,7 +128,7 @@ protected:
   ) :
     //lastCfgNode(lastCfgNode), 
     node(node),
-    vc(vc),
+    vc(vc.Clone()),
     globalMapping(globalMapping),
     funcMapping(funcMapping),
     generation(0)
@@ -143,7 +143,7 @@ protected:
   ) :
     //lastCfgNode(lastCfgNode), 
     node(node),
-    vc(state.vc),
+    vc(state.vc->Clone()),
     globalMapping(state.globalMapping),
     funcMapping(state.funcMapping),
     localMapping(state.localMapping),
@@ -160,10 +160,10 @@ public:
   virtual void        SetExplored()       override {        condition = StateStatus::Explored; }
   virtual bool        IsNew()       const override { return condition == StateStatus::New; }
 
-
-  virtual IValueContainer& GetVc() override final { return vc; }
   virtual gsl::span<const std::reference_wrapper<const IState>> GetPredecessors() const override { return {predecessors}; }
   virtual gsl::span<const std::reference_wrapper<const IState>> GetSuccessors()   const override { return {successors}; }
+
+  virtual IValueContainer& GetVc() override final { return *vc; }
 
   virtual ValueId GetValue(FrontendIdTypePair var) const override
   {
