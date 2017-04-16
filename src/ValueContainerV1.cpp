@@ -513,16 +513,22 @@ ValueId ValueContainer::Cmp(ValueId first, ValueId second, Type type, CmpFlags f
 
 void ValueContainer::Assume(ValueId first, ValueId second, Type type, CmpFlags flags)
 {
+  if (IsCmp(first, second, type, flags)) //TODO@CharvN: temporary fix, find a better solution
+    return;
   InsertConstraint(BinaryConstraint(first, second, flags));
 }
 
 void ValueContainer::AssumeTrue(ValueId first)
 {
+  if (IsTrue(first, Type::CreateIntegerType(64))) //TODO@CharvN: temporary fix, find a better solution
+    return;
   InsertConstraint(BinaryConstraint(Zero, first, CmpFlags::Neq)); //equal to 1?
 }
 
 void ValueContainer::AssumeFalse(ValueId first)
 {
+  if (IsFalse(first, Type::CreateIntegerType(64))) //TODO@CharvN: temporary fix, find a better solution
+    return;
   InsertConstraint(BinaryConstraint(Zero, first, CmpFlags::Eq));
 }
 
