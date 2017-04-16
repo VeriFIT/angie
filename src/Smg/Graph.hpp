@@ -65,6 +65,13 @@ public:
   }
 
 
+  // Temporary function, should be replaced by CmpPointers or similiar 
+  bool ExistsPtEdge(ValueId ptr)
+  {
+    // The given pointer must be bound to an existing object
+    auto objectHandle = handles.FindPtEdgeByValue(ptr);
+    return objectHandle != nullptr;
+  }
 
   // Returns PtEdge [object, offset, type] corresponding to given pointer value
   // The given pointer must be bound to an existing object, otherwise it is an undefined behaviour!
