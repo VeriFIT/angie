@@ -153,12 +153,13 @@ protected:
   }
 
 public:
-
-  virtual StateId     GetId()       const override { return id; }
-  virtual StateStatus GetStatus()   const override { return condition; }
-  virtual ICfgNode&   GetNode()     const override { return node; }
-  virtual void        SetExplored()       override {        condition = StateStatus::Explored; }
-  virtual bool        IsNew()       const override { return condition == StateStatus::New; }
+#define NCONS
+  virtual StateId       GetId()         const override { return id; }
+  virtual StateId::type GetGeneration() const override { return generation; }
+  virtual StateStatus   GetStatus()     const override { return condition; }
+  virtual ICfgNode&     GetNode()       const override { return node; }
+  virtual void          SetExplored()   NCONS override {        condition = StateStatus::Explored; }
+  virtual bool          IsNew()         const override { return condition == StateStatus::New; }
 
   virtual gsl::span<const std::reference_wrapper<const IState>> GetPredecessors() const override { return {predecessors}; }
   virtual gsl::span<const std::reference_wrapper<const IState>> GetSuccessors()   const override { return {successors}; }
