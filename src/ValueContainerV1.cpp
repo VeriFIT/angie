@@ -505,9 +505,8 @@ bool ValueContainer::IsUnknown(ValueId first) const
 ValueId ValueContainer::Cmp(ValueId first, ValueId second, Type type, CmpFlags flags)
 {
   boost::tribool result = IsCmp(first, second, type, flags);
-  if (result == boost::indeterminate)
-    throw std::runtime_error("Fuck if I know how to create boolean from indeterminate relation.");
-
+  if (boost::indeterminate(result))
+    return CreateVal(Type::CreateIntegerType(1));
   return CreateConstIntVal(static_cast<uint64_t>(result.value));
 }
 
