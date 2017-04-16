@@ -44,6 +44,77 @@ struct ModificationObserver<PtEdge> {
 
 // Base implementation of Object
 // Base implementation of Object
+
+namespace {
+
+template<typename T, typename... Args>
+static inline auto& CreateEdge(std::vector<T>& container, Args&&... args)
+{
+  container.emplace_back(std::forward<Args>(args)...);
+  return container.back();
+}
+
+template<typename RangeT, typename ValueT = typename RangeT::value_type>
+static inline auto FindEdgeByOffset(RangeT& range, ValueId offset)
+{
+  using namespace ::ranges;
+  auto res = find(range, offset, &EdgeBase::sourceOffset);
+  if (res != end(range))
+  {
+    return &*res;
+  }
+  else
+  {
+    return (decltype(&*res))nullptr;
+  }
+}
+template<typename RangeT, typename ValueT = typename RangeT::value_type>
+static inline auto FindEdgeByValue(RangeT& range, ValueId value)
+{
+  using namespace ::ranges;
+  auto res = find(range, value, &EdgeBase::value);
+  if (res != end(range))
+  {
+    return &*res;
+  }
+  else
+  {
+    return (decltype(&*res))nullptr;
+  }
+}
+template<typename RangeT, typename ValueT = typename RangeT::value_type>
+static inline auto FindEdgeByValueType(RangeT& range, ValueId value, Type type)
+{
+  using namespace ::ranges;
+  auto res = find_if(range, [=](const ValueT& ed) { return ed.value == value && ed.valueType == type; });
+  if (res != end(range))
+  {
+    return &*res;
+  }
+  else
+  {
+    return (decltype(&*res))nullptr;
+  }
+}
+/*
+template<typename T>
+static inline auto FindEdge(T&& range, ValueId value, Type type)
+{
+using namespace ::ranges;
+auto res = find_if(range, [const=](auto& edge) { return edge.value == value && edge.valueType == type});
+if (res != end(range))
+{
+return &*res;
+}
+else
+{
+nullptr;
+}
+}
+*/
+
+} // anonymous namespace
+
 class Object {
 
 public:
@@ -60,12 +131,6 @@ public:
 
 private:
 
-  template<typename T, typename... Args>
-  static inline auto& CreateEdge(std::vector<T>& container, Args&&... args)
-  {
-    container.emplace_back(std::forward<Args>(args)...);
-    return container.back();
-  }
 
   template<typename T, typename... Args>
   static inline auto& CreateOrModifyEdge(std::vector<T>& container, ValueId&& offset, Args&&... args)
@@ -83,65 +148,6 @@ private:
     // In case we are using container different than vector, also provide an insertion hint
     return CreateEdge(container, std::forward<ValueId>(offset), std::forward<Args>(args)...);
   }
-
-  template<typename RangeT, typename ValueT = typename RangeT::value_type>
-  static auto FindEdgeByOffset(RangeT& range, ValueId offset)
-  {
-    using namespace ::ranges;
-    auto res = find(range, offset, &EdgeBase::sourceOffset);
-    if (res != end(range))
-    {
-      return &*res;
-    }
-    else
-    {
-      return (decltype(&*res))nullptr;
-    }
-  }
-  template<typename RangeT, typename ValueT = typename RangeT::value_type>
-  static auto FindEdgeByValue(RangeT& range, ValueId value)
-  {
-    using namespace ::ranges;
-    auto res = find(range, value, &EdgeBase::value);
-    if (res != end(range))
-    {
-      return &*res;
-    }
-    else
-    {
-      return (decltype(&*res))nullptr;
-    }
-  }
-  template<typename RangeT, typename ValueT = typename RangeT::value_type>
-  static auto FindEdgeByValueType(RangeT& range, ValueId value, Type type)
-  {
-    using namespace ::ranges;
-    auto res = find_if(range, [=](const ValueT& ed) { return ed.value == value && ed.valueType == type; });
-    if (res != end(range))
-    {
-      return &*res;
-    }
-    else
-    {
-      return (decltype(&*res))nullptr;
-    }
-  }
-  /*
-  template<typename T>
-  static auto FindEdge(T&& range, ValueId value, Type type)
-  {
-  using namespace ::ranges;
-  auto res = find_if(range, [const=](auto& edge) { return edge.value == value && edge.valueType == type});
-  if (res != end(range))
-  {
-  return &*res;
-  }
-  else
-  {
-  nullptr;
-  }
-  }
-  */
 
 public:
 
