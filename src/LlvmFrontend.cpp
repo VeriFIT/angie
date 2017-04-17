@@ -759,6 +759,17 @@ void LlvmCfgParser::DealWithConstants()
       //TODO maybe different value than 0 for nullptr?
       id = vc.CreateConstIntVal(0, Type{constNullPtr->getType()});
     }
+    else if (auto constExpr = llvm::dyn_cast<llvm::ConstantExpr>(x))
+    {
+      llvm::Instruction* asInstr = deconst_cast(*constExpr).getAsInstruction();
+      if (llvm::isa<llvm::CastInst>(asInstr) && asInstr->getNumOperands() == 1)
+      {
+        auto asConstInt = llvm::dyn_cast<llvm::ConstantInt>(asInstr->getOperand(0));
+        id = vc.CreateConstIntVal(asConstInt->getValue().getZExtValue(), Type{constExpr-> getType()});
+      }
+      else
+        throw NotImplementedException();
+    }
     else
       throw NotImplementedException();
 
