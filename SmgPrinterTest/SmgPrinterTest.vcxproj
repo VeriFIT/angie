@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugNoLlvm|x64">
+      <Configuration>DebugNoLlvm</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C3DE3F41-1F25-4B02-AF00-7E9B3E84A58D}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>SmgPrinterTest</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoLlvm|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='DebugNoLlvm'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>bin\$(Platform)-$(Configuration)\</OutDir>
+    <IntDir>bin\$(Platform)-$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(INCLUDE_PATH);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIBRARY_PATH);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoLlvm|x64'" />
+  <ItemDefinitionGroup>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+      <AdditionalDependencies>LLVMAnalysis.lib;LLVMAsmParser.lib;LLVMAsmPrinter.lib;LLVMBitReader.lib;LLVMBitWriter.lib;LLVMCodeGen.lib;LLVMCore.lib;LLVMDebugInfoCodeView.lib;LLVMDebugInfoDWARF.lib;LLVMDebugInfoPDB.lib;LLVMExecutionEngine.lib;LLVMInstCombine.lib;LLVMInstrumentation.lib;LLVMInterpreter.lib;LLVMipo.lib;LLVMIRReader.lib;LLVMLibDriver.lib;LLVMLineEditor.lib;LLVMLinker.lib;LLVMLTO.lib;LLVMMC.lib;LLVMMCDisassembler.lib;LLVMMCJIT.lib;LLVMMCParser.lib;LLVMMIRParser.lib;LLVMObjCARCOpts.lib;LLVMObject.lib;LLVMOption.lib;LLVMOrcJIT.lib;LLVMPasses.lib;LLVMProfileData.lib;LLVMRuntimeDyld.lib;LLVMScalarOpts.lib;LLVMSelectionDAG.lib;LLVMSupport.lib;LLVMSymbolize.lib;LLVMTableGen.lib;LLVMTarget.lib;LLVMTransformUtils.lib;LLVMVectorize.lib;libz3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>/permissive- /w34062 /arch:AVX2 %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>TYPE_KIND=0;_SCL_SECURE_NO_WARNINGS;_MBCS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoLlvm|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>TYPE_KIND=1;_SCL_SECURE_NO_WARNINGS;_MBCS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>TYPE_KIND=0;_SCL_SECURE_NO_WARNINGS;_MBCS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\CfgNodeBase.hpp" />
+    <ClInclude Include="..\src\Definitions.hpp" />
+    <ClInclude Include="..\src\DummyOperations.hpp" />
+    <ClInclude Include="..\src\DummyState.hpp" />
+    <ClInclude Include="..\src\enum_flags.h" />
+    <ClInclude Include="..\src\Exceptions.hpp" />
+    <ClInclude Include="..\src\ForwardNullAnalysis.hpp" />
+    <ClInclude Include="..\src\FrontedValueMapper.hpp" />
+    <ClInclude Include="..\src\IdImpl.hpp" />
+    <ClInclude Include="..\src\ISmgVisitor.hpp" />
+    <ClInclude Include="..\src\LlvmFrontend.hpp" />
+    <ClInclude Include="..\src\General.hpp" />
+    <ClInclude Include="..\src\ICfgNode.hpp" />
+    <ClInclude Include="..\src\IOperation.hpp" />
+    <ClInclude Include="..\src\IState.hpp" />
+    <ClInclude Include="..\src\LlvmGlobals.hpp" />
+    <ClInclude Include="..\..\croaring\roaring.h" />
+    <ClInclude Include="..\..\croaring\roaring.hpp" />
+    <ClInclude Include="..\src\Operation.hpp" />
+    <ClInclude Include="..\src\MemoryGraphAnalysis.hpp" />
+    <ClInclude Include="..\src\OsUtils.hpp" />
+    <ClInclude Include="..\src\precompall.hpp" />
+    <ClInclude Include="..\src\precompllvm.hpp" />
+    <ClInclude Include="..\src\precompother.hpp" />
+    <ClInclude Include="..\src\Smg.hpp" />
+    <ClInclude Include="..\src\SmgCrawler.hpp" />
+    <ClInclude Include="..\src\SmgPrinter.hpp" />
+    <ClInclude Include="..\src\SmgUtils.hh" />
+    <ClInclude Include="..\src\Smg\Edge.hpp" />
+    <ClInclude Include="..\src\Smg\Object.hpp" />
+    <ClInclude Include="..\src\Smg\Graph.hpp" />
+    <ClInclude Include="..\src\Smg\ObjectId.hpp" />
+    <ClInclude Include="..\src\Smg\Smg_fwd.hpp" />
+    <ClInclude Include="..\src\Smg\Wrappers.hpp" />
+    <ClInclude Include="..\src\Smg\Wrappers_fwd.hpp" />
+    <ClInclude Include="..\src\StateStorage.hpp" />
+    <ClInclude Include="..\src\Type.hpp" />
+    <ClInclude Include="..\src\ValueContainerV1.hpp" />
+    <ClInclude Include="..\src\ValueId.hpp" />
+    <ClInclude Include="..\src\Values.hpp" />
+    <ClInclude Include="..\src\ValuesZ3.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\AngieType.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\src\Exceptions.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\src\LlvmFrontend.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="..\src\laboratory.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\src\LlvmGlobals.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="..\tests\SmgPrinterUnitTest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\croaring\roaring.c">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\src\OsUtils.cpp" />
+    <ClCompile Include="..\src\precompall.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="..\src\precompllvm.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompllvm.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precompllvm.pch</PrecompiledHeaderOutputFile>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\src\precompother.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>precompother.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precompother.pch</PrecompiledHeaderOutputFile>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\src\Smg.cpp">
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\src\SmgCrawler.cpp" />
+    <ClCompile Include="..\src\SmgPrinter.cpp" />
+    <ClCompile Include="..\src\Smg\Edge.cpp" />
+    <ClCompile Include="..\src\Smg\Object.cpp" />
+    <ClCompile Include="..\src\Smg\Graph.cpp" />
+    <ClCompile Include="..\src\Smg\ObjectId.cpp" />
+    <ClCompile Include="..\src\Smg\Wrappers.cpp" />
+    <ClCompile Include="..\src\StateStorage.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\src\LlvmType.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="..\src\ValueContainerV1.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\src\ValueId.cpp">
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\src\ValuesZ3.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="llvm.natvis" />
+    <Natvis Include="clang.natvis" />
+    <Natvis Include="custom.natvis" />
+    <Natvis Include="GSL.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\notes\meetings.md" />
+    <None Include="..\notes\dulezite_poznatky.md" />
+    <None Include="..\notes\todo.md" />
+    <None Include="..\README.md" />
+    <None Include="..\regex_cheat_sheet.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Angie.licenseheader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\memgraph\memgraph.vcxproj">
+      <Project>{873e2daf-cf7f-4d49-a614-49bbc8c5f83d}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
