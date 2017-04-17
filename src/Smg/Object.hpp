@@ -199,9 +199,9 @@ class Region : public Object {
 
 public:
 
-  bool isValid = true;
+  bool isValid     = true;
   bool isNullified = false;
-  bool isFreed = false;
+  bool isFreed     = false;
 
   virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
 

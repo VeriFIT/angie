@@ -240,17 +240,17 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
         {
           op = &opFactory.Noop();
           break;
-        }        
+        }
         else
         { //TODO@mikchot: guard this code to happen only if advanced-memory-operations generation are ON
           //HACK, llvm.memset and std::memset have probably different params
-          if (func->getName().startswith("llvm.memset")) 
+          if (func->getName().startswith("llvm.memset"))
           {
             op = &opFactory.Memset();
             break;
           }
         }
-      }      
+      }
       if (func->getName().startswith("__ANGIE"))
       { // Those are analysis-independnent angie intrinsic functions, no need to guard them
 #if 0 // not yet implemented
