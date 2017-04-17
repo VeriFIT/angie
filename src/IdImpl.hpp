@@ -51,7 +51,8 @@ public:
                      ~Id() = default;
 
   // Conversion methods
-  operator UnderlyingT() const { return id; } //HACK: temporary change for debugging SmgPrinter
+  explicit operator UnderlyingT() const { return id; }
+  UnderlyingT Unwrap() const { return id; }
 
   // Creator methods
   static Id GetNextId() { return nextIdToGive++; }
@@ -72,7 +73,8 @@ public:
   constexpr bool operator>=(const Id& other) const { return this->id >= other.id; }
 
   // Friend printer
-  friend std::ostream& operator<<(std::ostream& os, const Id<Token, UnderlyingT, FIRST_ID>& idValue) { return os << idValue.id; }
+  friend std::ostream& operator<<(std::ostream& os, const Id& idValue) { return os << idValue.id; }
+  friend std::string   to_string(                   const Id& idValue) { return std::to_string(idValue.id); }
 };
 
 template<typename Token, typename UnderlyingT, UnderlyingT FIRST_ID>
