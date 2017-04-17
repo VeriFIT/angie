@@ -178,6 +178,7 @@ public:
   auto GetOutEdges()   { return objseo<Smg::Edge>  (object.GetPtOutEdges(), graph); }
   auto GetPtInEdges()  { throw NotImplementedException(); }
   ObjectId GetId()     { return object.id; }
+  ValueId       GetSize()       const { return GetObject().GetSize(); }
 
   void Accept(ISmgVisitor& visitor) { object.Accept(visitor, graph); }
   Object(Impl::Object& object, Impl::Graph& graph) : object{object}, graph{graph} {}
@@ -195,12 +196,10 @@ public:
   bool IsValid()     { return GetObject().isValid; }
   bool IsFreed()     { return GetObject().isFreed; }
   bool IsNullified() { return GetObject().isNullified; }
-  ValueId GetSize()  { return GetObject().GetSize(); }
   Region(Impl::Region& object, Impl::Graph& graph) : Object{object, graph} {}
 };
 class Sls : public Object {
 public:
-  ValueId  GetSize()  { throw NotImplementedException(); }
   uint16_t GetLevel() { throw NotImplementedException(); }
   uint16_t GetRank()  { throw NotImplementedException(); }
 };
