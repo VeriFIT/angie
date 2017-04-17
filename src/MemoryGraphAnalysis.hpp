@@ -34,6 +34,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "Operation.hpp"
 
 #include "Smg.hpp"
+#include "Smg/Abstraction.hpp"
 
 class MemoryGraphAnalysisState : public State {
 public:

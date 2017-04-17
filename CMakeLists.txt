@@ -92,6 +92,7 @@ set(SOURCE_FILES
     src/Operation.hpp
     src/OsUtils.hpp
     src/OsUtils.cpp
+    src/Smg/Abstraction.hpp
     src/Smg/Edge.cpp
     src/Smg/Edge.hpp
     src/Smg/Graph.cpp
