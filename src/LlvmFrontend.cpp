@@ -251,12 +251,55 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
           }
         }
       }      
+      if (func->getName().startswith("__ANGIE"))
+      { // Those are analysis-independnent angie intrinsic functions, no need to guard them
+#if 0 // not yet implemented
+        if (func->getName() == "__ANGIE_FORCE_ABSTRACTION")
+        {
+          op = &opFactory.ForceAbstraction();
+          break;
+        }
+        else if (func->getName() == "__ANGIE_FORCE_JOIN")
+        {
+          op = &opFactory.ForceJoin();
+          break;
+        }
+        else if (func->getName().startswith(("__ANGIE_CREATE_UNKNOWN_"))
+        {
+          op = &opFactory.CreateUnknownVal();
+          break;
+        }
+#endif
+      }
+      else
       { //TODO@mikchot: guard this code to happen only if advanced-memory-operations generation are ON
         if (func->getName() == "malloc")
         {
           op = &opFactory.Malloc();
           break;
         }
+#if 0 // not yet implemented
+        else if (func->getName() == "calloc")
+        {
+          op = &opFactory.Calloc();
+          break;
+        }
+        else if (func->getName() == "memset")
+        {
+          op = &opFactory.Memset();
+          break;
+        }
+        else if (func->getName() == "memcpy")
+        {
+          op = &opFactory.Memcpy();
+          break;
+        }
+        else if (func->getName() == "memove")
+        {
+          op = &opFactory.Memmove();
+          break;
+        }
+#endif
       }
     }
     op = &opFactory.Call();
