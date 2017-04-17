@@ -231,23 +231,33 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
   {
     auto& typedInstr = static_cast<const llvm::CallInst&>(instr);
     auto func = typedInstr.getCalledFunction();
-    if (func && func->isIntrinsic())
+    //TODO@michkot: the following switch-like behaviour has to be duplicated in GetOperArgsForInstr
+    if (func) // only if this is direct call
     {
-      if (func->getName().startswith("llvm.memset"))
+      if (func->isIntrinsic())
       {
-        op = &opFactory.Memset();
-        break;
+        if (func->getName().startswith("llvm.dbg"))
+        {
+          op = &opFactory.Noop();
+          break;
+        }        
+        else
+        { //TODO@mikchot: guard this code to happen only if advanced-memory-operations generation are ON
+          //HACK, llvm.memset and std::memset have probably different params
+          if (func->getName().startswith("llvm.memset")) 
+          {
+            op = &opFactory.Memset();
+            break;
+          }
+        }
+      }      
+      { //TODO@mikchot: guard this code to happen only if advanced-memory-operations generation are ON
+        if (func->getName() == "malloc")
+        {
+          op = &opFactory.Malloc();
+          break;
+        }
       }
-      else if (func->getName().startswith("llvm.dbg"))
-      {
-        op = &opFactory.Noop();
-        break;
-      }
-    }
-    if (func->getName() == "malloc")
-    {
-      op = &opFactory.Malloc();
-      break;
     }
     op = &opFactory.Call();
     break;
