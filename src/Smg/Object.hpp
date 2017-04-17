@@ -209,10 +209,21 @@ public:
 
 class Dls : public Object {
 
+  size_t minLength;
+  DlsOffsets offsets;
 
 public:
 
+  size_t GetMinLength() { return minLength; }
+  DlsOffsets GetOffsets() { return offsets; }
+
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
+
 };
+
+class DlsAdapter : Dls {};
+class DlsFirstAdapter : DlsAdapter {};
+class DlsLastAdapter : DlsAdapter {};
 
 } // namespace Smg::Impl
 } // namespace Smg

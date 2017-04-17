@@ -15,4 +15,11 @@ using ObjectSize = ValueId;
 using ObjectType = int; // not used
 
 } // namespace Smg::Impl
+
+struct DlsOffsets{
+  ValueId hfo;
+  ValueId nfo;
+  ValueId pfo;
+};
+
 } // namespace Smg
