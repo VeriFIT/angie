@@ -126,6 +126,9 @@ public:
   std::vector<PtEdge> ptEdges;
   int32_t refCounter{0};
 
+  ObjectSize size;
+  size_t level;
+
   void IncRefCounter() { ++refCounter; }
   void DecRefCounter() { --refCounter; }
 
@@ -153,6 +156,8 @@ public:
 
   virtual ~Object() = default;
   ObjectId GetId() const { return id; }
+  ObjectSize GetSize() const { return size; }
+  size_t GetLevel() const { return level; }
 
   //Relies on GetPtOutEdges  //GetSucessors
         auto  GetOutEdges()         { return ::ranges::view::concat(hvEdges, ptEdges); }
@@ -200,10 +205,12 @@ public:
 
   virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
 
-  ObjectSize size;
+};
+
+class Dls : public Object {
+
 
 public:
-  ObjectSize GetSize() const { return size; }
 
 };
 
