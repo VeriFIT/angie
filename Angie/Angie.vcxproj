@@ -179,8 +179,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="..\src\laboratory.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
@@ -191,8 +189,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="..\src\main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
@@ -242,8 +238,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="..\src\ValueContainerV1.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
