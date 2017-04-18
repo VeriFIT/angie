@@ -139,8 +139,7 @@ private:
   static inline auto& CreateOrModifyEdge(std::vector<T>& container, ValueId&& offset, Args&&... args)
   {
     {
-      T* edge;
-      if (edge = FindEdgeByOffset(container, offset))
+      if (T* edge = FindEdgeByOffset(container, offset))
       {
         //TODO: edge modification -> should have a reference counter, when the original value is no longer accessible - FOR OBJECTS, DEFINITELY
         ModificationObserver<T>{}(*edge);
@@ -154,10 +153,11 @@ private:
 
 public:
 
-  virtual ~Object() = default;
+  virtual ~Object() = 0;
   ObjectId GetId() const { return id; }
   ObjectSize GetSize() const { return size; }
   size_t GetLevel() const { return level; }
+  virtual uptr<Object> Clone() const = 0;
 
   //Relies on GetPtOutEdges  //GetSucessors
         auto  GetOutEdges()         { return ::ranges::view::concat(hvEdges, ptEdges); }
@@ -195,15 +195,17 @@ public:
   { return CreateOrModifyEdge(ptEdges, std::forward<ValueId>(offset), std::forward<Args>(args)...); }
 };
 
-class Region : public Object {
+inline ::Smg::Impl::Object::~Object() {}
 
+class Region : public Object {
 public:
 
   bool isValid     = true;
   bool isNullified = false;
   bool isFreed     = false;
 
-  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
+  virtual uptr<Object> Clone() const override { return std::make_unique<std::decay<decltype(*this)>::type>(*this); }
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx) override;
 
 };
 
@@ -217,8 +219,8 @@ public:
   size_t GetMinLength() { return minLength; }
   DlsOffsets GetOffsets() { return offsets; }
 
-  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
 
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx) override;
 };
 
 class DlsAdapter : Dls {};

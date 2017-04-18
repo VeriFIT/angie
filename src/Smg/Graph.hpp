@@ -38,7 +38,7 @@ private:
 
 public:
   Region handles;
-  std::map<ObjectId, uptr<Region>> objects;
+  std::map<ObjectId, uptr<Object>> objects;
 
 public:
 
@@ -60,7 +60,7 @@ public:
     ////  );
     for (const auto& kvp : g.objects)
     {
-      objects.emplace(kvp.first, std::make_unique<Region>(*kvp.second));
+      objects.emplace(kvp.first, kvp.second->Clone());
     }
   }
 
