@@ -275,6 +275,18 @@ public:
 
   }
 
+  auto FindPtInEdges(ObjectId id)
+  {
+    return objects 
+      | ranges::view::transform([=](auto& idObjPair) { return std::ref(*idObjPair.second); })
+      | ranges::view::for_each([=](Impl::Object& obj)
+    {
+      return ranges::yield_from(obj.ptEdges
+        | ranges::view::filter([=](Impl::PtEdge& edge) { return edge.targetObjectId == id; })
+        | ranges::view::transform([&](Impl::PtEdge& edge) { return std::pair<Object&, PtEdge&>(obj, edge); }));
+    }
+    );
+  }
 
 };
 
