@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugClang|x64">
@@ -91,7 +91,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/permissive- /w34062 /arch:AVX2 %(AdditionalOptions)</AdditionalOptions>
-      <PrecompiledHeaderFile>..\src\precompall.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -200,27 +200,27 @@
     <ClCompile Include="..\src\Exceptions.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\LlvmFrontend.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\laboratory.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\LlvmGlobals.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\..\croaring\roaring.c">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
@@ -230,7 +230,7 @@
     <ClCompile Include="..\src\OsUtils.cpp" />
     <ClCompile Include="..\src\precompall.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>..\src\precompall.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="..\src\precompllvm.cpp">
@@ -247,10 +247,18 @@
     </ClCompile>
     <ClCompile Include="..\src\Smg.cpp">
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="..\src\SmgCrawler.cpp" />
-    <ClCompile Include="..\src\SmgPrinter.cpp" />
+    <ClCompile Include="..\src\SmgCrawler.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\src\SmgPrinter.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="..\src\Smg\Edge.cpp" />
     <ClCompile Include="..\src\Smg\Object.cpp" />
     <ClCompile Include="..\src\Smg\Graph.cpp" />
@@ -259,26 +267,26 @@
     <ClCompile Include="..\src\StateStorage.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\LlvmType.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\ValueContainerV1.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\ValueId.cpp">
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\ValuesZ3.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">..\src\precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
