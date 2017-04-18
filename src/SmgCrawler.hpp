@@ -56,6 +56,7 @@ public:
   void Visit(Smg::PtEdge) override final;
   void Visit(Smg::Object) override final;
   void Visit(Smg::Region) override final;
+  void Visit(Smg::Dls)    override final;
   void Visit(Smg::Sls)    override final;
   void Visit(Smg::Graph)  override final;
 

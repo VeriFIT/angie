@@ -91,7 +91,7 @@ void SmgPrinter::Visit(Region r)
     ->setAttr("shape", "box")
     ->setAttr("color", "black")
     ->setAttr("fontcolor", "black")
-    ->setAttr("label", "R#" + to_string(r.GetId()) + "\n[sz=" + to_string(r.GetSize()) + "B,va=" + to_string(r.IsValid()));
+    ->setAttr("label", "R#" + to_string(r.GetId()) + "\n[sz=" + to_string(r.GetSize()) + "B,va=" + to_string(r.IsValid()) + "]");
 
   for (HvEdge edge : r.GetHvOutEdges())
   {
@@ -121,6 +121,10 @@ void SmgPrinter::Visit(Region r)
       ->setAttr("label", to_string(edge.GetTargetOffset()));
   }
 }
+void SmgPrinter::Visit(Dls s)
+{
+  Visit(*reinterpret_cast<Sls*>(&s));
+}
 void SmgPrinter::Visit(Sls s)
 {
   memgraph::Subgraph *sub;
@@ -136,7 +140,7 @@ void SmgPrinter::Visit(Sls s)
     ->setAttr("shape", "box")
     ->setAttr("color", "orange")
     ->setAttr("fontcolor", "orange")
-    ->setAttr("label", "SLS#" + to_string(s.GetId()) + " [SC_ON_HEAP, size = " + to_string(s.GetSize()) + " B]");
+    ->setAttr("label", "SLS#" + to_string(s.GetId()) + " [sz=" + to_string(s.GetSize()) + " B]");
 
   for (HvEdge edge : s.GetHvOutEdges())
   {
