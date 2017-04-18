@@ -290,6 +290,27 @@ public:
     );
   }
 
+  void Free(ValueId ptr)
+  {
+    auto& graph = *this;
+    auto& ptrEdge = FindPtEdge(ptr);
+
+    //TODO: materialize as region, edge gets updates to point to materialized object now
+
+    // Set regions state to invalid
+    Region& object = static_cast<Region&>(*graph.objects[ptrEdge.targetObjectId]);
+
+    // Remove references from other objects, set them to invalid [freed] memory
+    using ret_t = std::pair<Impl::Object&, Impl::PtEdge&>;
+    RANGES_FOR(ret_t pair, graph.FindPtInEdges(object.GetId()))
+    {
+      pair.second.targetObjectId = ObjectId{-1};
+    }
+
+    // Delete the object
+    graph.objects.erase(object.GetId());
+  }
+
 };
 
 } // namespace Smg::Impl
