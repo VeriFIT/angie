@@ -193,6 +193,12 @@ public:
     auto& ptrEdge = FindPtEdge(ptr, ptrType);
 
     auto  objectId = ptrEdge.targetObjectId;
+    // for efficiency reasons, we could move/copy the null check to the start and check ptr == {0}
+    if (objectId == ObjectId{0} || objectId == ObjectId{-1})
+    {
+      throw InvalidDereferenceException_smg();
+    }
+
     auto& object   = *objects.at(objectId);
     auto  offset   = ptrEdge.targetOffset;
 
@@ -206,14 +212,21 @@ public:
       { // HvEdges does not yet exist -> we should attempt read reinterpretation, if there are any values
         //TODO: should newly allocated object be covered by unknown value of object's size,
         // or there just should not be any HvEdges at all?
-        if (object.hvEdges.size() == 0)
-        { // Unknown!
-          throw InvalidDereferenceException_smg();
-        }
-        //TODO: read reinterpretation
-        throw InvalidDereferenceException_smg(
-          "HvEdges for such offset does not yet exists and read re-interpretation is not yet supported"
-          );
+
+        ////if (object.hvEdges.size() == 0)
+        ////{ // Unknown!
+        ////  throw InvalidDereferenceException_smg();
+        ////}
+        //////TODO: read reinterpretation
+        ////throw InvalidDereferenceException_smg(
+        ////  "HvEdges for such offset does not yet exists and read re-interpretation is not yet supported"
+        ////  );
+        /// 
+        std::cout << "Reading unknown as plain value" << std::endl;
+        
+        ValueId unknown = vc.CreateVal(tarType);      
+        object.CreateHvEdge(HvEdge{offset, unknown, tarType});
+        return unknown;
       }
     }
     else /* type is pointer && and is known pointer; debug if second fails */
@@ -229,11 +242,28 @@ public:
         // Or fallback to HvEdge scenario
         // Or use undefined value / special meaning value
         // Find out whether it is undefined-unknown or abstracted-unknown
-        auto status = vc.GetAbstractionStatus(ptr);
-        std::cout << AbstractionStatusToString(status) << std::endl;
-        //HACK: need this for argv 
-        ////throw std::runtime_error{"Writing unknown pointer value"}; 
-        return ValueId{(uint64_t)-1};
+        ////auto status = vc.GetAbstractionStatus(ptr);
+        ////std::cout << AbstractionStatusToString(status) << std::endl;
+        
+        std::cout << "Reading unknown as pointer" << std::endl;        
+
+        //TODO: retinterptation from values
+        {
+          //HACK: this is code duplication
+
+          HvEdge* edge = object.FindHvEdgeByOffset(offset);
+          if (edge)
+          {
+            return edge->value;
+          }
+          else
+          {
+            ValueId unknown = vc.CreateVal(tarType);
+            object.CreateHvEdge(HvEdge{offset, unknown, tarType});
+            return unknown;
+          }
+        }
+
       }
     }
 
@@ -241,6 +271,9 @@ public:
 
   // Type is potentially not needed, because the targetPtr must be a pointer to correctly typed edge
   // We use it here to skip the ptrEdge.valueType.GetPointerElementType()
+  //! ATTENATION!
+  //TODO: write reinterpetaiton - consider the read changes
+
   void WriteValue(ValueId ptr, ValueId value, Type type, IValueContainer& vc)
   {
     auto& ptrEdge = FindPtEdge(ptr, Type::CreatePointerTo(type));
@@ -254,7 +287,14 @@ public:
 
     // The object has to be valid for an operation
     // The flag should be stored inside the object, because the edge is unique to [object, offset, type]
+
     auto  objectId = ptrEdge.targetObjectId;
+    // for efficiency reasons, we could move/copy the null check to the start and check ptr == {0}
+    if (objectId == ObjectId{0} || objectId == ObjectId{-1})
+    {
+      throw InvalidDereferenceException_smg();
+    }
+
     auto& object   = *objects.at(objectId);
     auto  offset   = ptrEdge.targetOffset;
 
