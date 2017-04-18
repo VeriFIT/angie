@@ -176,6 +176,7 @@ public:
   auto GetPtInEdges()  { throw NotImplementedException(); }
   ValueId GetSize()    { return object.GetSize(); }
   ObjectId GetId()     { return object.id; }
+  uint16_t GetLevel()  { throw NotImplementedException(); }
 
   void Accept(ISmgVisitor& visitor) { object.Accept(visitor, graph); }
   Object(Impl::Object& object, Impl::Graph& graph) : object{object}, graph{graph} {}
@@ -196,7 +197,10 @@ public:
 };
 class Sls : public Object {
 public:
-  uint16_t GetLevel() { throw NotImplementedException(); }
+  uint16_t GetRank()  { throw NotImplementedException(); }
+};
+class Dls : public Object {
+public:
   uint16_t GetRank()  { throw NotImplementedException(); }
 };
 
