@@ -46,7 +46,7 @@ public:
   using type = UnderlyingT;
   UnderlyingT id;
   // Constructors
-  constexpr           Id()            : id{ 0 }  { }
+  constexpr           Id()               : id{ 0 }  { }
   constexpr explicit  Id(UnderlyingT id) : id{ id } { }
                      ~Id() = default;
 
