@@ -182,6 +182,8 @@ public:
         PtEdge* FindPtEdgeByValueType (ValueId value, Type type)       { return FindEdgeByValueType (ptEdges, value, type); }
   const PtEdge* FindPtEdgeByValueType (ValueId value, Type type) const { return FindEdgeByValueType (ptEdges, value, type); }
 
+  //TODO@michkot: reconsider uses of Create vs CreateOrModify + whether to guarante uniqueness of the edges
+  // motivation ->CreateDerivedPointer use currently creating duplicate edges
   template<typename... Args>
   HvEdge& CreateHvEdge(Args&&... args) { return CreateEdge(hvEdges, std::forward<Args>(args)...); }
   template<typename... Args>
@@ -204,12 +206,33 @@ public:
   bool isNullified = false;
   bool isFreed     = false;
 
+  static auto Create(ObjectId id) 
+  {
+    auto newObj = std::make_unique<Region>(); newObj->id = id; return newObj;
+  }
   virtual uptr<Object> Clone() const override { return std::make_unique<std::decay<decltype(*this)>::type>(*this); }
   virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx) override;
+};
 
+class Sls : public Object {
+public:
+
+  size_t minLength;
+
+public:
+
+  size_t GetMinLength() { return minLength; }
+
+  static auto Create(ObjectId id) 
+  {
+    auto newObj = std::make_unique<Sls>(); newObj->id = id; return newObj;
+  }
+  virtual uptr<Object> Clone() const override { return std::make_unique<std::decay<decltype(*this)>::type>(*this); }
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx) override;
 };
 
 class Dls : public Object {
+public:
 
   size_t minLength;
   DlsOffsets offsets;
@@ -219,7 +242,11 @@ public:
   size_t GetMinLength() { return minLength; }
   DlsOffsets GetOffsets() { return offsets; }
 
-
+  static auto Create(ObjectId id) 
+  {
+    auto newObj = std::make_unique<Dls>(); newObj->id = id; return newObj;
+  }
+  virtual uptr<Object> Clone() const override { return std::make_unique<std::decay<decltype(*this)>::type>(*this); }
   virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx) override;
 };
 
