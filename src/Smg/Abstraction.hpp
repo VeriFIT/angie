@@ -12,6 +12,8 @@ namespace Abstraction {
 //TODO@michkot: possible optimization, return the linked-to object too
 std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContainer& vc)
 {
+  using ret_t = std::tuple<bool, DlsOffsets, ObjectId>; // pre C++17 fix for explicit tuple ctor
+
   /*
   What are we trying to do: deduce NFO, HFO and PFO and if successful, get the linked-to region
 
@@ -92,7 +94,7 @@ std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContain
           if ((o2.FindPtEdgeByOffset(nfo)) && o1.FindPtEdgeByOffset(pfo))
           {
             DlsOffsets offsets = {hfo, nfo, pfo};
-            return{true, offsets, o2.GetId()};
+            return ret_t{true, offsets, o2.GetId()};
           }
         }
       }
@@ -101,7 +103,7 @@ std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContain
     // failed candidate        
   }
 
-  return{false, {}, {}};
+  return ret_t{false, {}, {}};
 }
 
 struct myless {
