@@ -44,10 +44,13 @@ public:
 
   Graph(IValueContainer& vc)
   {
-    auto& obj = objects.emplace(ObjectId{0}, std::make_unique<Region>()).first.operator*().second.operator*();
-    obj.id = ObjectId{0};
-    obj.size = ValueId{0};
-    handles.CreatePtEdge(PtEdge{ValueId{0}, ValueId{0}, Type::CreateCharPointerType(), ObjectId{0}, vc.GetZero(PTR_TYPE)});
+    ObjectId nullId{0};
+    ObjectId unknId{-1};
+    auto& nullObj    = objects.emplace(nullId, Region::Create(nullId)).first.operator*().second.operator*();
+    auto& unknownObj = objects.emplace(unknId, Region::Create(unknId)).first.operator*().second.operator*();
+    nullObj.size    = {};
+    unknownObj.size = {};
+    handles.CreatePtEdge(PtEdge{{}, {}, PTR_TYPE, ObjectId{0}, {}});
   }
   Graph(const Graph& g) :
     handles(g.handles)
@@ -134,6 +137,15 @@ public:
     handles.CreatePtEdge(PtEdge{ValueId{0}, ptr, ptrToTypeT, oid, vc.GetZero(PTR_TYPE)});
 
     //TODO: should allocation be allowed to fail, to model malloc, etc. returning null?
+
+    //? if the type is pointer [can happen with llvm.alloca, not with malloc ofc.], create implicit ptedge?
+    // problem is: do i want a guarantee, that when Pointer to Pointer value leaves SMGs, 
+    //   the target pointer edge already exists 
+    //   and i do not need to relly on read on reinterpretation to create one out of nothing?
+    // this applies also to ReadValue, when reading Pointer to Pointer value [currently creates new ValId]
+    //   and to cast instruction, when Pointer values can "randomly" appear for integers, etc...
+    //! it is probably easier just to catch them in "read" "write" "getderivedptr" -> in findptedge
+    //!   and to create new edges leading to object -1 ?
 
     return ptr;
   }
