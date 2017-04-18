@@ -243,7 +243,7 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
         }
         else
         { //TODO@mikchot: guard this code to happen only if advanced-memory-operations generation are ON
-          //HACK, llvm.memset and std::memset have probably different params
+          //HACK: llvm.memset and std::memset have probably different params
           if (func->getName().startswith("llvm.memset"))
           {
             op = &opFactory.Memset();
@@ -253,8 +253,24 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
       }
       if (func->getName().startswith("__ANGIE"))
       { // Those are analysis-independnent angie intrinsic functions, no need to guard them
+        if (false) {}
+        else if (func->getName() == "__ANGIE_DIAGNOSTIC_PLOT_MEMORY")
+        {
+          op = &opFactory.DiagnosticsPlotMem(); // In SMGS plots the memory graph
+          break;
+        }
+        else if (func->getName().startswith(("__ANGIE_CREATE_UNKNOWN_")))
+        {
+          op = &opFactory.CreateUnknownVal(); // The type is deduced from target register argument
+          break;
+        }
 #if 0 // not yet implemented
-        if (func->getName() == "__ANGIE_FORCE_ABSTRACTION")
+        else if (func->getName() == "__ANGIE_TRACE_PLOT")
+        {
+          op = &opFactory.TracePlot(); // Print the 
+          break;
+        }
+        else if (func->getName() == "__ANGIE_FORCE_ABSTRACTION")
         {
           op = &opFactory.ForceAbstraction();
           break;
@@ -264,11 +280,6 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
           op = &opFactory.ForceJoin();
           break;
         }
-        else if (func->getName().startswith(("__ANGIE_CREATE_UNKNOWN_"))
-        {
-          op = &opFactory.CreateUnknownVal();
-          break;
-        }
 #endif
       }
       else
@@ -276,6 +287,11 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
         if (func->getName() == "malloc")
         {
           op = &opFactory.Malloc();
+          break;
+        }
+        else if (func->getName() == "free")
+        {
+          op = &opFactory.Free();
           break;
         }
 #if 0 // not yet implemented
