@@ -10,7 +10,7 @@ namespace Abstraction {
 
 
 //TODO@michkot: possible optimization, return the linked-to object too
-std::pair<bool, DlsOffsets> IsCandidateObject(Object c, IValueContainer& vc)
+std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContainer& vc)
 {
   /*
   What are we trying to do: deduce NFO, HFO and PFO and if successful, get the linked-to region 
@@ -42,36 +42,37 @@ std::pair<bool, DlsOffsets> IsCandidateObject(Object c, IValueContainer& vc)
 
   */
 
-  auto candidateId = c.GetId();
-  auto size = c.GetSize();
+  auto o1 = c;
+  auto candidateId = o1.GetId();
+  auto size = o1.GetSize();
   auto sizeFilter = [size](PtEdge edge) { return edge.GetTargetObject().GetSize() == size; };
-
-  std::vector<PtEdge> ptEdges = c.GetPtOutEdges() | ranges::to_vector;
+  
+  auto ptEdges = o1.GetPtOutEdges();// | ranges::to_vector;
 
   // optional sort?
-  // ptEdges |= ranges::sort([vc&](PtEdge a, PtEdge b) { return (bool)vc.IsCmp(a.GetSourceOffset(), b.GetSourceOffset(), PTR_TYPE, CmpFlags::Default) });
+  //// ptEdges |= ranges::sort([vc&](PtEdge a, PtEdge b) { return (bool)vc.IsCmp(a.GetSourceOffset(), b.GetSourceOffset(), PTR_TYPE, CmpFlags::Default) });
 
   auto end = ptEdges.end();
   for (auto it = ptEdges.begin(); it != end; ++it)
   {
-    // 1) cnadidate NF edge
+    // 1) candidate NF edge
     PtEdge nfEdge = *it;
       
     // 1b) load the target object
-    auto obj = nfEdge.GetTargetObject();
+    auto o2 = nfEdge.GetTargetObject();
 
     //TODO@michkot: make a template for these == --> vc.IsCmp TODOs
     //TODO@michkot: this is only subset of possible equality, should be vc.IsCmp(.....)
     // 1c) test that the sizes match
-    if (obj.GetSize() == size)
+    if (o2.GetSize() == size)
     {
       // 2) deduce NFO and HFO
       auto nfo = nfEdge.GetSourceOffset();
       auto hfo = nfEdge.GetTargetOffset();
 
-      // find an edge pointing to the original object wih HF offset
+      // find an edge pointing to the original object with HF offset
       // if found, succeed, else return to 1)
-      for (PtEdge pfEdge : obj.GetPtOutEdges())
+      for (PtEdge pfEdge : o2.GetPtOutEdges())
       {
         if (
           (pfEdge.GetTargetObjectId() == candidateId) &&
@@ -83,8 +84,16 @@ std::pair<bool, DlsOffsets> IsCandidateObject(Object c, IValueContainer& vc)
           // get the PFO
           auto pfo = pfEdge.GetSourceOffset();
 
-          DlsOffsets offsets = {hfo, nfo, pfo};
-          return {true, offsets};
+          // Here, we could check whether there exists fields:
+          // at PFO on o1
+          // at NFO at o2
+          // and later keep the algo. from checking for them / using reinterpret cast
+          //HACK: doing eager next/prev checking, cause we can not do reinterpret cast yet
+          if((o2.FindPtEdgeByOffset(nfo)) && o1.FindPtEdgeByOffset(pfo))
+          {
+            DlsOffsets offsets = {hfo, nfo, pfo};
+            return{true, offsets, o2.GetId()};
+          }
         }          
       }  
       // PF edge not found
@@ -92,14 +101,55 @@ std::pair<bool, DlsOffsets> IsCandidateObject(Object c, IValueContainer& vc)
     // failed candidate        
   }
 
-  return {false, {}};
+  return{false, {}, {}};
 }
 
-void JoinTwoObjects()
+class X {};
+
+void JoinTwoRegions(ObjectPair pair, DlsOffsets offsets);
+void JoinTwoObjects(ObjectPair pair, DlsOffsets offsets)
 {
+  JoinTwoRegions(pair, offsets);
 }
-void JoinTwoRegion()
+void JoinTwoRegions(ObjectPair pair, DlsOffsets offsets)
 {
+  auto o1 = pair.GetFirst();
+  auto o2 = pair.GetSecond();
+  
+  auto nextEdge = o2.GetPtEdgeByOffset(offsets.nfo);
+  auto prevEdge = o1.GetPtEdgeByOffset(offsets.pfo);
+
+  auto dlsId = ObjectId::GetNextId();
+  auto dlsPtr = Impl::Dls::Create(dlsId);
+  auto& dls = *dlsPtr;
+  dls.offsets = offsets;
+  dls.minLength = 2;
+  dls.CreatePtEdge(Impl::PtEdge{nextEdge.GetEdge()});
+  dls.CreatePtEdge(Impl::PtEdge{prevEdge.GetEdge()});
+  
+  // put the DLS to the graph
+  o1.GetGraph().objects.emplace(dlsId, std::move(dlsPtr));
+  //! use DlsFront and DlsBack instead of just DLS -> we need the target specifiers
+
+  // redirect edges to the DLS
+  RANGES_FOR(ObjectPtEdgePair incEdge, o1.GetPtInEdges())
+  {
+    incEdge.GetEdge().GetEdge().targetObjectId = dlsId;
+  }
+  RANGES_FOR(ObjectPtEdgePair incEdge, o2.GetPtInEdges())
+  {
+    incEdge.GetEdge().GetEdge().targetObjectId = dlsId;
+  }
+  
+  //////HACK: should be cleaning up the whole SMG after everything is done
+  ////// erase the o1 and o2 from graph
+  ////o1.GetGraph().objects.erase(o1.GetId());
+  ////o1.GetGraph().objects.erase(o2.GetId());
+
+  // following is needed only for subSMG joining
+  // null the edges to cut the SMGs
+  ////nextEdge.GetEdge() = Impl::PtEdge::GetNullPtr();
+  ////prevEdge.GetEdge() = Impl::PtEdge::GetNullPtr();
 }
 
 void LookForCandidates(Impl::Graph& graph, IValueContainer& vc)
@@ -108,9 +158,11 @@ void LookForCandidates(Impl::Graph& graph, IValueContainer& vc)
   {
     auto obj = Object(*pair.second, graph);
     auto resTup = IsCandidateObject(obj, vc);
-    if (resTup.first)
+    if (std::get<bool>(resTup))
     {
-      //auto linkedToObject 
+      auto linkedToObjectId = std::get<ObjectId>(resTup);
+      auto linkedToObject = Object{*graph.objects[linkedToObjectId], graph};
+      JoinTwoObjects({obj, linkedToObject}, std::get<DlsOffsets>(resTup));
     }
   }
 }
