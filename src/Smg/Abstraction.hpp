@@ -13,7 +13,7 @@ namespace Abstraction {
 std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContainer& vc)
 {
   /*
-  What are we trying to do: deduce NFO, HFO and PFO and if successful, get the linked-to region 
+  What are we trying to do: deduce NFO, HFO and PFO and if successful, get the linked-to region
 
   0) deduce segment size from this region
   1) pick a NF edge (same size as this region) -> note this already requires loading the target object!
@@ -32,7 +32,7 @@ std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContain
   5) DONE
 
   in case of DLS, variant look back now! -> previous object might be list head with different size
-  3) pick PF as 
+  3) pick PF as
     a) the next with srcOffset higher then NFO
     b) any with higer srcOffset higher then NFO
     c) any other (will allow for NF a PF to swap)
@@ -46,7 +46,7 @@ std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContain
   auto candidateId = o1.GetId();
   auto size = o1.GetSize();
   auto sizeFilter = [size](PtEdge edge) { return edge.GetTargetObject().GetSize() == size; };
-  
+
   auto ptEdges = o1.GetPtOutEdges();// | ranges::to_vector;
 
   // optional sort?
@@ -57,7 +57,7 @@ std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContain
   {
     // 1) candidate NF edge
     PtEdge nfEdge = *it;
-      
+
     // 1b) load the target object
     auto o2 = nfEdge.GetTargetObject();
 
@@ -77,7 +77,7 @@ std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContain
         if (
           (pfEdge.GetTargetObjectId() == candidateId) &&
           //TODO@michkot: this is only subset of possible equality, should be vc.IsCmp(.....)
-          (pfEdge.GetTargetOffset() == hfo) 
+          (pfEdge.GetTargetOffset() == hfo)
           )
         {
           // found a PF edge!
@@ -89,13 +89,13 @@ std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContain
           // at NFO at o2
           // and later keep the algo. from checking for them / using reinterpret cast
           //HACK: doing eager next/prev checking, cause we can not do reinterpret cast yet
-          if((o2.FindPtEdgeByOffset(nfo)) && o1.FindPtEdgeByOffset(pfo))
+          if ((o2.FindPtEdgeByOffset(nfo)) && o1.FindPtEdgeByOffset(pfo))
           {
             DlsOffsets offsets = {hfo, nfo, pfo};
             return{true, offsets, o2.GetId()};
           }
-        }          
-      }  
+        }
+      }
       // PF edge not found
     }
     // failed candidate        
@@ -104,7 +104,45 @@ std::tuple<bool, DlsOffsets, ObjectId> IsCandidateObject(Object c, IValueContain
   return{false, {}, {}};
 }
 
-class X {};
+struct myless {
+  /*constexpr*/ bool operator()(const ref_wr<Impl::Object>& _Left, const ref_wr<Impl::Object>& _Right) const
+  {
+    return (_Left.get().GetId() < _Right.get().GetId());
+  }
+};
+
+//TODO make sub-graph dervied from Graph / GraphBase ... we need all objects &&&& edges! in the subgraph
+class SubGraph {
+  Smg::Object root;
+  std::set<ref_wr<Impl::Object>, myless> objects;
+  SubGraph(Impl::Object& root, Impl::Graph& graph) :
+    root{root, graph}
+  {
+    Init();
+  }
+  void Init()
+  {
+    using namespace ::ranges::view;
+    std::queue<ref_wr<Impl::Object>> worklist;
+    worklist.push(root.GetObject());
+
+    while (!worklist.empty())
+    {
+      for (Impl::PtEdge edge : worklist.front().get().GetPtOutEdges())
+      {
+        auto& objRef = PtEdge{edge, root.GetGraph()}.GetTargetObject().GetObject();
+        auto insResult = objects.insert(objRef);
+        if (insResult.second) // if newly inserted, queue for processing
+          worklist.push(objRef);
+      };
+      worklist.pop();
+    }
+  }
+};
+
+void JoinTwoSubSmgs()
+{
+}
 
 void JoinTwoRegions(ObjectPair pair, DlsOffsets offsets);
 void JoinTwoObjects(ObjectPair pair, DlsOffsets offsets)
@@ -115,6 +153,7 @@ void JoinTwoRegions(ObjectPair pair, DlsOffsets offsets)
 {
   auto o1 = pair.GetFirst();
   auto o2 = pair.GetSecond();
+  auto& graph = o1.GetGraph();
   
   auto nextEdge = o2.GetPtEdgeByOffset(offsets.nfo);
   auto prevEdge = o1.GetPtEdgeByOffset(offsets.pfo);
@@ -128,7 +167,7 @@ void JoinTwoRegions(ObjectPair pair, DlsOffsets offsets)
   dls.CreatePtEdge(Impl::PtEdge{prevEdge.GetEdge()});
   
   // put the DLS to the graph
-  o1.GetGraph().objects.emplace(dlsId, std::move(dlsPtr));
+  graph.objects.emplace(dlsId, std::move(dlsPtr));
   //! use DlsFront and DlsBack instead of just DLS -> we need the target specifiers
 
   // redirect edges to the DLS
@@ -141,10 +180,12 @@ void JoinTwoRegions(ObjectPair pair, DlsOffsets offsets)
     incEdge.GetEdge().GetEdge().targetObjectId = dlsId;
   }
   
-  //////HACK: should be cleaning up the whole SMG after everything is done
-  ////// erase the o1 and o2 from graph
-  ////o1.GetGraph().objects.erase(o1.GetId());
-  ////o1.GetGraph().objects.erase(o2.GetId());
+  //HACK: should be cleaning up the whole SMG after everything is done
+  // erase the o1 and o2 from graph
+  auto o1Id = o1.GetId();
+  auto o2Id = o2.GetId();
+  graph.objects.erase(o1Id);
+  graph.objects.erase(o2Id);
 
   // following is needed only for subSMG joining
   // null the edges to cut the SMGs
@@ -152,7 +193,7 @@ void JoinTwoRegions(ObjectPair pair, DlsOffsets offsets)
   ////prevEdge.GetEdge() = Impl::PtEdge::GetNullPtr();
 }
 
-void LookForCandidates(Impl::Graph& graph, IValueContainer& vc)
+bool LookForCandidates(Impl::Graph& graph, IValueContainer& vc)
 {
   for (auto& pair : graph.objects)
   {
@@ -163,8 +204,10 @@ void LookForCandidates(Impl::Graph& graph, IValueContainer& vc)
       auto linkedToObjectId = std::get<ObjectId>(resTup);
       auto linkedToObject = Object{*graph.objects[linkedToObjectId], graph};
       JoinTwoObjects({obj, linkedToObject}, std::get<DlsOffsets>(resTup));
+      return true;
     }
   }
+  return false;
 }
 
 //};
