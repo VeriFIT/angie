@@ -15,6 +15,7 @@ class ObjectSet;
 
 class Object;
 class Region;
+class Dls;
 class Sls;
 class Edge;
 class HvEdge;
