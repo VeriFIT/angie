@@ -80,9 +80,16 @@ private:
   //------------------------------------
 public:
 
+  void Plot()
+  {
+    ShowSmg(graph);
+  }
+
   void Store(ValueId where, ValueId what, Type ofType)
   {
     graph.WriteValue(where, what, ofType, GetVc());
+    if (Smg::Abstraction::LookForCandidates(graph, GetVc()))
+      ShowSmg(graph);
   }
 
   ValueId Load(ValueId ptr, Type ptrType, Type tarType)
@@ -140,12 +147,17 @@ public:
     throw NotSupportedException("Realloc is not supported");
   }
 
-  void Memset(ValueId target, ValueId value, ValueId size)
+  void Free(ValueId ptr)
+  {
+    graph.Free(ptr);
+  }
+
+  void Memset(ValueId ptr, ValueId value, ValueId size)
   {
     auto& vc = GetVc();
     if (vc.IsZero(value))
     {
-      return Memclear(target, size);
+      return Memclear(ptr, size);
     }
     if (vc.GetAbstractionStatus(size) != AbstractionStatus::Constant)
     {
@@ -156,7 +168,7 @@ public:
     throw NotSupportedException("Memset of arbitraty value is not supported");
   }
 
-  void Memclear(ValueId target, ValueId size)
+  void Memclear(ValueId ptr, ValueId size)
   {
     auto& vc = GetVc();
     if (vc.GetAbstractionStatus(size) != AbstractionStatus::Constant)
@@ -164,7 +176,7 @@ public:
       throw NotSupportedException("Memclear with abstract size is not supported");
     }
     auto byteArrayT = Type::CreateArrayOf(INT8_TYPE, vc.GetConstantIntInnerVal(size));
-    auto& edge = graph.CreateDerivedPointer(target, vc.GetZero(PTR_TYPE), Type::CreatePointerTo(byteArrayT), GetVc()).second;
+    auto& edge = graph.CreateDerivedPointer(ptr, vc.GetZero(PTR_TYPE), Type::CreatePointerTo(byteArrayT), GetVc()).second;
     graph.WriteValue(edge, vc.GetZero(INT8_TYPE), byteArrayT, GetVc());
   }
 
@@ -298,6 +310,27 @@ class MemGraphOpMemset : public BasicOperation<MemoryGraphAnalysisState> {
     auto len    = newState.GetValue(args.GetOperand(2));
 
     newState.Memset(target, value, len);
+
+    // void
+  }
+};
+
+class MemGraphOpFree : public BasicOperation<MemoryGraphAnalysisState> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
+  {
+    auto ptr = newState.GetValue(args.GetOperand(0));
+    newState.Free(ptr);
+
+    // void
+  }
+};
+
+class MemGraphOpPlotMem : public BasicOperation<MemoryGraphAnalysisState> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
+  {
+    newState.Plot();
+
+    // void
   }
 };
 
@@ -482,6 +515,7 @@ private:
   IOperation* malloc   = new MemGraphOpMalloc();
   IOperation* allocaop = new MemGraphOpAlloca();
   IOperation* memset   = new MemGraphOpMemset();
+  IOperation* free     = new MemGraphOpFree();
 
   IOperation* gep      = new MemGraphOpGetElementPtr();
   IOperation* cast     = new MemGraphOpCast();
@@ -489,6 +523,9 @@ private:
   IOperation* callop   = new FnaxOperationCall();
   IOperation* br       = new BasicOperationBranch();
   IOperation* ret      = new MemGraphOpRet();
+
+  IOperation* plot     = new MemGraphOpPlotMem();
+  IOperation* unkn     = new BasicOperationCreateUnknown();
 
 public:
   // Inherited via IOperationFactory
@@ -512,8 +549,11 @@ public:
   virtual IOperation& Memcpy() override { return *nsop; }
   virtual IOperation& Memmove() override { return *nsop; }
   virtual IOperation& Malloc() override { return *malloc; }
-  virtual IOperation& Free() override { return *nsop; }
+  virtual IOperation& Free() override { return *free; }
 
   virtual IOperation & NotSupportedInstr() override { return *nsop; }
   virtual IOperation & Noop() override { return *noop; }
+
+  virtual IOperation & CreateUnknownVal() override { return *unkn; }
+  virtual IOperation & DiagnosticsPlotMem() override { return *plot; }
 };

@@ -90,6 +90,10 @@ public:
   virtual IOperation& NotSupportedInstr() = 0;
   virtual IOperation& Noop() = 0;
 
+  virtual IOperation& CreateUnknownVal() = 0;
+
+  virtual IOperation& DiagnosticsPlotMem() = 0;
+
   /**
   * Destructor.
   */
