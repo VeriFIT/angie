@@ -755,7 +755,7 @@ void LlvmCfgParser::DealWithConstants()
     ValueId id;
     /**/ if (auto constInt = llvm::dyn_cast<llvm::ConstantInt>(x))
     {
-        id = vc.CreateConstIntVal(constInt->getValue().getZExtValue(), Type{constInt->getType()});
+        id = vc.CreateConstIntVal(constInt->getZExtValue(), Type{constInt->getType()});
     }
     else if (auto constFp = llvm::dyn_cast<llvm::ConstantFP>(x))
     {
@@ -778,10 +778,24 @@ void LlvmCfgParser::DealWithConstants()
     else if (auto constExpr = llvm::dyn_cast<llvm::ConstantExpr>(x))
     {
       llvm::Instruction* asInstr = deconst_cast(*constExpr).getAsInstruction();
-      if (llvm::isa<llvm::CastInst>(asInstr) && asInstr->getNumOperands() == 1)
+      if (false) {}
+      else if (llvm::isa<llvm::CastInst>(asInstr) && asInstr->getNumOperands() == 1)
       {
         auto asConstInt = llvm::dyn_cast<llvm::ConstantInt>(asInstr->getOperand(0));
-        id = vc.CreateConstIntVal(asConstInt->getValue().getZExtValue(), Type{constExpr-> getType()});
+        id = vc.CreateConstIntVal(asConstInt->getZExtValue(), Type{constExpr-> getType()});
+      }
+      else if (llvm::isa<llvm::GetElementPtrInst>(asInstr) && asInstr->getNumOperands() == 3)
+      {
+        auto idx0 = llvm::dyn_cast<llvm::ConstantInt>(asInstr->getOperand(1));
+        auto idx1 = llvm::dyn_cast<llvm::ConstantInt>(asInstr->getOperand(2));
+        if (idx0->getZExtValue() == 0 && idx1->getZExtValue() == 0)
+        {
+          //TODO: we are creating pointer to the begining of constant (string?) - relay it to SMGs
+          //HACK: we are replacig pointer to static value with unknown
+          id = vc.CreateVal(Type{constExpr-> getType()});
+        }
+        else
+          throw NotImplementedException();
       }
       else
         throw NotImplementedException();
