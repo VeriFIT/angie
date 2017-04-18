@@ -68,6 +68,11 @@ public:
   }
 
 
+  const PtEdge& CreateUnknownPtEdge(ValueId ptr)
+  {
+    return handles.CreatePtEdge(PtEdge{{}, ptr, PTR_TYPE, ObjectId{-1}, {}});
+  }
+
   // Temporary function, should be replaced by CmpPointers or similiar 
   bool ExistsPtEdge(ValueId ptr)
   {
@@ -82,8 +87,10 @@ public:
   {
     // The given pointer must be bound to an existing object
     auto objectHandle = handles.FindPtEdgeByValue(ptr);
-    assert(objectHandle != nullptr); //TODO: maybe an exception?
-    return *objectHandle;
+    if (objectHandle != nullptr)
+      return *objectHandle;
+    else
+      return CreateUnknownPtEdge(ptr);
   }
   
   // Returns PtEdge [object, offset, type] corresponding to given pointer value and type
@@ -92,8 +99,10 @@ public:
   {
     // The given pointer must be bound to an existing object
     auto objectHandle = handles.FindPtEdgeByValueType(ptr, type);
-    assert(objectHandle != nullptr); //TODO: maybe an exception?
-    return *objectHandle;
+    if(objectHandle == nullptr)
+      return *objectHandle;
+    else
+      return CreateUnknownPtEdge(ptr);
   }
 
   // Returns new pointer to different field [baseOffset + offset, type] of the same object
