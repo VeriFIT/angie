@@ -843,12 +843,28 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
 
   // -----------
 
-  auto returnType = llvm::Type::getVoidTy(ctx);
-  auto params     = mainFType->params();
-  auto ftype      = llvm::FunctionType::get(returnType, params, false);
+  // the following code prepends a fixed void __entry(int32, int8**) function to the module
+  // this is fixed to C/C++ and needs to be modulirazied to support other languages
+  // the purpose of "__entry" is to add here any instructions constraining the argc and argv values
+  //   before they are used as arguments for "main"
+  // it can also have the "termination" check purpose - if the end of __entry is not reached
 
-  auto entryFunc  = llvm::Function::Create(ftype, llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__entry", &module);
+  auto returnType = llvm::Type::getVoidTy(ctx);
+  auto params     = llvm::SmallVector<llvm::Type*, 2>{
+      llvm::Type::getInt32Ty(ctx), 
+      llvm::Type::getInt8PtrTy(ctx)->getPointerTo()
+    };
+  auto entryFType      = llvm::FunctionType::get(returnType, params, false);
+
+  auto entryFunc  = llvm::Function::Create(entryFType, llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__entry", &module);
   auto entryBlock = llvm::BasicBlock::Create(ctx, "", entryFunc);
+
+  // -----------
+
+  // Add instructions to maniuplate / create the call args for main
+
+  // Default way is to create them as __entry arguments
+  auto callValues = entryFunc->args();
 
   ////auto argcType   = mainFType->getParamType(0);
   ////auto argvType   = mainFType->getParamType(1);
@@ -865,34 +881,36 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   ////  entryBlock
   ////  );
 
-  auto argIt      = entryFunc->args().begin();
-  auto argc       = &*argIt++;
-  auto argv       = &*argIt;
-  auto mainArgs   = llvm::SmallVector<llvm::Value*, 2> {
-    argc,
-    argv
-  };
-
-  //TODO: in future :) need to replace static main_call args creation & registration with range-based
-  ////auto mainArgs   = llvm::ArrayRef<llvm::Value*>{&*entryFunc->arg_begin(), &*entryFunc->arg_end()};
-
   // -----------
 
-  auto mainCall   = llvm::CallInst::Create(mainFunc, mainArgs, "", entryBlock);
+  // place for main call args ... count is going to be either:
+  //   0 for int main(void)
+  //   2 for int main(int, const char**)
+  auto callArgs   = llvm::SmallVector<llvm::Value*, 2>{};
+
+  auto opArgs     = OperationArgs{};
+  opArgs.GetArgs().push_back(GetEmptyOperArg());
+  opArgs.GetArgs().push_back(ToOperArg(mainFunc));
+
+  // for every formal param, add one on of the values as main call arg
+  auto argIt = callValues.begin();
+  for (auto mainParam : mainFType->params())
+  {
+    auto arg = &*argIt++;
+    // Add to the function call arg range
+    callArgs.push_back(arg);
+    // Add to the operation
+    opArgs.GetArgs().push_back(ToOperArg(arg));
+    // Register args as values
+    mapper.CreateOrGetValueId(ToOperArg(arg).idTypePair, vc);
+  }
 
   // -----------
+  
+  auto mainCall   = llvm::CallInst::Create(mainFunc, callArgs, "", entryBlock);
+  entryPointCfg = &LlvmCfgNode::CreateNode(opFactory.Call(), opArgs, *mainCall);
 
-  auto args       = OperationArgs{};
-  args.GetArgs().push_back(GetEmptyOperArg());
-  args.GetArgs().push_back(ToOperArg(mainFunc));
-  args.GetArgs().push_back(ToOperArg(argc));
-  args.GetArgs().push_back(ToOperArg(argv));
-
-  entryPointCfg = &LlvmCfgNode::CreateNode(opFactory.Call(), args, *mainCall);
-
-  // Register argc, argv as values
-  mapper.CreateOrGetValueId(ToOperArg(argc).idTypePair, vc);
-  mapper.CreateOrGetValueId(ToOperArg(argv).idTypePair, vc);
+  // -----------
 
   while (!parseAndLinkTogether.empty())
   {
