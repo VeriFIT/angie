@@ -103,6 +103,11 @@ public:
   ObjectId targetObjectId; // optimization, could be replaced by map with value(address)<->object in Smg
   ValueId  targetOffset;
 
+  static const PtEdge GetNullPtr()
+  {
+    return PtEdge{ValueId{0}, ValueId{0}, PTR_TYPE, ObjectId{0}, ValueId{0}};
+  }
+
   /*ctr*/ PtEdge(ValueId sourceOffset, ValueId value, Type type, ObjectId targetObjectId, ValueId targetOffset) :
     HvEdge(sourceOffset, value, type),
     targetObjectId{targetObjectId},
