@@ -175,11 +175,11 @@ public:
     assert(state.GetNode().IsBranching()); 
 
     uptr<IState> successor;
-    successor = state.CreateSuccessor(state.GetNode().GetNextTrue());
-    this->SafelyExecuteAndEnque(state, std::move(successor), args, true);
-
     successor = state.CreateSuccessor(state.GetNode().GetNextFalse());
     this->SafelyExecuteAndEnque(state, std::move(successor), args, false);
+
+    successor = state.CreateSuccessor(state.GetNode().GetNextTrue());
+    this->SafelyExecuteAndEnque(state, std::move(successor), args, true);
 
     state.SetExplored();
     return;
