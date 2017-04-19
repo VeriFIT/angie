@@ -310,8 +310,12 @@ public:
       }
       else
       {
-        // Throw!
-        // Or fallback to HvEdge scenario
+        // Throw! OR fallback to HvEdge scenario
+
+        // HvEdge fallback
+        //! we are not decaying the type to PTR_TYPE here!
+        object.CreateOrModifyHvEdge(offset, value, type);        
+
         // Or use undefined value / special meaning value
         // Find out whether it is undefined-unknown or abstracted-unknown
         auto status = vc.GetAbstractionStatus(value);
