@@ -82,12 +82,18 @@ public:
 
   void Plot()
   {
-    PrintDot(graph);
+    auto svgv = OsUtils::GetEnv("SVG_VIEWER");
+    if (svgv.empty())
+      PrintDot(graph);
+    else
+      ShowSmg(graph, false, svgv.data());
   }
 
   void Store(ValueId where, ValueId what, Type ofType)
   {
     graph.WriteValue(where, what, ofType, GetVc());
+    //if (Smg::Abstraction::LookForCandidates(graph, GetVc()))
+    //  ShowSmg(graph);
   }
 
   ValueId Load(ValueId ptr, Type ptrType, Type tarType)
@@ -194,6 +200,7 @@ public:
     //TODO: pop mappins in graph
     this->localMapping = std::get<0>(stack.back());
     this->localMapping.LinkToValueId(std::get<1>(stack.back()), retValId);
+    // stackRetNode has been already aquired by helper when creating this state
     stack.pop_back();
   }
   void StackPop()

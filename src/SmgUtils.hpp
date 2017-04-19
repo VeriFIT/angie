@@ -17,6 +17,8 @@ void PrintDot(Smg::Impl::Graph& g, bool stack = false, const char* file = nullpt
 
 void ShowSmg(Smg::Impl::Graph& g, bool stack, const char* viewer)
 {
+  static int printgen = 0;
+
   SmgPrinter printer{};
   SmgCrawler crawler{printer};
   if (!stack)
@@ -30,8 +32,8 @@ void ShowSmg(Smg::Impl::Graph& g, bool stack, const char* viewer)
   {
     temp = OsUtils::GetEnv("PWD");
   }
-  std::string dotFileName = temp + PATH_SEPARATOR + "graph.dot";
-  std::string svgFileName = temp + PATH_SEPARATOR + "graph.svg";
+  std::string dotFileName = temp + PATH_SEPARATOR + "graph" + std::to_string(printgen) + ".dot";
+  std::string svgFileName = temp + PATH_SEPARATOR + "graph" + std::to_string(printgen++) + ".svg";
 
   std::string command =
     "dot -Tsvg -o" + svgFileName + " -Kdot < " + dotFileName  +" && " + viewer + " " + svgFileName;
@@ -42,6 +44,7 @@ void ShowSmg(Smg::Impl::Graph& g, bool stack, const char* viewer)
 
 void PrintDot(Smg::Impl::Graph& g, bool stack, const char* file)
 {
+  static int printgen = 0;
 
   SmgPrinter printer{};
   SmgCrawler crawler{printer};
@@ -59,7 +62,7 @@ void PrintDot(Smg::Impl::Graph& g, bool stack, const char* file)
     {
       temp = OsUtils::GetEnv("PWD");
     }
-    dotFileName = temp + PATH_SEPARATOR + "graph.dot";
+    dotFileName = temp + PATH_SEPARATOR + std::to_string(printgen) + ".dot";
   }
   else
   {
