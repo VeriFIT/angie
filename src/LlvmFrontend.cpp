@@ -43,6 +43,30 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 ////std::string dbgstr;
 ////llvm::raw_string_ostream dbgstr_rso(dbgstr);
 
+const char* dbg_name(const llvm::Value* val)
+{
+  return val->getName().data();
+}
+const char* dbg_name(const llvm::Value& val){ return dbg_name(&val); }
+
+const char* dbg_meta(const llvm::Instruction* val, const char* name)
+{
+  auto mdnode = val->getMetadata(name);
+  if (!mdnode) // exists
+    return "<empty>";
+
+  std::string str{"{\n"};
+  for (const auto& operand : mdnode->operands())
+  {
+    str.append("  ");
+    str.append(((const llvm::MDString&)operand).getString());
+    str.append("\n");
+  }
+  str.append("}\n");
+  return str.data();
+}
+const char* dbg_meta(const llvm::Instruction& val, const char* name){ return dbg_meta(&val, name); }
+
 class LlvmCfgNode : public CfgNode {
 private:
   const llvm::Instruction& innerInstruction;
