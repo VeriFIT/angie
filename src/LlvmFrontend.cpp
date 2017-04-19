@@ -730,8 +730,8 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
       {
         // Unconditional branch - next is first instruction of target basic block
 
-        // just skip its
-        // currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr);
+        // Place it as noop unconditionally, serves only for dbg printing
+        currentNode = &currentNode->InsertNewAfter(opFactory.Noop(), args, *instrPtr, bp);
 
         LinkWithOrPlanProcessing(currentNode, branchInstrPtr->getSuccessor(0), 0);
       }
