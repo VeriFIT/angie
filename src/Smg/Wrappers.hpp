@@ -68,13 +68,15 @@ public:
 };
 class Sls : public Object {
 public:
-  uint16_t GetRank()  { throw NotImplementedException(); }
+  Impl::Sls& GetObject() { return static_cast<Impl::Sls&>(object); }
+  size_t GetRank()     { return GetObject().minLength; }
 
   Sls(Impl::Sls& object, Impl::Graph& graph) : Object{object, graph} {}
 };
 class Dls : public Object {
 public:
-  uint16_t GetRank()  { throw NotImplementedException(); }
+  Impl::Dls& GetObject() { return static_cast<Impl::Dls&>(object); }
+  size_t GetRank()     { return GetObject().minLength; }
 
   Dls(Impl::Dls& object, Impl::Graph& graph) : Object{object, graph} {}
 };
