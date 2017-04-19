@@ -46,3 +46,73 @@ public:
   NotSupportedException(const char* nameOfMethod, const char* realTypeOfObject);
   NotSupportedException(const char* whatIsNotSupported);
 };
+
+class AnalysisErrorException : public std::logic_error {
+public:
+  /*ctr*/ AnalysisErrorException()
+    : logic_error("A fatal error was discovered by the analysis. Abstract execution can not continue in this path.")
+  {
+  }
+  /*ctr*/ AnalysisErrorException(const char* c)
+    : logic_error(c)
+  {
+  }
+  /*ctr*/ AnalysisErrorException(const std::string& c)
+    : logic_error(c)
+  {
+  }
+};
+
+class NulldDereferenceException : public AnalysisErrorException {
+public:
+  /*ctr*/ NulldDereferenceException()
+    : AnalysisErrorException("Program tried to dereference a null pointer.")
+  {
+  }
+};
+
+class InvalidDereferenceException : public AnalysisErrorException {
+public:
+  /*ctr*/ InvalidDereferenceException()
+    : AnalysisErrorException("Program tried to dereference an invalid location.")
+  {
+  }
+};
+
+class InvalidFreeException : public AnalysisErrorException {
+public:
+  /*ctr*/ InvalidFreeException()
+    : AnalysisErrorException("Program tried to free an invalid location.")
+  {
+  }
+};
+
+namespace {
+static const char* NonHeapFreeException_msg = "Program tried to free an location that was not on heap.";
+}
+class NonHeapFreeException : public AnalysisErrorException {
+public:
+  /*ctr*/ NonHeapFreeException()
+    : NonHeapFreeException(NonHeapFreeException_msg)
+  {
+  }
+  // concats the detail with default text
+  /*ctr*/ NonHeapFreeException(const char* c);
+};
+
+class DoubleFreeException : public AnalysisErrorException {
+public:
+  /*ctr*/ DoubleFreeException()
+    : AnalysisErrorException("Program tried to free an already freed memory.")
+  {
+  }
+};
+
+class PossibleNullDereferenceException : public AnalysisErrorException {
+public:
+  /*ctr*/ PossibleNullDereferenceException()
+    : AnalysisErrorException("Possible null dereference exception occurred - getElementPtr.")
+  {
+  }
+};
+

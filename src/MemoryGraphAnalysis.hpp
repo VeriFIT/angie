@@ -94,20 +94,7 @@ public:
 
   ValueId Load(ValueId ptr, Type ptrType, Type tarType)
   {
-    try
-    {
-      return graph.ReadValue(ptr, ptrType, tarType, GetVc());
-    }
-    catch(std::out_of_range e)
-    {
-      //! We assume an invalid read if the address was not written to previously
-      throw InvalidDereferenceException();
-    }
-    catch(InvalidDereferenceException_smg e)
-    {
-      //! We assume an invalid read if the address was not written to previously
-      throw InvalidDereferenceException();
-    }
+    return graph.ReadValue(ptr, ptrType, tarType, GetVc());
   }
 
   ValueId Alloca(Type type, ValueId count)

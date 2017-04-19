@@ -22,41 +22,13 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include "Exceptions.hpp"
 #include "Definitions.hpp"
 #include "General.hpp"
 #include "IOperation.hpp"
 #include "IState.hpp"
 #include "StateStorage.hpp"
 #include "FrontedValueMapper.hpp"
-
-class AnalysisErrorException : public std::logic_error {
-public:
-  /*ctr*/ AnalysisErrorException()
-    : logic_error("A fatal error was discovered by the analysis. Abstract execution can not continue in this path.")
-  {
-  }
-  /*ctr*/ AnalysisErrorException(const char* c)
-    : logic_error(c)
-  {
-  }
-
-};
-
-class InvalidDereferenceException : public AnalysisErrorException {
-public:
-  /*ctr*/ InvalidDereferenceException()
-    : AnalysisErrorException("Program tried to dereference unallocated or uninitialized memory.")
-  {
-  }
-};
-
-class PossibleNullDereferenceException : public AnalysisErrorException {
-public:
-  /*ctr*/ PossibleNullDereferenceException()
-    : AnalysisErrorException("Possible null dereference exception occurred - getElementPtr.")
-  {
-  }
-};
 
 //TODO: maybe remove use of IState& state from templated helpers, we can access that via successor
 //TODO: maybe replace dynamic_cast with static_cast ?
