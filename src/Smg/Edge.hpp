@@ -113,10 +113,12 @@ public:
     targetObjectId{targetObjectId},
     targetOffset{targetOffset}
   {
+    assert(type == PTR_TYPE);
   }
 
   void Modify(ValueId value, Type type, ObjectId targetObjectId, ValueId targetOffset)
   {
+    assert(type == PTR_TYPE);
     this->value = value;
     this->valueType = type;
     this->targetObjectId = targetObjectId;
@@ -144,6 +146,7 @@ public:
     targetOffset{targetOffset},
     HvEdge(baseEdge.sourceOffset, value, type)
   {
+    assert(type == PTR_TYPE);
   }
 
   virtual void Print(std::ostream& os) const override

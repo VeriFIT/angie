@@ -82,20 +82,6 @@ static inline auto FindEdgeByValue(RangeT& range, ValueId value)
     return (decltype(&*res))nullptr;
   }
 }
-template<typename RangeT, typename ValueT = typename RangeT::value_type>
-static inline auto FindEdgeByValueType(RangeT& range, ValueId value, Type type)
-{
-  using namespace ::ranges;
-  auto res = find_if(range, [=](const ValueT& ed) { return ed.value == value && ed.valueType == type; });
-  if (res != end(range))
-  {
-    return &*res;
-  }
-  else
-  {
-    return (decltype(&*res))nullptr;
-  }
-}
 /*
 template<typename T>
 static inline auto FindEdge(T&& range, ValueId value, Type type)
@@ -178,9 +164,6 @@ public:
 
         PtEdge* FindPtEdgeByOffset    (ValueId offset)       { return FindEdgeByOffset(ptEdges, offset); }
   const PtEdge* FindPtEdgeByOffset    (ValueId offset) const { return FindEdgeByOffset(ptEdges, offset); }
-  
-        PtEdge* FindPtEdgeByValueType (ValueId value, Type type)       { return FindEdgeByValueType (ptEdges, value, type); }
-  const PtEdge* FindPtEdgeByValueType (ValueId value, Type type) const { return FindEdgeByValueType (ptEdges, value, type); }
 
   //TODO@michkot: reconsider uses of Create vs CreateOrModify + whether to guarante uniqueness of the edges
   // motivation ->CreateDerivedPointer use currently creating duplicate edges

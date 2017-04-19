@@ -176,13 +176,13 @@ public:
       throw NotSupportedException("Memclear with abstract size is not supported");
     }
     auto byteArrayT = Type::CreateArrayOf(INT8_TYPE, vc.GetConstantIntInnerVal(size));
-    auto& edge = graph.CreateDerivedPointer(ptr, vc.GetZero(PTR_TYPE), Type::CreatePointerTo(byteArrayT), GetVc()).second;
+    auto& edge = graph.CreateDerivedPointer(ptr, {}, GetVc()).second;
     graph.WriteValue(edge, vc.GetZero(INT8_TYPE), byteArrayT, GetVc());
   }
 
   ValueId CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type)
   {
-    return graph.CreateDerivedPointer(basePtr, offset, type, GetVc()).first;
+    return graph.CreateDerivedPointer(basePtr, offset, GetVc()).first;
   }
 
   std::vector<std::tuple<Mapper,FrontendValueId,ICfgNode&>> stack;

@@ -92,27 +92,15 @@ public:
     else
       return CreateUnknownPtEdge(ptr);
   }
-  
-  // Returns PtEdge [object, offset, type] corresponding to given pointer value and type
-  // The given pointer must be bound to an existing object, otherwise it is an undefined behaviour!
-  const PtEdge& FindPtEdge(ValueId ptr, Type type)
-  {
-    // The given pointer must be bound to an existing object
-    auto objectHandle = handles.FindPtEdgeByValueType(ptr, type);
-    if(objectHandle == nullptr)
-      return *objectHandle;
-    else
-      return CreateUnknownPtEdge(ptr);
-  }
 
   // Returns new pointer to different field [baseOffset + offset, type] of the same object
-  auto CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type, IValueContainer& vc)
+  auto CreateDerivedPointer(ValueId basePtr, ValueId offset, IValueContainer& vc)
   {
     auto& baseEdge = FindPtEdge(basePtr);
     auto derivedOffset = vc.Add(baseEdge.targetOffset, offset       , PTR_TYPE, ArithFlags::Default);
     auto derivedValue  = vc.Add(basePtr              , derivedOffset, PTR_TYPE, ArithFlags::Default);
     //TODO@michkot duplicates edges
-    auto& derEdge = handles.CreatePtEdge(PtEdge{baseEdge, derivedValue, type, derivedOffset}); 
+    auto& derEdge = handles.CreatePtEdge(PtEdge{baseEdge, derivedValue, PTR_TYPE, derivedOffset}); 
     //std::vector<int>().em
     return std::make_pair<decltype(derivedValue), ref_wr<std::decay<decltype(derEdge)>::type>>(std::move(derivedValue), derEdge);
   }
@@ -130,20 +118,23 @@ public:
     // assign a new ObjectId and new ValueId representing the resultant pointer
     //TODO: different acquisition of ValueId based on MemorySpace
 
+#if !defined(ANGIE_NO_VALUE_INIT_TYPES)
     auto ptrToTypeT = Type::CreatePointerTo(type);
+    ValueId  ptr = vc.CreateVal(ptrToTypeT);
+#else
+    ValueId  ptr = vc.CreateVal(PTR_TYPE);
+#endif
 
     ObjectId oid = ObjectId::GetNextId();
-    ValueId  ptr = vc.CreateVal(ptrToTypeT);//ValueId ::GetNextId();
 
     // move from new uptr<Region>
     // create new object and place it into map
-    auto& obj = objects.emplace(oid, std::make_unique<Region>()).first.operator*().second.operator*();
+    auto& obj = objects.emplace(oid, Region::Create(oid)).first.operator*().second.operator*();
 
     // initialize the object
-    obj.id = oid;
-    obj.size = vc.CreateConstIntVal(type.GetSizeOf());
+    obj.size = type.GetSizeOfV(vc);
 
-    handles.CreatePtEdge(PtEdge{ValueId{0}, ptr, ptrToTypeT, oid, vc.GetZero(PTR_TYPE)});
+    handles.CreatePtEdge(PtEdge{{}, ptr, PTR_TYPE, oid, {}});
 
     //TODO: should allocation be allowed to fail, to model malloc, etc. returning null?
 
@@ -190,7 +181,9 @@ public:
 
   ValueId ReadValue(ValueId ptr, Type ptrType, Type tarType, IValueContainer& vc)
   {
-    auto& ptrEdge = FindPtEdge(ptr, ptrType);
+    auto& ptrEdge = FindPtEdge(ptr);
+    // The pointer target type and the type of value being read are probably different,
+    // as we decay pointer types in edges to i8*
 
     auto  objectId = ptrEdge.targetObjectId;
     // for efficiency reasons, we could move/copy the null check to the start and check ptr == {0}
@@ -269,25 +262,22 @@ public:
 
   }
 
-  // Type is potentially not needed, because the targetPtr must be a pointer to correctly typed edge
-  // We use it here to skip the ptrEdge.valueType.GetPointerElementType()
   //! ATTENATION!
   //TODO: write reinterpetaiton - consider the read changes
 
   void WriteValue(ValueId ptr, ValueId value, Type type, IValueContainer& vc)
   {
-    auto& ptrEdge = FindPtEdge(ptr, Type::CreatePointerTo(type));
+    auto& ptrEdge = FindPtEdge(ptr);
+    // The pointer target type and the type of value being written are probably different,
+    // as we decay pointer types in edges to i8*
 
     WriteValue(ptrEdge, value, type, vc);
   }
   void WriteValue(const PtEdge& ptrEdge, ValueId value, Type type, IValueContainer& vc)
   {
-    // The pointer target type and the type of value being written must not differ
-    assert(ptrEdge.valueType.GetPointerElementType() == type);
-
     // The object has to be valid for an operation
     // The flag should be stored inside the object, because the edge is unique to [object, offset, type]
-
+    
     auto  objectId = ptrEdge.targetObjectId;
     // for efficiency reasons, we could move/copy the null check to the start and check ptr == {0}
     if (objectId == ObjectId{0} || objectId == ObjectId{-1})
