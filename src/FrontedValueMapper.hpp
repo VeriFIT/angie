@@ -83,7 +83,10 @@ public:
 
   void LinkToValueId(FrontendValueId id, ValueId value)
   {
-    innerMap.insert({id, value});
+    //TODO@michkot: unify code with CreateOrGetValueId, probably remove "MapperDebug", what is its purpose??
+    auto res = innerMap.emplace(id, value);
+    if (!res.second)
+      res.first->second = value;
   }
 
   ValueId CreateOrGetValueId(FrontendIdTypePair arg, IValueContainer& vc)

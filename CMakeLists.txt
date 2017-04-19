@@ -63,6 +63,7 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANIT_FLAGS} -g")
 add_definitions(-DNOT_COMPILE_Z3)
 
 set(SOURCE_FILES
+    src/Analysis.hpp
     src/AngieType.cpp
     src/CfgNodeBase.hpp
     src/console.cpp
@@ -91,6 +92,7 @@ set(SOURCE_FILES
     src/Operation.hpp
     src/OsUtils.hpp
     src/OsUtils.cpp
+    src/Smg/Abstraction.hpp
     src/Smg/Edge.cpp
     src/Smg/Edge.hpp
     src/Smg/Graph.cpp

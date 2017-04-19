@@ -45,16 +45,43 @@ typedef llvm::Type* FrontendTypeId;    // unique GCC id (or LLVM representation)
 class LlvmType;
 typedef LlvmType Type;
 
+#elif TYPE_KIND == TYPE_KIND_ANGIE
+
+class AngieTypeImpl;
+
+typedef const AngieTypeImpl* FrontendTypeId;
+class AngieType;
+typedef AngieType Type;
+
+#endif
+
+#if TYPE_KIND == TYPE_KIND_LLVM
+#elif TYPE_KIND == TYPE_KIND_ANGIE
+#endif
 
 // Type -- reference to type representation (copyable, assignable)
 // Might be later changed to interface(fully abstract class) when multiple frontends are in mind
-class LlvmType {
+#if TYPE_KIND == TYPE_KIND_LLVM
+class LlvmType 
+#elif TYPE_KIND == TYPE_KIND_ANGIE
+class AngieType
+#endif
+{
 private:
+#if TYPE_KIND == TYPE_KIND_LLVM
   llvm::Type* frontedId;
+#elif TYPE_KIND == TYPE_KIND_ANGIE
+  const AngieTypeImpl* frontedId;
+#endif
 
 public:
+#if TYPE_KIND == TYPE_KIND_LLVM
   constexpr explicit /*ctr*/ LlvmType(llvm::Type* frontedId) : frontedId{frontedId} {}
   llvm::Type* GetFrontendId() const { return frontedId; }
+#elif TYPE_KIND == TYPE_KIND_ANGIE
+  constexpr explicit /*ctr*/ AngieType(const AngieTypeImpl* frontedId) : frontedId{frontedId} {}
+  const AngieTypeImpl* GetFrontendId() const { return frontedId; }
+#endif
 
   static void InitTypeSystem();
 
@@ -98,60 +125,5 @@ public:
 
   ValueId GetStructElementOffsetV(unsigned index, IValueContainer& vc) const;
 };
-
-#elif TYPE_KIND == TYPE_KIND_ANGIE
-
-class AngieTypeImpl;
-
-typedef const AngieTypeImpl* FrontendTypeId;
-class AngieType;
-typedef AngieType Type;
-
-class AngieType {
-private:
-  const AngieTypeImpl* frontedId;
-
-public:
-  constexpr explicit /*ctr*/ AngieType(const AngieTypeImpl* frontedId) : frontedId{frontedId} {}
-  const AngieTypeImpl* GetFrontendId() const { return frontedId; }
-
-  static void InitTypeSystem() {}
-
-  static Type CreateVoidType();
-  static Type CreateCharPointerType();
-  static Type CreateIntegerType(unsigned bitwidth);
-  static Type CreatePointerTo(Type target);
-
-  bool operator==(const Type& rhs) const
-  {
-    return GetFrontendId() == rhs.GetFrontendId();
-  }
-
-  void        ToString(std::string& str) const;
-  std::string ToString() const { std::string s{}; ToString(s); return s; }
-
-  size_t GetSizeOf() const; // Returns type's allocation size
-  size_t GetBitWidth() const; // Returns type's bit size
-
-  bool IsInteger() const;
-  bool IsInteger(unsigned bitwidth) const;
-  bool IsBool() const { return IsInteger(1u); }
-  bool IsReal() const;
-  bool IsPointer() const;
-  bool IsFunction() const;
-  bool IsSimdVector() const;
-  bool IsAggregateType() const; // LLVM type group for Arrays and Structs
-  bool IsArray() const;
-  bool IsStruct() const;
-  // bool IsUnion() const; // LLVM does not support Union type
-  bool IsVoid() const;
-
-  Type GetPointerToType() const;
-  Type GetPointerElementType() const;
-  Type GetStructElementType(unsigned index) const;
-  size_t GetStructElementOffset(unsigned index) const;
-};
-
-#endif
 
 #define PTR_TYPE Type::CreateCharPointerType()

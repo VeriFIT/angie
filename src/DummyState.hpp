@@ -44,7 +44,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 //    globalVarMapping.insert_or_assign(var.id, ValueId{});
 //  }
 //
-//  virtual void LinkLocalVar(OperArg var, ValueId value) override {}
+//  virtual void AssignValue(OperArg var, ValueId value) override {}
 //  virtual ValueId AddOrGetLocalVar(OperArg var) override
 //  {
 //    varMapping.insert_or_assign(var.id, ValueId{});

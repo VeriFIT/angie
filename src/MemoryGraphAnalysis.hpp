@@ -34,34 +34,35 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "Operation.hpp"
 
 #include "Smg.hpp"
+#include "Smg/Abstraction.hpp"
 
-class MemoryGraphAnalysisState : public StateBase {
+class MemoryGraphAnalysisState : public State {
 public:
 
   /*ctr*/ MemoryGraphAnalysisState(
-    ICfgNode& nextCfgNode,
+    ICfgNode& node,
     IValueContainer& vc,
     Mapper& globalMapping,
     FuncMapper& funcMapping
   ) :
-    StateBase(
+    State(
       //lastCfgNode, 
-      nextCfgNode, 
+      node, 
       vc, 
       globalMapping,
       funcMapping),
-    graph{&vc}
+    graph{vc}
   {
   }
 
   // copy ctr ??? or what
   /*ctr*/ MemoryGraphAnalysisState(
     const MemoryGraphAnalysisState& state, 
-    ICfgNode& nextCfgNode
+    ICfgNode& node
   ) :
-    StateBase(
+    State(
       state, 
-      nextCfgNode),
+      node),
     graph(state.graph),
     stack(state.stack)
   {
@@ -79,27 +80,25 @@ private:
   //------------------------------------
 public:
 
+  void Plot()
+  {
+    auto svgv = OsUtils::GetEnv("SVG_VIEWER");
+    if (svgv.empty())
+      PrintDot(graph);
+    else
+      ShowSmg(graph, false, svgv.data());
+  }
+
   void Store(ValueId where, ValueId what, Type ofType)
   {
-    graph.WriteValue(where, what, ofType);
+    graph.WriteValue(where, what, ofType, GetVc());
+    //if (Smg::Abstraction::LookForCandidates(graph, GetVc()))
+    //  ShowSmg(graph);
   }
 
   ValueId Load(ValueId ptr, Type ptrType, Type tarType)
   {
-    try
-    {
-      return graph.ReadValue(ptr, ptrType, tarType);
-    }
-    catch(std::out_of_range e)
-    {
-      //! We assume an invalid read if the address was not written to previously
-      throw InvalidDereferenceException();
-    }
-    catch(InvalidDereferenceException_smg e)
-    {
-      //! We assume an invalid read if the address was not written to previously
-      throw InvalidDereferenceException();
-    }
+    return graph.ReadValue(ptr, ptrType, tarType, GetVc());
   }
 
   ValueId Alloca(Type type, ValueId count)
@@ -113,7 +112,7 @@ public:
     {
       throw NotSupportedException("Alloca with count != 1 is not supported");
     }
-    return graph.AllocateObject(type);
+    return graph.AllocateRegion(type, GetVc(), MemorySpace::Stack);
   }
 
   ValueId Malloc(ValueId size)
@@ -124,7 +123,7 @@ public:
       throw NotSupportedException("Malloc with abstract size is not supported");
     }
     auto byteArrayT = Type::CreateArrayOf(INT8_TYPE, vc.GetConstantIntInnerVal(size));
-    return graph.AllocateObject(byteArrayT);
+    return graph.AllocateRegion(byteArrayT, GetVc(), MemorySpace::Heap);
   }
 
   ValueId Calloc(ValueId size)
@@ -139,12 +138,17 @@ public:
     throw NotSupportedException("Realloc is not supported");
   }
 
-  void Memset(ValueId target, ValueId value, ValueId size)
+  void Free(ValueId ptr)
+  {
+    graph.Free(ptr);
+  }
+
+  void Memset(ValueId ptr, ValueId value, ValueId size)
   {
     auto& vc = GetVc();
     if (vc.IsZero(value))
     {
-      return Memclear(target, size);
+      return Memclear(ptr, size);
     }
     if (vc.GetAbstractionStatus(size) != AbstractionStatus::Constant)
     {
@@ -155,7 +159,7 @@ public:
     throw NotSupportedException("Memset of arbitraty value is not supported");
   }
 
-  void Memclear(ValueId target, ValueId size)
+  void Memclear(ValueId ptr, ValueId size)
   {
     auto& vc = GetVc();
     if (vc.GetAbstractionStatus(size) != AbstractionStatus::Constant)
@@ -163,13 +167,13 @@ public:
       throw NotSupportedException("Memclear with abstract size is not supported");
     }
     auto byteArrayT = Type::CreateArrayOf(INT8_TYPE, vc.GetConstantIntInnerVal(size));
-    auto& edge = graph.CreateDerivedPointer(target, vc.GetZero(PTR_TYPE), Type::CreatePointerTo(byteArrayT)).second;
-    graph.WriteValue(edge, vc.GetZero(INT8_TYPE), byteArrayT);
+    auto& edge = graph.CreateDerivedPointer(ptr, {}, GetVc()).second;
+    graph.WriteValue(edge, vc.GetZero(INT8_TYPE), byteArrayT, GetVc());
   }
 
   ValueId CreateDerivedPointer(ValueId basePtr, ValueId offset, Type type)
   {
-    return graph.CreateDerivedPointer(basePtr, offset, type).first;
+    return graph.CreateDerivedPointer(basePtr, offset, GetVc()).first;
   }
 
   std::vector<std::tuple<Mapper,FrontendValueId,ICfgNode&>> stack;
@@ -196,6 +200,7 @@ public:
     //TODO: pop mappins in graph
     this->localMapping = std::get<0>(stack.back());
     this->localMapping.LinkToValueId(std::get<1>(stack.back()), retValId);
+    // stackRetNode has been already aquired by helper when creating this state
     stack.pop_back();
   }
   void StackPop()
@@ -203,6 +208,26 @@ public:
     //TODO: pop mappins in graph
     this->localMapping = std::get<0>(stack.back());
     stack.pop_back();
+  }
+
+  boost::tribool SmgIsCmp(ValueId first, ValueId second, Type type, CmpFlags flags)
+  {
+    if (!(graph.ExistsPtEdge(first) && graph.ExistsPtEdge(second)))
+      return boost::indeterminate;
+
+    //HACK: this is not sound, when we de-allocate, newly created pointer with new ID can alias the previous one
+    switch (flags)
+    {
+    case CmpFlags::Eq:
+      return first == second;
+      break;
+    case CmpFlags::Neq:
+      return first != second;
+      break;
+    default:
+      throw std::logic_error("not supported");
+      break;
+    }
   }
 
 };
@@ -219,10 +244,10 @@ class MemGraphOpLoad : public BasicOperation<MemoryGraphAnalysisState> {
     auto ptr = args.GetOperand(0);
     auto reg = args.GetTarget();
 
-    auto ptrId = newState.GetAnyVar(ptr);
+    auto ptrId = newState.GetValue(ptr);
     ValueId value = newState.Load(ptrId, ptr.type, reg.type);
 
-    newState.LinkLocalVar(reg, value);
+    newState.AssignValue(reg, value);
   }
 };
 
@@ -234,8 +259,8 @@ class MemGraphOpStore : public BasicOperation<MemoryGraphAnalysisState> {
     // the way for the operation to handle such a "write" is completely analysis specific
     auto value = args.GetOperand(0);
 
-    auto valueId  = newState.GetAnyVar(value);
-    auto target = newState.GetAnyVar(args.GetOperand(1));
+    auto valueId  = newState.GetValue(value);
+    auto target = newState.GetValue(args.GetOperand(1));
 
     newState.Store(target, valueId, value.type);
   }
@@ -244,25 +269,25 @@ class MemGraphOpStore : public BasicOperation<MemoryGraphAnalysisState> {
 class MemGraphOpAlloca : public BasicOperation<MemoryGraphAnalysisState> {
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
   {
-    auto count = newState.GetAnyVar(args.GetOperand(0));
+    auto count = newState.GetValue(args.GetOperand(0));
     auto type  = args.GetTarget().type;
 
     ValueId count64       = newState.GetVc().ExtendInt(count, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
     ValueId retVal        = newState.Alloca(type.GetPointerElementType(), count64);
 
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
 class MemGraphOpMalloc : public BasicOperation<MemoryGraphAnalysisState> {
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
   {
-    auto size = newState.GetAnyVar(args.GetOperand(0));
+    auto size = newState.GetValue(args.GetOperand(0));
 
     ValueId size64        = newState.GetVc().ExtendInt(size, args.GetOperand(0).type, PTR_TYPE, ArithFlags::Default);
     ValueId retVal        = newState.Malloc(size64);
 
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -272,11 +297,32 @@ class MemGraphOpMemset : public BasicOperation<MemoryGraphAnalysisState> {
     // this operation should somehow Store a value in register to certain address in memory
     // the way for the operation to handle such a "write" is completely analysis specific
 
-    auto target = newState.GetAnyVar(args.GetOperand(0));
-    auto value  = newState.GetAnyVar(args.GetOperand(1));
-    auto len    = newState.GetAnyVar(args.GetOperand(2));
+    auto target = newState.GetValue(args.GetOperand(0));
+    auto value  = newState.GetValue(args.GetOperand(1));
+    auto len    = newState.GetValue(args.GetOperand(2));
 
     newState.Memset(target, value, len);
+
+    // void
+  }
+};
+
+class MemGraphOpFree : public BasicOperation<MemoryGraphAnalysisState> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
+  {
+    auto ptr = newState.GetValue(args.GetOperand(0));
+    newState.Free(ptr);
+
+    // void
+  }
+};
+
+class MemGraphOpPlotMem : public BasicOperation<MemoryGraphAnalysisState> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override final
+  {
+    newState.Plot();
+
+    // void
   }
 };
 
@@ -288,37 +334,63 @@ class MemGraphOpGetElementPtr : public BasicOperation<MemoryGraphAnalysisState> 
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const OperationArgs& args) override
   {
     // consider packing and aligment!!!
+    auto& vc = newState.GetVc();
+    ValueId offsetVal;
 
-    //auto numOfIndexes = args.size() - 2;
+    auto source = args.GetOperand(0);
+    auto sourceId = newState.GetValue(source);
+    auto elementType = source.type.GetPointerElementType();
 
-    //auto lvl0Size = args.GetOperand(0).type.GetPointerElementType().GetSizeOf();
-
-    //if (args.GetOperand(0).type.IsStruct())
-    //{
-    //  auto lvl1Size = args.GetOperand(0).type.GetPointerElementType().GetStructElementOffset(/*and here index*/);
-    //}
-
-    auto source          = args.GetOperand(0);
-    auto sourceId        = newState.GetAnyVar   (source);
-    uint64_t offset      = static_cast<uint64_t>(args.GetOptions().idTypePair.id); //HACK relaying on ValueId == constant value stored by that id    
-
+    // opt
     //! We assume, that getelementptr instruction is always generated as forerunner of load/store op.
-    if (newState.GetVc().IsZero(sourceId))
+    if (vc.IsZero(sourceId))
     {
       throw PossibleNullDereferenceException();
     }
 
-    ValueId offsetVal     = newState.GetVc().CreateConstIntVal(offset, PTR_TYPE);
-    ValueId retVal        = newState.CreateDerivedPointer(sourceId, offsetVal, args.GetTarget().type);
+    // possible opt
+    //HACK relaying on ValueId == constant value stored by that id    
+    ////offset = static_cast<uint64_t>(args.GetOptions().idTypePair.id); 
+    
+    auto numOfIndexes = args.GetOperandCount() - 1;
+    // lvl0: array/pointer athimetic indexation
+    auto fIdx0 = args.GetOperand(1);
+    auto vIdx0 = newState.GetValue(fIdx0);
 
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    // Do the math
+    auto vL0Size = elementType.GetSizeOfV(vc);
+    offsetVal = vc.Mul(vIdx0, vL0Size, PTR_TYPE, ArithFlags::Default);
+
+    if (numOfIndexes > 1)
+    {
+      // lvl1 indexing should be only possible on structs right now
+      assert(elementType.IsStruct());
+      auto fIdx1 = args.GetOperand(2);
+      auto vIdx1 = newState.GetValue(fIdx1);
+      // structure field index must be a constant
+      assert(vc.GetAbstractionStatus(vIdx1) == AbstractionStatus::Constant);
+      auto fieldIndex = vc.GetConstantIntInnerVal(vIdx1);
+
+      // Do the math
+      auto vL1Offset = elementType.GetStructElementOffsetV(fieldIndex, vc);
+      offsetVal = vc.Add(offsetVal, vL1Offset, PTR_TYPE, ArithFlags::Default);
+
+      if (numOfIndexes > 2)
+      {
+        throw NotSupportedException("Only 2 levels (L0 and L1) of indexation via GEP are supported.");
+      }
+    }
+
+    ValueId retVal = newState.CreateDerivedPointer(sourceId, offsetVal, args.GetTarget().type);
+
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
 class MemGraphOpCast : public BasicOperation<MemoryGraphAnalysisState, CastOpArgs> {
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const CastOpArgs& args) override  
   {
-    auto lhs           = newState.GetAnyVar(args.GetOperand(0));
+    auto lhs           = newState.GetValue(args.GetOperand(0));
     auto opts          = args.GetOptions();
     //ArithFlags flags = static_cast<ArithFlags>(static_cast<uint64_t>(args[1].id) & 0xffff);
     auto tarType     = args.GetTarget().type;
@@ -326,15 +398,15 @@ class MemGraphOpCast : public BasicOperation<MemoryGraphAnalysisState, CastOpArg
 
     if (opts.opKind == CastOpKind::BitCast)
     {
-      newState.LinkLocalVar(args.GetTarget(), lhs);
+      newState.AssignValue(args.GetTarget(), lhs);
       newState.CreateDerivedPointer(lhs, newState.GetVc().GetZero(PTR_TYPE), tarType);
     }
     else if(opts.opKind == CastOpKind::Extend)      
-      newState.LinkLocalVar(args.GetTarget(), lhs); //TODO: hack!
+      newState.AssignValue(args.GetTarget(), lhs); //TODO: hack!
     else if (opts.opKind == CastOpKind::Truncate)
     {
       auto trunc = newState.GetVc().TruncateInt(lhs, srcType, tarType);
-      newState.LinkLocalVar(args.GetTarget(), trunc); //TODO: hack!
+      newState.AssignValue(args.GetTarget(), trunc); //TODO: hack!
     }
     else
       throw NotImplementedException();
@@ -348,20 +420,20 @@ class FnaxOperationCall : public OperationCall<MemoryGraphAnalysisState> {
     auto callTargetId = args.GetOptions().id;
     auto callTargetType = args.GetOptions().type;
     
-    auto& func = newState.GetFuncMapping().GetFunction(newState.GetAnyVar(args.GetOptions()));
+    auto& func = newState.GetFuncMapping().GetFunction(newState.GetValue(args.GetOptions()));
 
     std::vector<ValueId> callArgs;
     int i = 0;
     for (auto& param : func.params.GetArgs())
     {      
-      callArgs.push_back(newState.GetAnyVar(args.GetOperand(i)));
+      callArgs.push_back(newState.GetValue(args.GetOperand(i)));
       i++;
     } 
     newState.StackPush(args.GetTarget().id);
     i = 0;
     for (auto& param : func.params.GetArgs())
     {      
-      newState.LinkLocalVar(
+      newState.AssignValue(
         param.idTypePair, 
         callArgs[i]
         );
@@ -375,13 +447,49 @@ class MemGraphOpRet : public OperationRet<MemoryGraphAnalysisState> {
   {
     if (args.GetArgs().size() > 2)
     {
-      auto retVal = newState.GetAnyVar(args.GetOperand(0));
+      auto retVal = newState.GetValue(args.GetOperand(0));
       newState.StackPop(retVal);
     }
     else
     {
       newState.StackPop();
     }
+  }
+};
+
+class MemGraphOpCmp : public BasicOperation<MemoryGraphAnalysisState, CmpOpArgs> {
+  virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const CmpOpArgs& args) override final
+  {
+    auto lhs         = newState.GetValue(args.GetOperand(0));
+    auto rhs         = newState.GetValue(args.GetOperand(1));
+    auto srcType     = args.GetOperand(0).type;
+    auto flags       = args.GetOptions();
+
+    auto& vc = newState.GetVc();
+    auto result = vc.IsCmp(lhs, rhs, srcType, flags);
+
+    ValueId retVal;
+
+    // if the cmp did not yield a resu
+    if (boost::indeterminate(result))
+    {
+      // try to handle it as pointer
+      result = newState.SmgIsCmp(lhs, rhs, srcType, flags);
+      if (boost::indeterminate(result))
+      {
+        retVal = vc.CreateVal(Type::CreateIntegerType(1));
+      }
+      else
+      {
+        retVal = vc.CreateConstIntVal(static_cast<uint64_t>(result.value));
+      }
+    }
+    else
+    {
+      retVal = vc.CreateConstIntVal(static_cast<uint64_t>(result.value));
+    }
+
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -393,12 +501,13 @@ private:
   IOperation* load     = new MemGraphOpLoad();
   IOperation* store    = new MemGraphOpStore();
   IOperation* binop    = new BasicOperationBinOp();
-  IOperation* cmp      = new BasicOperationCmp();
+  IOperation* cmp      = new MemGraphOpCmp();
   IOperation* trunc    = new BasicOperationTruncate();
   IOperation* extend   = new BasicOperationExtend();
   IOperation* malloc   = new MemGraphOpMalloc();
   IOperation* allocaop = new MemGraphOpAlloca();
   IOperation* memset   = new MemGraphOpMemset();
+  IOperation* free     = new MemGraphOpFree();
 
   IOperation* gep      = new MemGraphOpGetElementPtr();
   IOperation* cast     = new MemGraphOpCast();
@@ -406,6 +515,11 @@ private:
   IOperation* callop   = new FnaxOperationCall();
   IOperation* br       = new BasicOperationBranch();
   IOperation* ret      = new MemGraphOpRet();
+
+  IOperation* plot     = new MemGraphOpPlotMem();
+  IOperation* unkn     = new BasicOperationCreateUnknown();
+
+  IOperation* abort    = new BasicOperationAbort();
 
 public:
   // Inherited via IOperationFactory
@@ -425,12 +539,19 @@ public:
 
   virtual IOperation & Cmp() override { return *cmp; }
 
+  virtual IOperation& Abort() override { return *abort; }
+  virtual IOperation& Exit() override { return *abort; }
+
   virtual IOperation& Memset() override { return *memset; }
   virtual IOperation& Memcpy() override { return *nsop; }
   virtual IOperation& Memmove() override { return *nsop; }
   virtual IOperation& Malloc() override { return *malloc; }
-  virtual IOperation& Free() override { return *nsop; }
+  virtual IOperation& Free() override { return *free; }
 
   virtual IOperation & NotSupportedInstr() override { return *nsop; }
   virtual IOperation & Noop() override { return *noop; }
+
+  virtual IOperation & Terminate() override { return *noop; }
+  virtual IOperation & CreateUnknownVal() override { return *unkn; }
+  virtual IOperation & DiagnosticsPlotMem() override { return *plot; }
 };

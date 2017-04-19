@@ -72,7 +72,7 @@ class HvEdge : public EdgeBase {
 
 public:
 
-  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx) override;
 
   /*ctr*/ HvEdge(ValueId sourceOffset, ValueId value, Type type) :
     EdgeBase(sourceOffset, value, type)
@@ -98,20 +98,27 @@ class PtEdge : public HvEdge {
 
 public:
 
-  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx);
+  virtual void Accept(ISmgVisitor& visitor, Impl::Graph& ctx) override;
 
   ObjectId targetObjectId; // optimization, could be replaced by map with value(address)<->object in Smg
   ValueId  targetOffset;
 
-  /*ctr*/ PtEdge(ValueId sourceOffset, ValueId value, Type type, ObjectId targetObjectId, ValueId targetOffset) :
-    targetObjectId{targetObjectId},
-    targetOffset{targetOffset},
-    HvEdge(sourceOffset, value, type)
+  static const PtEdge GetNullPtr()
   {
+    return PtEdge{ValueId{0}, ValueId{0}, PTR_TYPE, ObjectId{0}, ValueId{0}};
+  }
+
+  /*ctr*/ PtEdge(ValueId sourceOffset, ValueId value, Type type, ObjectId targetObjectId, ValueId targetOffset) :
+    HvEdge(sourceOffset, value, type),
+    targetObjectId{targetObjectId},
+    targetOffset{targetOffset}
+  {
+    assert(type == PTR_TYPE);
   }
 
   void Modify(ValueId value, Type type, ObjectId targetObjectId, ValueId targetOffset)
   {
+    assert(type == PTR_TYPE);
     this->value = value;
     this->valueType = type;
     this->targetObjectId = targetObjectId;
@@ -139,6 +146,7 @@ public:
     targetOffset{targetOffset},
     HvEdge(baseEdge.sourceOffset, value, type)
   {
+    assert(type == PTR_TYPE);
   }
 
   virtual void Print(std::ostream& os) const override

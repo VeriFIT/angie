@@ -175,7 +175,8 @@ public:
 
 class OperationArgs {
 protected:
-  std::vector<OperArg> args;
+  std::vector<OperArg> args{};
+  using size_type = decltype(args)::size_type;
 public:
   /*ctr*/ OperationArgs() = default;
   /*ctr*/ OperationArgs(std::vector<OperArg>&& args) : args{args} {}
@@ -186,7 +187,9 @@ public:
   const FrontendIdTypePair& GetTarget()  const { return args[0].idTypePair; }
   const OperArg&            GetOptions() const { return args[1]; }
 
-  const FrontendIdTypePair& GetOperand(decltype(args)::size_type index) const { return args[index + 2].idTypePair; }
+
+  const FrontendIdTypePair& GetOperand(size_type index) const { return args[index + 2].idTypePair; }
+        size_type           GetOperandCount()           const { return args.size() - 2; }
 };
 
 class CastOpArgs : public OperationArgs {
@@ -212,4 +215,13 @@ public:
 class CallOpArgs : public OperationArgs {
 public:
   const FrontendIdTypePair& GetOptions() const { return args[1].idTypePair; }
+};
+
+//TODO: find a better place for this (Common/MemoryAnalysis ?)
+enum class MemorySpace : int8_t {
+  Heap,
+  Stack,
+  Static,
+  ThreadLocal,
+  Invalid
 };

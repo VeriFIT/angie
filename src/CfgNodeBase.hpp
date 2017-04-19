@@ -28,6 +28,58 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "StateStorage.hpp"
 #include "ICfgNode.hpp"
 
+class SpecialCfgNode : public ICfgNode {
+public:
+  virtual ICfgNode& GetNextTrue() const override { throw NotSupportedException{}; }
+  virtual ICfgNode& GetNextFalse() const override { throw NotSupportedException{}; }
+  virtual bool      HasBreakpoint() const override { return false; }
+  virtual StatesManager& GetStatesManager() override { throw NotSupportedException{}; }
+
+protected:
+  /*ctr*/ SpecialCfgNode() = default;
+};
+
+class StartCfgNode : public SpecialCfgNode {
+  friend CfgNode;
+  friend LlvmCfgNode;
+public:
+  virtual ICfgNode& GetNext() const override { return *next; }
+  virtual const ref_vector<ICfgNode>& GetPrevs() const override { throw NotSupportedException{}; }
+
+  virtual void PrintInstruction() const override { throw NotSupportedException{}; }
+  virtual void PrintLocation() const override { throw NotSupportedException{}; }
+  virtual void GetDebugInfo() const override { throw NotSupportedException{}; }
+  virtual OperationArgs GetArguments() const override { throw NotSupportedException{}; }
+
+  virtual void Execute(IState& s, const OperationArgs& args) override  { throw NotSupportedException{}; }
+
+  virtual bool IsStartNode() override { return true; }
+
+private:
+  /*ctr*/ StartCfgNode() = default;
+};
+
+class TerminalCfgNode : public SpecialCfgNode {
+  friend CfgNode;
+  friend LlvmCfgNode;
+public:
+  virtual ICfgNode& GetNext() const override { throw NotSupportedException{}; }
+  virtual const ref_vector<ICfgNode>& GetPrevs() const override { return prevs; }
+
+  //! It might be worth implementing these as no-ops -> autonomous end of analysis
+  virtual void PrintInstruction() const override  { return; }
+  virtual void PrintLocation() const override { return; }
+  virtual void GetDebugInfo() const override { return; }
+  virtual OperationArgs GetArguments() const override { return OperationArgs{}; }
+
+  virtual void Execute(IState& s, const OperationArgs& args) override { return; }
+
+  virtual bool IsTerminalNode() override { return true; }
+
+private:
+  /*ctr*/ TerminalCfgNode() = default;
+};
+
 class CfgNode : public ICfgNode {
 private:
   OperationArgs args;
@@ -35,7 +87,7 @@ private:
   StatesManager states;
 
 public:
-  virtual bool HasTwoNext() override { return nextFalse != nullptr; }
+  virtual bool IsBranching() override { return nextFalse != nullptr; }
   virtual ICfgNode& GetNext() const override { return *next; }
   virtual ICfgNode& GetNextTrue() const override
   {

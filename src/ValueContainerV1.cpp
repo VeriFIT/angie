@@ -505,24 +505,29 @@ bool ValueContainer::IsUnknown(ValueId first) const
 ValueId ValueContainer::Cmp(ValueId first, ValueId second, Type type, CmpFlags flags)
 {
   boost::tribool result = IsCmp(first, second, type, flags);
-  if (result == boost::indeterminate)
-    throw std::runtime_error("Fuck if I know how to create boolean from indeterminate relation.");
-
+  if (boost::indeterminate(result))
+    return CreateVal(Type::CreateIntegerType(1));
   return CreateConstIntVal(static_cast<uint64_t>(result.value));
 }
 
 void ValueContainer::Assume(ValueId first, ValueId second, Type type, CmpFlags flags)
 {
+  if (IsCmp(first, second, type, flags)) //TODO@CharvN: temporary fix, find a better solution
+    return;
   InsertConstraint(BinaryConstraint(first, second, flags));
 }
 
 void ValueContainer::AssumeTrue(ValueId first)
 {
+  if (IsTrue(first, Type::CreateIntegerType(64))) //TODO@CharvN: temporary fix, find a better solution
+    return;
   InsertConstraint(BinaryConstraint(Zero, first, CmpFlags::Neq)); //equal to 1?
 }
 
 void ValueContainer::AssumeFalse(ValueId first)
 {
+  if (IsFalse(first, Type::CreateIntegerType(64))) //TODO@CharvN: temporary fix, find a better solution
+    return;
   InsertConstraint(BinaryConstraint(Zero, first, CmpFlags::Eq));
 }
 

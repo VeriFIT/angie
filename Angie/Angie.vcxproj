@@ -1,12 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugClang|x64">
+      <Configuration>DebugClang</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="DebugNoLlvm|x64">
       <Configuration>DebugNoLlvm</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Library|x64">
+      <Configuration>Library</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
@@ -25,6 +33,18 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Library|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugClang|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoLlvm|x64'" Label="Configuration">
@@ -49,15 +69,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='DebugNoLlvm'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <PropertyGroup>
     <OutDir>bin\$(Platform)-$(Configuration)\</OutDir>
     <IntDir>bin\$(Platform)-$(Configuration)\</IntDir>
@@ -67,7 +78,22 @@
     <IncludePath>$(INCLUDE_PATH);$(IncludePath)</IncludePath>
     <LibraryPath>$(LIBRARY_PATH);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoLlvm|x64'" />
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Library'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='DebugClang'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(INCLUDE_PATH)\clang-c2;$(INCLUDE_PATH);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='DebugNoLlvm'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -84,6 +110,32 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>TYPE_KIND=0;_SCL_SECURE_NO_WARNINGS;_MBCS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Library|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>TYPE_KIND=0;_SCL_SECURE_NO_WARNINGS;_MBCS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugClang|x64'">
+    <ClCompile>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>TYPE_KIND=0;_SCL_SECURE_NO_WARNINGS;_MBCS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -119,6 +171,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Analysis.hpp" />
     <ClInclude Include="..\src\CfgNodeBase.hpp" />
     <ClInclude Include="..\src\Definitions.hpp" />
     <ClInclude Include="..\src\DummyOperations.hpp" />
@@ -147,6 +200,7 @@
     <ClInclude Include="..\src\SmgCrawler.hpp" />
     <ClInclude Include="..\src\SmgPrinter.hpp" />
     <ClInclude Include="..\src\SmgUtils.hpp" />
+    <ClInclude Include="..\src\Smg\Abstraction.hpp" />
     <ClInclude Include="..\src\Smg\Edge.hpp" />
     <ClInclude Include="..\src\Smg\Object.hpp" />
     <ClInclude Include="..\src\Smg\Graph.hpp" />
@@ -167,35 +221,33 @@
     </ClCompile>
     <ClCompile Include="..\src\console.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\src\Exceptions.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\LlvmFrontend.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\laboratory.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\LlvmGlobals.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\croaring\roaring.c">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
@@ -222,10 +274,20 @@
     </ClCompile>
     <ClCompile Include="..\src\Smg.cpp">
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="..\src\SmgCrawler.cpp" />
-    <ClCompile Include="..\src\SmgPrinter.cpp" />
+    <ClCompile Include="..\src\SmgCrawler.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\src\SmgPrinter.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\src\Smg\Edge.cpp" />
     <ClCompile Include="..\src\Smg\Object.cpp" />
     <ClCompile Include="..\src\Smg\Graph.cpp" />
@@ -234,28 +296,26 @@
     <ClCompile Include="..\src\StateStorage.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\LlvmType.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\ValueContainerV1.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\ValueId.cpp">
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\src\ValuesZ3.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

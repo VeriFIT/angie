@@ -80,6 +80,11 @@ public:
   //llvm::CmpInst::Predicate
   virtual IOperation& Cmp() = 0;
 
+  // C operations
+  virtual IOperation& Abort() = 0;
+  virtual IOperation& Exit() = 0;
+
+  // C memory operations
   virtual IOperation& Memset() = 0;
   virtual IOperation& Memcpy() = 0;
   virtual IOperation& Memmove() = 0;
@@ -89,6 +94,13 @@ public:
   // Not a supported instruction
   virtual IOperation& NotSupportedInstr() = 0;
   virtual IOperation& Noop() = 0;
+
+  // Internal functions
+  virtual IOperation& Terminate() = 0;
+  virtual IOperation& CreateUnknownVal() = 0;
+
+  // Internal diagnostic functions
+  virtual IOperation& DiagnosticsPlotMem() = 0;
 
   /**
   * Destructor.

@@ -37,7 +37,7 @@ class ICfgNode : public IOperation {
   friend CfgNode;
   friend LlvmCfgNode;
 public:
-  virtual bool HasTwoNext() { return false; }
+  virtual bool IsBranching() { return false; }
   virtual ICfgNode& GetNext() const = 0;
   virtual ICfgNode& GetNextTrue() const = 0;
   virtual ICfgNode& GetNextFalse() const = 0;
@@ -47,6 +47,7 @@ public:
   virtual void PrintInstruction() const = 0;
   virtual void PrintLocation() const = 0;
   virtual void GetDebugInfo() const = 0; //TODO@review: maybe find a better name for this method?
+  virtual bool HasBreakpoint() const = 0;
   virtual OperationArgs GetArguments() const = 0;
 
   virtual void Execute(IState& s, const OperationArgs& args) override = 0;
@@ -74,56 +75,4 @@ protected:
   /*ctr*/ ICfgNode(ICfgNode* next) : next{next}, prevs{} {}
   /*ctr*/ ICfgNode(ref_vector<ICfgNode> prevs) : next{nullptr}, prevs{prevs} {}
   /*ctr*/ ICfgNode(ICfgNode* next, ref_vector<ICfgNode> prevs) : next{next}, prevs{prevs} {}
-};
-
-
-class StartCfgNode : public ICfgNode {
-  friend CfgNode;
-  friend LlvmCfgNode;
-public:
-  virtual ICfgNode& GetNext() const override { return *next; }
-  virtual ICfgNode& GetNextTrue() const override { throw NotSupportedException{}; }
-  virtual ICfgNode& GetNextFalse() const override { throw NotSupportedException{}; }
-  virtual const ref_vector<ICfgNode>& GetPrevs() const override { throw NotSupportedException{}; }
-
-  virtual StatesManager& GetStatesManager() override { throw NotSupportedException{}; }
-  virtual void PrintInstruction() const override { throw NotSupportedException{}; }
-  virtual void PrintLocation() const override { throw NotSupportedException{}; }
-  virtual void GetDebugInfo() const override { throw NotSupportedException{}; }
-  virtual OperationArgs GetArguments() const override { throw NotSupportedException{}; }
-
-  virtual bool IsStartNode() override { return true; }
-
-  virtual void Execute(IState& s, const OperationArgs& args) override  { throw NotSupportedException{}; }
-
-private:
-  /*ctr*/ StartCfgNode() {}
-};
-
-class TerminalCfgNode : public ICfgNode {
-  friend CfgNode;
-  friend LlvmCfgNode;
-public:
-  virtual ICfgNode& GetNext() const override { throw NotSupportedException{}; }
-  virtual ICfgNode& GetNextTrue() const override { throw NotSupportedException{}; }
-  virtual ICfgNode& GetNextFalse() const override { throw NotSupportedException{}; }
-  virtual const ref_vector<ICfgNode>& GetPrevs() const override { return prevs; }
-
-  virtual StatesManager& GetStatesManager() override { throw NotSupportedException{}; }
-  //! It might be worth implementing these as no-ops -> autonomous end of analysis
-  virtual void PrintInstruction() const override  { return; }
-  //! It might be worth implementing these as no-ops -> autonomous end of analysis
-  virtual void PrintLocation() const override { return; }
-  //! It might be worth implementing these as no-ops -> autonomous end of analysis
-  virtual void GetDebugInfo() const override { return; }
-  //! It might be worth implementing these as no-ops -> autonomous end of analysis
-  virtual OperationArgs GetArguments() const override { return OperationArgs{}; }
-
-  virtual bool IsTerminalNode() override { return true; }
-
-  //! It might be worth implementing these as no-ops -> autonomous end of analysis
-  virtual void Execute(IState& s, const OperationArgs& args) override { return; }
-
-private:
-  /*ctr*/ TerminalCfgNode() {}
 };

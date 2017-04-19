@@ -77,8 +77,8 @@ void VerificationLoop()
       if (!state.IsNew())
         continue;
 
-      state.GetNextStep().GetDebugInfo();
-      state.GetNextStep().Execute(state);
+      state.GetNode().GetDebugInfo();
+      state.GetNode().Execute(state);
     }
 
   }
@@ -116,11 +116,11 @@ void main_old(gsl::span<std::string> files)
 
   //this is a debugging code for experimenting
   //vc.CreateVal(Type{0});
-  for (int i = 0; i < 32; i++)
+  for (int i = 0; i < 1001; i++)
   {
     vc.CreateConstIntVal(i);
   }
-  for (int i = 1; i < 33; i++)
+  for (int i = 1; i < 1000; i++)
   {
     vc.CreateConstIntVal(-i);
   }
@@ -138,3 +138,10 @@ void main_old(gsl::span<std::string> files)
   //getchar();
   return;
 }
+
+#if defined(_MSC_VER)
+
+#include "SmgCrawler.cpp"
+#include "SmgPrinter.cpp"
+
+#endif

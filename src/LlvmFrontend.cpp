@@ -43,17 +43,44 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 ////std::string dbgstr;
 ////llvm::raw_string_ostream dbgstr_rso(dbgstr);
 
+const char* dbg_name(const llvm::Value* val)
+{
+  return val->getName().data();
+}
+const char* dbg_name(const llvm::Value& val){ return dbg_name(&val); }
+
+const char* dbg_meta(const llvm::Instruction* val, const char* name)
+{
+  auto mdnode = val->getMetadata(name);
+  if (!mdnode) // exists
+    return "<empty>";
+
+  std::string str{"{\n"};
+  for (const auto& operand : mdnode->operands())
+  {
+    str.append("  ");
+    str.append(((const llvm::MDString&)operand).getString());
+    str.append("\n");
+  }
+  str.append("}\n");
+  return str.data();
+}
+const char* dbg_meta(const llvm::Instruction& val, const char* name){ return dbg_meta(&val, name); }
+
 class LlvmCfgNode : public CfgNode {
 private:
   const llvm::Instruction& innerInstruction;
+  const bool hasBreakpoint;
   ////const OperationArgs
 
   /*ctr*/ LlvmCfgNode(IOperation& op, OperationArgs args,
     const llvm::Instruction& inner,
+    bool bp,
     ICfgNode& prev,
     ICfgNode& next
   ) :
     innerInstruction{inner},
+    hasBreakpoint{bp},
     CfgNode(op, args, prev, next) {
   }
 
@@ -62,6 +89,7 @@ public:
   virtual void PrintInstruction() const override { innerInstruction.print(llvm::outs()); llvm::outs() << "\n"; llvm::outs().flush();  }
   virtual void PrintLocation() const override { innerInstruction.getDebugLoc().print(llvm::outs()); llvm::outs() << "\n"; llvm::outs().flush(); }
   virtual void GetDebugInfo() const override { innerInstruction.print(llvm::errs()); llvm::errs() << "\n"; llvm::errs().flush(); }
+  virtual bool HasBreakpoint() const override { return hasBreakpoint; }
 
   static LlvmCfgNode& CreateEmpty()
   {
@@ -72,27 +100,27 @@ public:
     return *(LlvmCfgNode*)first;
   }
 
-  static LlvmCfgNode& CreateNode(IOperation& op, OperationArgs args, const llvm::Instruction& inner)
-  {
-    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, *new StartCfgNode{}, *new TerminalCfgNode{}};
-    ((ICfgNode&)newNode->prevs[0]).next = newNode;
-    newNode->next->prevs.push_back(*newNode);
-    return *newNode;
-  }
+  ////static LlvmCfgNode& CreateNode(IOperation& op, OperationArgs args, const llvm::Instruction& inner, bool bp)
+  ////{
+  ////  LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, bp, *new StartCfgNode{}, *new TerminalCfgNode{}};
+  ////  ((ICfgNode&)newNode->prevs[0]).next = newNode;
+  ////  newNode->next->prevs.push_back(*newNode);
+  ////  return *newNode;
+  ////}
 
   //beware - adding a node after terminal node here(after improper cast) would not raise exception
   //same applies for similar linking manipulation
 
-  LlvmCfgNode& InsertNewAfter(IOperation& op, OperationArgs args, const llvm::Instruction& inner)
+  LlvmCfgNode& InsertNewAfter(IOperation& op, OperationArgs args, const llvm::Instruction& inner, bool bp)
   {
-    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, *this, *this->next};
+    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, bp, *this, *this->next};
     this->next = newNode;
     return *newNode;
   }
 
-  LlvmCfgNode& InsertNewBranchAfter(IOperation& op, OperationArgs args, const llvm::Instruction& inner)
+  LlvmCfgNode& InsertNewBranchAfter(IOperation& op, OperationArgs args, const llvm::Instruction& inner, bool bp)
   {
-    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, *this, *this->next};
+    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, bp, *this, *this->next};
     newNode->nextFalse = new TerminalCfgNode{};
     this->next = newNode;
     return *newNode;
@@ -140,6 +168,7 @@ Type LlvmCfgParser::GetValueType(llvm::Type* type)
   return Type{type};
 }
 
+//TODO: rename to GetId, GetFrontendId, ToId or ToFrontendId... i am in favor of ToId
 FrontendValueId LlvmCfgParser::GetValueId(uint64_t id)
 {
   return FrontendValueId{id};
@@ -231,23 +260,108 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
   {
     auto& typedInstr = static_cast<const llvm::CallInst&>(instr);
     auto func = typedInstr.getCalledFunction();
-    if (func && func->isIntrinsic())
+    //TODO@michkot: the following switch-like behaviour has to be duplicated in GetOperArgsForInstr
+    if (func) // only if this is direct call
     {
-      if (func->getName().startswith("llvm.memset"))
+      if (func->isIntrinsic())
       {
-        op = &opFactory.Memset();
-        break;
+        if (func->getName().startswith("llvm.dbg"))
+        {
+          op = &opFactory.Noop();
+          break;
+        }
+        else
+        { //TODO@mikchot: guard this code to happen only if advanced-memory-operations generation are ON
+          //HACK: llvm.memset and std::memset have probably different params
+          if (func->getName().startswith("llvm.memset"))
+          {
+            op = &opFactory.Memset();
+            break;
+          }
+        }
       }
-      else if (func->getName().startswith("llvm.dbg"))
-      {
-        op = &opFactory.Noop();
-        break;
+      if (func->getName().startswith("__ANGIE"))
+      { // Those are analysis-independnent angie intrinsic functions, no need to guard them
+        if (false) {}
+        else if (func->getName() == "__ANGIE_DIAGNOSTICS_PLOT_MEMORY")
+        {
+          op = &opFactory.DiagnosticsPlotMem(); // In SMGS plots the memory graph
+          break;
+        }
+        else if (func->getName().startswith(("__ANGIE_CREATE_UNKNOWN_")))
+        {
+          op = &opFactory.CreateUnknownVal(); // The type is deduced from target register argument
+          break;
+        }
+        else if (func->getName().startswith(("__ANGIE_fin")))
+        {
+          op = &opFactory.Terminate(); // The type is deduced from target register argument
+          break;
+        }
+#if 0 // not yet implemented
+        else if (func->getName() == "__ANGIE_TRACE_PLOT")
+        {
+          op = &opFactory.TracePlot(); // Print the 
+          break;
+        }
+        else if (func->getName() == "__ANGIE_FORCE_ABSTRACTION")
+        {
+          op = &opFactory.ForceAbstraction();
+          break;
+        }
+        else if (func->getName() == "__ANGIE_FORCE_JOIN")
+        {
+          op = &opFactory.ForceJoin();
+          break;
+        }
+#endif
       }
-    }
-    if (func->getName() == "malloc")
-    {
-      op = &opFactory.Malloc();
-      break;
+      else
+      { //TODO@mikchot: guard this code to happen only if advanced-memory-operations generation are ON
+        if (false) {}
+        else if (func->getName() == "abort")
+        {
+          op = &opFactory.Abort();
+          break;
+        }
+        else if (func->getName() == "exit")
+        {
+          op = &opFactory.Exit();
+          break;
+        }
+        else if (func->getName() == "malloc")
+        {
+          op = &opFactory.Malloc();
+          break;
+        }
+        else if (func->getName() == "free")
+        {
+          op = &opFactory.Free();
+          break;
+        }
+#if 0 // not yet implemented
+        else if (func->getName() == "calloc")
+        {
+          op = &opFactory.Calloc();
+          break;
+        }
+        else if (func->getName() == "memset")
+        {
+          op = &opFactory.Memset();
+          break;
+        }
+        else if (func->getName() == "memcpy")
+        {
+          op = &opFactory.Memcpy();
+          break;
+        }
+        else if (func->getName() == "memove")
+        {
+          op = &opFactory.Memmove();
+          break;
+        }
+#endif
+      }
     }
     op = &opFactory.Call();
     break;
@@ -625,7 +739,8 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
   {
     auto& op = GetOperationFor(*instrPtr);
     auto args = GetOperArgsForInstr(*instrPtr);
-    currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr);
+    bool bp = (instrPtr->getMetadata("angie.debugbreak") != nullptr);
+    currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr, bp);
     instrPtr = instrPtr->getNextNode();
   }
   //last BB instruction
@@ -638,6 +753,8 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
     // and op's arguments
     auto args = GetOperArgsForInstr(*instrPtr);
 
+    bool bp = (instrPtr->getMetadata("angie.debugbreak") != nullptr);
+
     switch (instrPtr->getOpcode())
     {
     case llvm::Instruction::Br:
@@ -648,15 +765,15 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
       {
         // Unconditional branch - next is first instruction of target basic block
 
-        // just skip its
-        // currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr);
+        // Place it as noop unconditionally, serves only for dbg printing
+        currentNode = &currentNode->InsertNewAfter(opFactory.Noop(), args, *instrPtr, bp);
 
         LinkWithOrPlanProcessing(currentNode, branchInstrPtr->getSuccessor(0), 0);
       }
       else //if (branchInstrPtr->isConditional())
       {
         // Conditional branch - has two successors for true and false branches
-        currentNode = &currentNode->InsertNewBranchAfter(op, args, *instrPtr);
+        currentNode = &currentNode->InsertNewBranchAfter(op, args, *instrPtr, bp);
         LinkWithOrPlanProcessing(currentNode, branchInstrPtr->getSuccessor(0), 0);
         LinkWithOrPlanProcessing(currentNode, branchInstrPtr->getSuccessor(1), 1);
       }
@@ -665,7 +782,7 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
     case llvm::Instruction::Ret:
     {
       // Create node for RET instruction, do not link with anything
-      currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr);
+      currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr, bp);
     }
     break;
     default:
@@ -686,7 +803,7 @@ void LlvmCfgParser::DealWithConstants()
     ValueId id;
     /**/ if (auto constInt = llvm::dyn_cast<llvm::ConstantInt>(x))
     {
-        id = vc.CreateConstIntVal(constInt->getValue().getZExtValue(), Type{constInt->getType()});
+        id = vc.CreateConstIntVal(constInt->getZExtValue(), Type{constInt->getType()});
     }
     else if (auto constFp = llvm::dyn_cast<llvm::ConstantFP>(x))
     {
@@ -705,6 +822,35 @@ void LlvmCfgParser::DealWithConstants()
     {
       //TODO maybe different value than 0 for nullptr?
       id = vc.CreateConstIntVal(0, Type{constNullPtr->getType()});
+    }
+    else if (auto constExpr = llvm::dyn_cast<llvm::ConstantExpr>(x))
+    {
+      llvm::Instruction* asInstr = deconst_cast(*constExpr).getAsInstruction();
+      if (false) {}
+      else if (llvm::isa<llvm::CastInst>(asInstr) && asInstr->getNumOperands() == 1)
+      {
+        auto asConstInt = llvm::dyn_cast<llvm::ConstantInt>(asInstr->getOperand(0));
+        id = vc.CreateConstIntVal(asConstInt->getZExtValue(), Type{constExpr-> getType()});
+      }
+      else if (llvm::isa<llvm::GetElementPtrInst>(asInstr) && asInstr->getNumOperands() == 3)
+      {
+        auto idx0 = llvm::dyn_cast<llvm::ConstantInt>(asInstr->getOperand(1));
+        auto idx1 = llvm::dyn_cast<llvm::ConstantInt>(asInstr->getOperand(2));
+        if (idx0->getZExtValue() == 0 && idx1->getZExtValue() == 0)
+        {
+          //TODO: we are creating pointer to the begining of constant (string?) - relay it to SMGs
+          //HACK: we are replacig pointer to static value with unknown
+          id = vc.CreateVal(Type{constExpr-> getType()});
+        }
+        else
+          throw NotImplementedException();
+      }
+      else
+        throw NotImplementedException();
+    }
+    else if (auto constFunc = llvm::dyn_cast<llvm::Function>(x))
+    {
+      id = mapper.GetValueId(GetValueId(constFunc));
     }
     else
       throw NotImplementedException();
@@ -741,7 +887,7 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
     fmap.RegisterFunction(vid, std::move(handle));
   }
 
-  mainCfg = &fmap.GetFunction(mapper.GetValueId(ToIdTypePair(mainFunc).id)).cfg;
+  mainCfg = &fmap.GetFunction(mapper.GetValueId(GetValueId(mainFunc))).cfg;
 
   // -----------
 
@@ -749,12 +895,31 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
 
   // -----------
 
-  auto returnType = llvm::Type::getVoidTy(ctx);
-  auto params     = mainFType->params();
-  auto ftype      = llvm::FunctionType::get(returnType, params, false);
+  // the following code prepends a fixed void __entry(int32, int8**) function to the module
+  // this is fixed to C/C++ and needs to be modulirazied to support other languages
+  // the purpose of "__entry" is to add here any instructions constraining the argc and argv values
+  //   before they are used as arguments for "main"
+  // it can also have the "termination" check purpose - if the end of __entry is not reached
 
-  auto entryFunc  = llvm::Function::Create(ftype, llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__entry", &module);
+  auto voidType   = llvm::Type::getVoidTy(ctx);
+  auto params     = llvm::SmallVector<llvm::Type*, 2>{
+      llvm::Type::getInt32Ty(ctx), 
+      llvm::Type::getInt8PtrTy(ctx)->getPointerTo()
+    };
+  auto entryFType = llvm::FunctionType::get(voidType, params, false);
+  auto finFType   = llvm::FunctionType::get(voidType, false);
+
+  auto finFunc    = llvm::Function::Create(finFType,   llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__ANGIE_fin",   &module);
+  auto entryFunc  = llvm::Function::Create(entryFType, llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__entry", &module);
+
   auto entryBlock = llvm::BasicBlock::Create(ctx, "", entryFunc);
+
+  // -----------
+
+  // Add instructions to maniuplate / create the call args for main
+
+  // Default way is to create them as __entry arguments
+  auto callValues = entryFunc->args();
 
   ////auto argcType   = mainFType->getParamType(0);
   ////auto argvType   = mainFType->getParamType(1);
@@ -771,34 +936,46 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   ////  entryBlock
   ////  );
 
-  auto argIt      = entryFunc->args().begin();
-  auto argc       = &*argIt++;
-  auto argv       = &*argIt;
-  auto mainArgs   = llvm::SmallVector<llvm::Value*, 2> {
-    argc,
-    argv
-  };
+  // -----------
 
-  //TODO: in future :) need to replace static main_call args creation & registration with range-based
-  ////auto mainArgs   = llvm::ArrayRef<llvm::Value*>{&*entryFunc->arg_begin(), &*entryFunc->arg_end()};
+  // place for main call args ... count is going to be either:
+  //   0 for int main(void)
+  //   2 for int main(int, const char**)
+  auto callArgs   = llvm::SmallVector<llvm::Value*, 2>{};
+
+  auto opArgs     = OperationArgs{};
+  opArgs.GetArgs().push_back(GetEmptyOperArg());
+  opArgs.GetArgs().push_back(ToOperArg(mainFunc));
+
+  // for every formal param, add one on of the values as main call arg
+  auto argIt = callValues.begin();
+  for (auto mainParam : mainFType->params())
+  {
+    auto arg = &*argIt++;
+    // Add to the function call arg range
+    callArgs.push_back(arg);
+    // Add to the operation
+    opArgs.GetArgs().push_back(ToOperArg(arg));
+    // Register args as values
+    mapper.CreateOrGetValueId(ToOperArg(arg).idTypePair, vc);
+  }
+
+  // -----------
+  
+  auto mainCall   = llvm::CallInst::Create(mainFunc, callArgs, "", entryBlock);
+  auto finCall    = llvm::CallInst::Create(finFunc,            "", entryBlock);
 
   // -----------
 
-  auto mainCall   = llvm::CallInst::Create(mainFunc, mainArgs, "", entryBlock);
+  auto voidOpArgs = OperationArgs{};
+  voidOpArgs.GetArgs().push_back(GetEmptyOperArg());
 
+  auto currtNode  = &LlvmCfgNode::CreateEmpty();
+  currtNode  = &currtNode->InsertNewAfter(opFactory.Call(),      opArgs,     *mainCall, false);
+  entryPointCfg = currtNode;
+  currtNode  = &currtNode->InsertNewAfter(opFactory.Terminate(), voidOpArgs, *finCall,  false);
+ 
   // -----------
-
-  auto args       = OperationArgs{};
-  args.GetArgs().push_back(GetEmptyOperArg());
-  args.GetArgs().push_back(ToOperArg(mainFunc));
-  args.GetArgs().push_back(ToOperArg(argc));
-  args.GetArgs().push_back(ToOperArg(argv));
-
-  entryPointCfg = &LlvmCfgNode::CreateNode(opFactory.Call(), args, *mainCall);
-
-  // Register argc, argv as values
-  mapper.CreateOrGetValueId(ToOperArg(argc).idTypePair, vc);
-  mapper.CreateOrGetValueId(ToOperArg(argv).idTypePair, vc);
 
   while (!parseAndLinkTogether.empty())
   {

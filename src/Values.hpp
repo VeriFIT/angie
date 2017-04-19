@@ -198,10 +198,19 @@ public:
   virtual uint64_t GetConstantIntInnerVal  (ValueId value) const = 0;
   virtual double   GetConstantFloatInnerVal(ValueId value) const { throw NotImplementedException(); }
 
+  virtual uptr<IValueContainer> Clone() = 0;
 protected:
 
   // Zero in all possible interpretations 
   virtual ValueId GetZero() const { throw NotImplementedException(); }
+
+protected:
+  // This is polymorphic class, hide ctors
+  IValueContainer()                        = default;
+  IValueContainer(const IValueContainer&)  = default;
+  IValueContainer(      IValueContainer&&) = default;
+  IValueContainer& operator=(const IValueContainer&) = default;
+  IValueContainer& operator=(IValueContainer&&) = default;
 };
 
 //inline std::ostream& operator<<(std::ostream& os, const IValueContainer& vc) { vc.Print(os); return os; }

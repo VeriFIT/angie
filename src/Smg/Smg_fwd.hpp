@@ -8,11 +8,18 @@ namespace Smg {
 namespace Impl {
 
 class EdgeBase;
-class Object;
+class Region;
 class Graph;
 
 using ObjectSize = ValueId;
 using ObjectType = int; // not used
 
 } // namespace Smg::Impl
+
+struct DlsOffsets{
+  ValueId hfo;
+  ValueId nfo;
+  ValueId pfo;
+};
+
 } // namespace Smg

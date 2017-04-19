@@ -132,10 +132,12 @@ public:
     return constantContainer.at(value);
   }
 
+  virtual uptr<IValueContainer> Clone() override { return std::make_unique<ValueContainer>(*this); }
+
+  ValueId GetZero(Type type) const override { return Zero; }
 protected:
 
   ValueId GetZero() const override { return Zero; };
-  ValueId GetZero(Type type) const override { return Zero; }
 };
 
 //--------------------------------------------------------------

@@ -22,43 +22,16 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include "Exceptions.hpp"
 #include "Definitions.hpp"
 #include "General.hpp"
 #include "IOperation.hpp"
 #include "IState.hpp"
 #include "StateStorage.hpp"
 #include "FrontedValueMapper.hpp"
+#include "debugbreak.h"
 
-class AnalysisErrorException : public std::logic_error {
-public:
-  /*ctr*/ AnalysisErrorException()
-    : logic_error("A fatal error was discovered by the analysis. Abstract execution can not continue in this path.")
-  {
-  }
-  /*ctr*/ AnalysisErrorException(const char* c)
-    : logic_error(c)
-  {
-  }
-
-};
-
-class InvalidDereferenceException : public AnalysisErrorException {
-public:
-  /*ctr*/ InvalidDereferenceException()
-    : AnalysisErrorException("Program tried to dereference unallocated or uninitialized memory.")
-  {
-  }
-};
-
-class PossibleNullDereferenceException : public AnalysisErrorException {
-public:
-  /*ctr*/ PossibleNullDereferenceException()
-    : AnalysisErrorException("Possible null dereference exception occurred - getElementPtr.")
-  {
-  }
-};
-
-//TODO: maybe remove use of IState& lastSt from templated helpers, we can access that via successor
+//TODO: maybe remove use of IState& state from templated helpers, we can access that via successor
 //TODO: maybe replace dynamic_cast with static_cast ?
 //TODO: comment about executing last instruction -> it is OK now, TerminalNode implements no-op Execute()
 
@@ -68,17 +41,21 @@ class OperationHelpers;
 template<typename StateT, typename OperArgsT>
 class OperationHelpers<StateT, OperArgsT, std::false_type> {
 public:
-  void SafelyExecuteAndEnque(IState& lastSt, uptr<IState>&& successor, const OperationArgs& args)
+  void SafelyExecuteAndEnque(IState& state, uptr<IState>&& successor, const OperationArgs& args)
   {
+    //TODO@michkot: do not use exceptions to handle analysis warnings and errors
+    // Also applies for the branching variant bellow 
     try
     {
-      lastSt.SetExplored();
+      state.SetExplored();
+      if (state.GetNode().HasBreakpoint())
+        debug_break();
       ExecuteOnNewState(static_cast<StateT&>(*successor), static_cast<const OperArgsT&>(args));
-      lastSt.GetNextStep().GetStatesManager().InsertAndEnqueue(std::move(successor));
+      state.GetNode().GetStatesManager().InsertAndEnqueue(std::move(successor));
     }
     catch (AnalysisErrorException e)
     {
-      lastSt.GetNextStep().PrintLocation();
+      state.GetNode().PrintLocation();
       printf("%s\n", e.what());
     }
   }
@@ -88,17 +65,19 @@ public:
 template<typename StateT, typename OperArgsT>
 class OperationHelpers<StateT, OperArgsT, std::true_type> {
 public:
-  void SafelyExecuteAndEnque(IState& lastSt, uptr<IState>&& successor, const OperationArgs& args, bool br)
+  void SafelyExecuteAndEnque(IState& state, uptr<IState>&& successor, const OperationArgs& args, bool br)
   {
     try
     {
-      lastSt.SetExplored();
+      state.SetExplored();
+      if (state.GetNode().HasBreakpoint())
+        debug_break();
       ExecuteOnNewState(static_cast<StateT&>(*successor), static_cast<const OperArgsT&>(args), br);
-      lastSt.GetNextStep().GetStatesManager().InsertAndEnqueue(std::move(successor));
+      state.GetNode().GetStatesManager().InsertAndEnqueue(std::move(successor));
     }
     catch (AnalysisErrorException e)
     {
-      lastSt.GetNextStep().PrintLocation();
+      state.GetNode().PrintLocation();
       printf("%s\n", e.what());
     }
   }
@@ -112,23 +91,25 @@ public:
 template<typename StateT, typename OperArgsT = OperationArgs>
 class BasicOperation : public IOperation, OperationHelpers<StateT, OperArgsT> {
 public:
-  virtual void Execute(IState& lastSt, const OperationArgs& args) override final
+  virtual void Execute(IState& state, const OperationArgs& args) override final
   {
-    assert(!lastSt.GetNextStep().HasTwoNext()); //TODO: comment
+    // check whether this non-branching operation is placed in non-branching node
+    assert(!state.GetNode().IsBranching()); 
 
-    uptr<IState> successor = lastSt.CreateSuccessor(lastSt.GetNextStep().GetNext());
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
+    uptr<IState> successor = state.CreateSuccessor(state.GetNode().GetNext());
+    this->SafelyExecuteAndEnque(state, std::move(successor), args);
   }
 };
 
 template<typename StateT, typename OperArgsT = OperationArgs>
 class OperationRet : public IOperation, OperationHelpers<StateT, OperArgsT> {
-  void Execute(IState& lastSt, const OperArgsT& args)
+  void Execute(IState& state, const OperArgsT& args)
   {
-    assert(!lastSt.GetNextStep().HasTwoNext()); //TODO: comment
+    // check whether this non-branching operation is placed in non-branching node
+    assert(!state.GetNode().IsBranching());
 
-    uptr<IState> successor = lastSt.CreateSuccessor(lastSt.GetStackRetNode());
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
+    uptr<IState> successor = state.CreateSuccessor(state.GetStackRetNode());
+    this->SafelyExecuteAndEnque(state, std::move(successor), args);
   }
 };
 
@@ -136,26 +117,27 @@ template<typename StateT>
 class OperationCall : public IOperation, OperationHelpers<StateT, CallOpArgs> {
 public:
 
-  virtual void Execute(IState& lastSt, const OperationArgs& args) override
+  virtual void Execute(IState& state, const OperationArgs& args) override
   {
-    Execute(lastSt, static_cast<const CallOpArgs&>(args));
+    Execute(state, static_cast<const CallOpArgs&>(args));
   }
 
 private:
 
-  void Execute(IState& lastSt, const CallOpArgs& args)
+  void Execute(IState& state, const CallOpArgs& args)
   {
-    assert(!lastSt.GetNextStep().HasTwoNext()); //TODO: comment
+    // check whether this non-branching operation is placed in non-branching node
+    assert(!state.GetNode().IsBranching());
 
     uptr<IState> successor;
     {
-      auto& nextJump = lastSt.GetFuncMapping().GetFunction(lastSt.GetAnyVar(args.GetOptions())).cfg;
-      successor = lastSt.CreateSuccessor(nextJump);
+      auto& nextJump = state.GetFuncMapping().GetFunction(state.GetValue(args.GetOptions())).cfg;
+      successor = state.CreateSuccessor(nextJump);
 
       // Prepares the instruction-after-call to be pushed on the stack
-      (*successor).SetStackRetNode(lastSt.GetNextStep().GetNext());
+      (*successor).SetStackRetNode(state.GetNode().GetNext());
     }
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args);
+    this->SafelyExecuteAndEnque(state, std::move(successor), args);
   }
 };
 
@@ -164,18 +146,19 @@ class OperationBranch : public IOperation, OperationHelpers<StateT, OperArgsT, s
 public:
 
   // Override this again to switch to branching implementation
-  virtual void Execute(IState& lastSt, const OperationArgs& args) override final
+  virtual void Execute(IState& state, const OperationArgs& args) override final
   {
-    assert(lastSt.GetNextStep().HasTwoNext()); //TODO: comment
+    // check whether this branching operation is placed in branching node
+    assert(state.GetNode().IsBranching()); 
 
     uptr<IState> successor;
-    successor = lastSt.CreateSuccessor(lastSt.GetNextStep().GetNextTrue());
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args, true);
+    successor = state.CreateSuccessor(state.GetNode().GetNextFalse());
+    this->SafelyExecuteAndEnque(state, std::move(successor), args, false);
 
-    successor = lastSt.CreateSuccessor(lastSt.GetNextStep().GetNextFalse());
-    this->SafelyExecuteAndEnque(lastSt, std::move(successor), args, false);
+    successor = state.CreateSuccessor(state.GetNode().GetNextTrue());
+    this->SafelyExecuteAndEnque(state, std::move(successor), args, true);
 
-    lastSt.SetExplored();
+    state.SetExplored();
     return;
   }
 };
@@ -191,17 +174,32 @@ class BasicOperationNoop : public BasicOperation<IState, OperationArgs> {
   }
 };
 
+class BasicOperationAbort : public BasicOperation<IState, OperationArgs> {
+  virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args) override final
+  {
+    throw AnalysisErrorException("abort or exit called");
+  }
+};
+
+class BasicOperationCreateUnknown : public BasicOperation<IState, OperationArgs> {
+  virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args) override final
+  {
+    ValueId retVal = newState.GetVc().CreateVal(args.GetTarget().type);
+    newState.AssignValue(args.GetTarget(), retVal);
+  }
+};
+
 class BasicOperationBinOp : public BasicOperation<IState, BinaryOpArgs> {
   virtual void ExecuteOnNewState(IState& newState, const BinaryOpArgs& args) override final
   {
     auto opts        = args.GetOptions();
 
     auto type        = args.GetOperand(0).type;
-    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
-    auto rhs         = newState.GetAnyVar(args.GetOperand(1));
+    auto lhs         = newState.GetValue(args.GetOperand(0));
+    auto rhs         = newState.GetValue(args.GetOperand(1));
 
     ValueId retVal = newState.GetVc().BinOp(lhs, rhs, type, opts);
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -209,12 +207,12 @@ class BasicOperationTruncate : public BasicOperation<IState, TruncExtendOpArgs> 
   virtual void ExecuteOnNewState(IState& newState, const TruncExtendOpArgs& args) override final
   {
     ArithFlags flags = args.GetOptions();
-    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
+    auto lhs         = newState.GetValue(args.GetOperand(0));
     auto tarType     = args.GetTarget().type;
     auto srcType     = args.GetOperand(0).type;
 
     ValueId retVal = newState.GetVc().TruncateInt(lhs, srcType, tarType);
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -222,25 +220,25 @@ class BasicOperationExtend : public BasicOperation<IState, TruncExtendOpArgs> {
   virtual void ExecuteOnNewState(IState& newState, const TruncExtendOpArgs& args) override final
   {
     ArithFlags flags = args.GetOptions();
-    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
+    auto lhs         = newState.GetValue(args.GetOperand(0));
     auto tarType     = args.GetTarget().type;
     auto srcType     = args.GetOperand(0).type;
 
     ValueId retVal = newState.GetVc().ExtendInt(lhs, srcType, tarType, flags);
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
 class BasicOperationCmp : public BasicOperation<IState, CmpOpArgs> {
   virtual void ExecuteOnNewState(IState& newState, const CmpOpArgs& args) override final
   {
-    auto lhs         = newState.GetAnyVar(args.GetOperand(0));
-    auto rhs         = newState.GetAnyVar(args.GetOperand(1));
+    auto lhs         = newState.GetValue(args.GetOperand(0));
+    auto rhs         = newState.GetValue(args.GetOperand(1));
     auto srcType     = args.GetOperand(0).type;
     auto flags       = args.GetOptions();
 
     ValueId retVal = newState.GetVc().Cmp(lhs, rhs, srcType, flags);
-    newState.LinkLocalVar(args.GetTarget(), retVal);
+    newState.AssignValue(args.GetTarget(), retVal);
   }
 };
 
@@ -248,12 +246,21 @@ class BasicOperationBranch : public OperationBranch<IState> {
 public:
   virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args, bool br) override
   {
-    auto lhs = newState.GetAnyVar(args.GetOperand(0));
-    newState.GetAnyVar(args.GetOperand(0));
+    auto lhs = newState.GetValue(args.GetOperand(0));
     if (br)
+    {
+      // if this state can not happen
+      if (newState.GetVc().IsFalse(lhs, Type::CreateIntegerType(1)))
+        throw AnalysisErrorException("Branch: can not go true");
       newState.GetVc().AssumeTrue(lhs);
+    }
     else
+    {
+      // if this state can not happen
+      if (newState.GetVc().IsTrue(lhs, Type::CreateIntegerType(1)))
+        throw AnalysisErrorException("Branch: can not go false");
       newState.GetVc().AssumeFalse(lhs);
+    }
   }
 };
 

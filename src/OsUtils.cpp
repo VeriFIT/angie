@@ -11,7 +11,8 @@ namespace OsUtils {
 
 std::string GetEnv(boost::string_view str)
 {
-  return{std::getenv(str.data())};
+  auto envVal = std::getenv(str.data());
+  return envVal ? std::string{envVal} : std::string{};
 }
 
 void Exec(boost::string_view str)
@@ -19,11 +20,21 @@ void Exec(boost::string_view str)
   std::system(str.data());
 }
 
+void ExecNoWait(boost::string_view str)
+{
+
+#ifdef _WIN32
+  std::system(("start /b cmd /c \"" + str.to_string() + "\"").data());
+#else // _WIN32
+  std::system((str.to_string() + " &").data());
+#endif // ! _WIN32
+}
+
 void PasteToClipboard(boost::string_view str)
 {
-  #if ! defined _WIN32
+#if ! defined _WIN32
   std::runtime_error("PasteToClipboard is only supported on Windows");
-  #else
+#else
   if (!OpenClipboard(0))
   {
     std::runtime_error("Cannot open the Clipboard");
@@ -49,7 +60,7 @@ void PasteToClipboard(boost::string_view str)
     return;
   }
   CloseClipboard();
-  #endif
+#endif
 }
 
 void WriteToFile(boost::string_view str, boost::string_view filename)
