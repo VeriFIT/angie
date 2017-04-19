@@ -138,3 +138,10 @@ void main_old(gsl::span<std::string> files)
   //getchar();
   return;
 }
+
+#if defined(_MSC_VER)
+
+#include "SmgCrawler.cpp"
+#include "SmgPrinter.cpp"
+
+#endif
