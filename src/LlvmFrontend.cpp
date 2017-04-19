@@ -805,6 +805,10 @@ void LlvmCfgParser::DealWithConstants()
       else
         throw NotImplementedException();
     }
+    else if (auto constFunc = llvm::dyn_cast<llvm::Function>(x))
+    {
+      id = mapper.GetValueId(GetValueId(constFunc));
+    }
     else
       throw NotImplementedException();
 
