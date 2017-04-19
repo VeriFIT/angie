@@ -264,6 +264,11 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
           op = &opFactory.CreateUnknownVal(); // The type is deduced from target register argument
           break;
         }
+        else if (func->getName().startswith(("__ANGIE_fin")))
+        {
+          op = &opFactory.Terminate(); // The type is deduced from target register argument
+          break;
+        }
 #if 0 // not yet implemented
         else if (func->getName() == "__ANGIE_TRACE_PLOT")
         {
@@ -849,14 +854,17 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   //   before they are used as arguments for "main"
   // it can also have the "termination" check purpose - if the end of __entry is not reached
 
-  auto returnType = llvm::Type::getVoidTy(ctx);
+  auto voidType   = llvm::Type::getVoidTy(ctx);
   auto params     = llvm::SmallVector<llvm::Type*, 2>{
       llvm::Type::getInt32Ty(ctx), 
       llvm::Type::getInt8PtrTy(ctx)->getPointerTo()
     };
-  auto entryFType      = llvm::FunctionType::get(returnType, params, false);
+  auto entryFType = llvm::FunctionType::get(voidType, params, false);
+  auto finFType   = llvm::FunctionType::get(voidType, false);
 
+  auto finFunc    = llvm::Function::Create(finFType,   llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__ANGIE_fin",   &module);
   auto entryFunc  = llvm::Function::Create(entryFType, llvm::GlobalValue::LinkageTypes::AvailableExternallyLinkage, "__entry", &module);
+
   auto entryBlock = llvm::BasicBlock::Create(ctx, "", entryFunc);
 
   // -----------

@@ -541,6 +541,7 @@ public:
   virtual IOperation & NotSupportedInstr() override { return *nsop; }
   virtual IOperation & Noop() override { return *noop; }
 
+  virtual IOperation & Terminate() override { return *noop; }
   virtual IOperation & CreateUnknownVal() override { return *unkn; }
   virtual IOperation & DiagnosticsPlotMem() override { return *plot; }
 };
