@@ -102,13 +102,6 @@ public:
     return std::make_pair<decltype(derivedValue), ref_wr<std::decay<decltype(derEdge)>::type>>(std::move(derivedValue), derEdge);
   }
 
-  enum class MemorySpace : int8_t {
-    Static,
-    ThreadLocal,
-    Stack,
-    Heap
-  };
-
   // Returns a pointer to newly allocated object
   ValueId AllocateRegion(Type type, IValueContainer& vc, MemorySpace ms = MemorySpace::Heap)
   {
@@ -130,6 +123,7 @@ public:
 
     // initialize the object
     obj.size = type.GetSizeOfV(vc);
+    obj.memSpace = ms;
 
     handles.CreatePtEdge(PtEdge{{}, ptr, PTR_TYPE, oid, {}});
 
@@ -366,10 +360,21 @@ public:
       throw DoubleFreeException{};
     }
 
-    //TODO: materialize as region, edge gets updates to point to materialized object now
+    auto& possiblyAbstractObj = *graph.objects[objectId];
+    if (possiblyAbstractObj.memSpace != MemorySpace::Heap)
+      throw NonHeapFreeException("ADD THE REAL SPACE HERE");
 
-    // Set regions state to invalid
-    Region& object = static_cast<Region&>(*graph.objects[objectId]);
+    //TODO: materialize as region, edge gets updates to point to materialized object now
+    Region& object = static_cast<Region&>(possiblyAbstractObj);
+
+    // This is not needed now because we do instant garbage collection
+    ////// Set regions state to invalid
+    ////object.isValid = false;
+    ////object.isFreed = true;
+
+    //TODO: work on "isValid" system
+    //HACK: deleting object instantly and setting edges to Obj{-2} instead of looking for "isValid" flag
+    // This is garbage collection, but is neccesray now ^^
 
     // Remove references from other objects, set them to invalid [freed] memory
     using ret_t = std::pair<Impl::Object&, Impl::PtEdge&>;

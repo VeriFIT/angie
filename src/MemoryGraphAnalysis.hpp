@@ -108,7 +108,7 @@ public:
     {
       throw NotSupportedException("Alloca with count != 1 is not supported");
     }
-    return graph.AllocateRegion(type, GetVc());
+    return graph.AllocateRegion(type, GetVc(), MemorySpace::Stack);
   }
 
   ValueId Malloc(ValueId size)
@@ -119,7 +119,7 @@ public:
       throw NotSupportedException("Malloc with abstract size is not supported");
     }
     auto byteArrayT = Type::CreateArrayOf(INT8_TYPE, vc.GetConstantIntInnerVal(size));
-    return graph.AllocateRegion(byteArrayT, GetVc());
+    return graph.AllocateRegion(byteArrayT, GetVc(), MemorySpace::Heap);
   }
 
   ValueId Calloc(ValueId size)

@@ -113,7 +113,8 @@ public:
   int32_t refCounter{0};
 
   ObjectSize size;
-  size_t level;
+  size_t level{};
+  MemorySpace memSpace{MemorySpace::Heap};
 
   void IncRefCounter() { ++refCounter; }
   void DecRefCounter() { --refCounter; }
