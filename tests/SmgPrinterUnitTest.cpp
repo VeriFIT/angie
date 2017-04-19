@@ -14,6 +14,7 @@
 #pragma comment(lib, "gtest.lib")
 
 
+
 TEST(SMGTest, Graph1)
 {
   ValueContainer vc{};
@@ -25,7 +26,7 @@ TEST(SMGTest, Graph1)
     using namespace ::Smg::Impl;
     auto& objs = ig.objects;
     auto& hndl = ig.handles;
-
+    
     Type int8 = Type::CreateIntegerType(8);
     Type int16 = Type::CreateIntegerType(16);
     Type int32 = Type::CreateIntegerType(32);
@@ -41,7 +42,7 @@ TEST(SMGTest, Graph1)
     auto oids
       = {o1,o2,o3,o4,o5};
 
-    ValueId  v0{0};
+    ValueId  v0{20};
     ValueId  v1{1};
     ValueId  v2{2};
     ValueId  v3{3};
@@ -67,6 +68,9 @@ TEST(SMGTest, Graph1)
       = {vPtr1,vPtr2,vPtr3,vPtr4,vPtr5,vPtr6,vPtr7,vPtr8};
 
     int i = 0;
+
+    EXPECT_EQ(objs.size(), 1);
+
     for (auto oid : oids)
     {
       Object& obj =
@@ -78,29 +82,30 @@ TEST(SMGTest, Graph1)
 
 
       obj.id = oid;
-      PtEdge e = PtEdge{v0, vPtrs[i], voidT, oid, v0};
+      PtEdge e = PtEdge{vals[i], vPtrs[i], voidT, oid, vals[i]};
       hndl.CreatePtEdge(e);
 
-      auto edge = hndl.FindPtEdgeByOffset(v0);
+     
+
+      auto edge = hndl.FindPtEdgeByOffset(vals[i]);
       EXPECT_NE(edge, nullptr);
       EXPECT_EQ(edge->valueType, voidT);
       EXPECT_EQ(edge->value, vPtrs[i]);
-      EXPECT_EQ(edge->sourceOffset, v0);
-      EXPECT_EQ(edge->targetOffset, v0);
+      EXPECT_EQ(edge->sourceOffset, vals[i]);
+      EXPECT_EQ(edge->targetOffset, vals[i]);
       EXPECT_EQ(edge->targetObjectId, oid);
-      EXPECT_EQ(hndl.FindPtEdgeByValue(vPtrs[i]), hndl.FindPtEdgeByOffset(v0));
+      EXPECT_EQ(hndl.FindPtEdgeByValue(vPtrs[i]), hndl.FindPtEdgeByOffset(vals[i]));
       //EXPECT_EQ(hndl.FindPtEdgeByValueType(vPtrs[i], voidT), hndl.FindPtEdgeByValue(vPtrs[i]));
       EXPECT_EQ(hndl.FindPtEdgeByOffset(ValueId{99}), nullptr);
       EXPECT_EQ(hndl.FindPtEdgeByValue(ValueId(55)), nullptr);
       //EXPECT_EQ(hndl.FindPtEdgeByValueType(vPtrs[i], int32), nullptr);
       
-      EXPECT_EQ(hndl.FindHvEdgeByOffset(v0), nullptr);
+      EXPECT_EQ(hndl.FindHvEdgeByOffset(vals[i]), nullptr);
       EXPECT_EQ(hndl.FindHvEdgeByValue(vPtrs[i]), nullptr);
 
       EXPECT_EQ(hndl.GetHvOutEdges().size(), 0);
-      EXPECT_EQ(hndl.GetPtOutEdges().size(), i+1);
-      EXPECT_EQ(hndl.ptEdges.size(), i + 1);
-      EXPECT_EQ(hndl.GetSize(), i+1);
+      EXPECT_EQ(hndl.GetPtOutEdges().size(), i+2);
+      EXPECT_EQ(hndl.ptEdges.size(), i+2);
 
       i++;
     }
@@ -119,13 +124,8 @@ TEST(SMGTest, Graph1)
 
   }
 
- 
-
-
-
 }
 
-TEST(asdf, asfdasdf) { EXPECT_EQ(true, true); }
 
 
 int main(int argc, char **argv)
