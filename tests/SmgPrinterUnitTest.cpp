@@ -71,7 +71,7 @@ TEST(SMGTest, Graph1)
     {
       Object& obj =
         objs
-        .emplace(oid, std::make_unique<Object>())
+        .emplace(oid, std::make_unique<Region>())
         .first.operator*().second.operator*();
 
       EXPECT_NE(objs.find(oid), objs.end());
@@ -89,10 +89,10 @@ TEST(SMGTest, Graph1)
       EXPECT_EQ(edge->targetOffset, v0);
       EXPECT_EQ(edge->targetObjectId, oid);
       EXPECT_EQ(hndl.FindPtEdgeByValue(vPtrs[i]), hndl.FindPtEdgeByOffset(v0));
-      EXPECT_EQ(hndl.FindPtEdgeByValueType(vPtrs[i], voidT), hndl.FindPtEdgeByValue(vPtrs[i]));
+      //EXPECT_EQ(hndl.FindPtEdgeByValueType(vPtrs[i], voidT), hndl.FindPtEdgeByValue(vPtrs[i]));
       EXPECT_EQ(hndl.FindPtEdgeByOffset(ValueId{99}), nullptr);
       EXPECT_EQ(hndl.FindPtEdgeByValue(ValueId(55)), nullptr);
-      EXPECT_EQ(hndl.FindPtEdgeByValueType(vPtrs[i], int32), nullptr);
+      //EXPECT_EQ(hndl.FindPtEdgeByValueType(vPtrs[i], int32), nullptr);
       
       EXPECT_EQ(hndl.FindHvEdgeByOffset(v0), nullptr);
       EXPECT_EQ(hndl.FindHvEdgeByValue(vPtrs[i]), nullptr);

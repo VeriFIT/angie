@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugNoLlvm|x64">
@@ -78,8 +78,10 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/permissive- /w34062 /arch:AVX2 %(AdditionalOptions)</AdditionalOptions>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -119,140 +121,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\CfgNodeBase.hpp" />
-    <ClInclude Include="..\src\Definitions.hpp" />
-    <ClInclude Include="..\src\DummyOperations.hpp" />
-    <ClInclude Include="..\src\DummyState.hpp" />
-    <ClInclude Include="..\src\enum_flags.h" />
-    <ClInclude Include="..\src\Exceptions.hpp" />
-    <ClInclude Include="..\src\ForwardNullAnalysis.hpp" />
-    <ClInclude Include="..\src\FrontedValueMapper.hpp" />
-    <ClInclude Include="..\src\IdImpl.hpp" />
-    <ClInclude Include="..\src\ISmgVisitor.hpp" />
-    <ClInclude Include="..\src\LlvmFrontend.hpp" />
-    <ClInclude Include="..\src\General.hpp" />
-    <ClInclude Include="..\src\ICfgNode.hpp" />
-    <ClInclude Include="..\src\IOperation.hpp" />
-    <ClInclude Include="..\src\IState.hpp" />
-    <ClInclude Include="..\src\LlvmGlobals.hpp" />
-    <ClInclude Include="..\..\croaring\roaring.h" />
-    <ClInclude Include="..\..\croaring\roaring.hpp" />
-    <ClInclude Include="..\src\Operation.hpp" />
-    <ClInclude Include="..\src\MemoryGraphAnalysis.hpp" />
-    <ClInclude Include="..\src\OsUtils.hpp" />
-    <ClInclude Include="..\src\precompall.hpp" />
-    <ClInclude Include="..\src\precompllvm.hpp" />
-    <ClInclude Include="..\src\precompother.hpp" />
-    <ClInclude Include="..\src\Smg.hpp" />
-    <ClInclude Include="..\src\SmgCrawler.hpp" />
-    <ClInclude Include="..\src\SmgPrinter.hpp" />
-    <ClInclude Include="..\src\SmgUtils.hh" />
-    <ClInclude Include="..\src\Smg\Edge.hpp" />
-    <ClInclude Include="..\src\Smg\Object.hpp" />
-    <ClInclude Include="..\src\Smg\Graph.hpp" />
-    <ClInclude Include="..\src\Smg\ObjectId.hpp" />
-    <ClInclude Include="..\src\Smg\Smg_fwd.hpp" />
-    <ClInclude Include="..\src\Smg\Wrappers.hpp" />
-    <ClInclude Include="..\src\Smg\Wrappers_fwd.hpp" />
-    <ClInclude Include="..\src\StateStorage.hpp" />
-    <ClInclude Include="..\src\Type.hpp" />
-    <ClInclude Include="..\src\ValueContainerV1.hpp" />
-    <ClInclude Include="..\src\ValueId.hpp" />
-    <ClInclude Include="..\src\Values.hpp" />
-    <ClInclude Include="..\src\ValuesZ3.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\AngieType.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\src\Exceptions.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="..\src\LlvmFrontend.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\src\laboratory.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="..\src\LlvmGlobals.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="..\tests\SmgPrinterUnitTest.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="..\..\croaring\roaring.c">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\src\OsUtils.cpp" />
-    <ClCompile Include="..\src\precompall.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\src\precompllvm.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>precompllvm.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompllvm.pch</PrecompiledHeaderOutputFile>
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\src\precompother.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>precompother.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompother.pch</PrecompiledHeaderOutputFile>
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\src\Smg.cpp">
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="..\src\SmgCrawler.cpp" />
-    <ClCompile Include="..\src\SmgPrinter.cpp" />
-    <ClCompile Include="..\src\Smg\Edge.cpp" />
-    <ClCompile Include="..\src\Smg\Object.cpp" />
-    <ClCompile Include="..\src\Smg\Graph.cpp" />
-    <ClCompile Include="..\src\Smg\ObjectId.cpp" />
-    <ClCompile Include="..\src\Smg\Wrappers.cpp" />
-    <ClCompile Include="..\src\StateStorage.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="..\src\LlvmType.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-      <PrecompiledHeaderFile>precompall.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)precompall.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\src\ValueContainerV1.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="..\src\ValueId.cpp">
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="..\src\ValuesZ3.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <ForcedIncludeFiles>precompall.hpp</ForcedIncludeFiles>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -262,19 +131,12 @@
     <Natvis Include="GSL.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\notes\meetings.md" />
-    <None Include="..\notes\dulezite_poznatky.md" />
-    <None Include="..\notes\todo.md" />
-    <None Include="..\README.md" />
-    <None Include="..\regex_cheat_sheet.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Angie.licenseheader" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Angie\Angie.vcxproj">
+      <Project>{c3de3f41-1f25-4b02-af00-7e9b3e84a58c}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\memgraph\memgraph.vcxproj">
       <Project>{873e2daf-cf7f-4d49-a614-49bbc8c5f83d}</Project>
     </ProjectReference>
