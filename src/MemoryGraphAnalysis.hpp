@@ -88,8 +88,6 @@ public:
   void Store(ValueId where, ValueId what, Type ofType)
   {
     graph.WriteValue(where, what, ofType, GetVc());
-    if (Smg::Abstraction::LookForCandidates(graph, GetVc()))
-      ShowSmg(graph);
   }
 
   ValueId Load(ValueId ptr, Type ptrType, Type tarType)
