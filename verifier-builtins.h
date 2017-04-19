@@ -1,6 +1,6 @@
 #pragma once
 
-#define __VERIFIER_plot(...) __ANGIE_DIAGNOSTIC_PLOT_MEMORY(__VA_ARGS__)
+#define __VERIFIER_plot(...) __ANGIE_DIAGNOSTICS_PLOT_MEMORY(__VA_ARGS__)
 #define __VERIFIER_nondet_int(...) __ANGIE_CREATE_UNKNOWN_INT(__VA_ARGS__)
 #define __VERIFIER_nondet_int(...) __ANGIE_CREATE_UNKNOWN_INT(__VA_ARGS__)
 
@@ -10,7 +10,7 @@ extern "C" {
 
 #if 1
   /* declare built-ins */
-  void __ANGIE_DIAGNOSTIC_PLOT_MEMORY(const char *name, ...);
+  void __ANGIE_DIAGNOSTICS_PLOT_MEMORY(const char *name, ...);
   char __ANGIE_CREATE_UNKNOWN_CHAR   (void);
   int  __ANGIE_CREATE_UNKNOWN_INT    (void);
 #else

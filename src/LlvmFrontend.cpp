@@ -283,7 +283,7 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
       if (func->getName().startswith("__ANGIE"))
       { // Those are analysis-independnent angie intrinsic functions, no need to guard them
         if (false) {}
-        else if (func->getName() == "__ANGIE_DIAGNOSTIC_PLOT_MEMORY")
+        else if (func->getName() == "__ANGIE_DIAGNOSTICS_PLOT_MEMORY")
         {
           op = &opFactory.DiagnosticsPlotMem(); // In SMGS plots the memory graph
           break;
