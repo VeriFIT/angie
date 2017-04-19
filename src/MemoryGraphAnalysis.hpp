@@ -514,6 +514,8 @@ private:
   IOperation* plot     = new MemGraphOpPlotMem();
   IOperation* unkn     = new BasicOperationCreateUnknown();
 
+  IOperation* abort    = new BasicOperationAbort();
+
 public:
   // Inherited via IOperationFactory
   virtual IOperation & Ret() override { return *ret; }
@@ -531,6 +533,9 @@ public:
   virtual IOperation & GetElementPtr() override { return *gep; }
 
   virtual IOperation & Cmp() override { return *cmp; }
+
+  virtual IOperation& Abort() override { return *abort; }
+  virtual IOperation& Exit() override { return *abort; }
 
   virtual IOperation& Memset() override { return *memset; }
   virtual IOperation& Memcpy() override { return *nsop; }

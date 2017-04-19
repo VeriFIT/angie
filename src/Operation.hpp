@@ -183,6 +183,13 @@ class BasicOperationNoop : public BasicOperation<IState, OperationArgs> {
   }
 };
 
+class BasicOperationAbort : public BasicOperation<IState, OperationArgs> {
+  virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args) override final
+  {
+    throw AnalysisErrorException("abort or exit called");
+  }
+};
+
 class BasicOperationCreateUnknown : public BasicOperation<IState, OperationArgs> {
   virtual void ExecuteOnNewState(IState& newState, const OperationArgs& args) override final
   {

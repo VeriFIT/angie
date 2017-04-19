@@ -318,7 +318,18 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
       }
       else
       { //TODO@mikchot: guard this code to happen only if advanced-memory-operations generation are ON
-        if (func->getName() == "malloc")
+        if (false) {}
+        else if (func->getName() == "abort")
+        {
+          op = &opFactory.Abort();
+          break;
+        }
+        else if (func->getName() == "exit")
+        {
+          op = &opFactory.Exit();
+          break;
+        }
+        else if (func->getName() == "malloc")
         {
           op = &opFactory.Malloc();
           break;
