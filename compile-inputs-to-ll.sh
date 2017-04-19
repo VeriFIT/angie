@@ -11,7 +11,7 @@ cd $SCRIPTPATH
 : ${CLANGXX:=clang++}
 
 # for predator testcasses
-export CPATH=$SCRIPTPATH/examples
+export CPATH=$SCRIPTPATH
 
 # $CLANGXX -S -g -emit-llvm input1.cpp -o - | $COPT -lowerswitch -S -o input1.ll
 # $CLANGXX -S -g -emit-llvm input2.cpp -o - | $COPT -lowerswitch -S -o input2.ll
