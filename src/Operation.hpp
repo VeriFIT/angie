@@ -31,15 +31,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "FrontedValueMapper.hpp"
 #include "debugbreak.h"
 
-//TODO: find a better place for this (Common/MemoryAnalysis ?)
-enum class MemorySpace : int8_t {
-  Heap,
-  Stack,
-  Static,
-  ThreadLocal,
-  Invalid
-};
-
 //TODO: maybe remove use of IState& state from templated helpers, we can access that via successor
 //TODO: maybe replace dynamic_cast with static_cast ?
 //TODO: comment about executing last instruction -> it is OK now, TerminalNode implements no-op Execute()

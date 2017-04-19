@@ -175,7 +175,7 @@ public:
 
 class OperationArgs {
 protected:
-  std::vector<OperArg> args;
+  std::vector<OperArg> args{};
   using size_type = decltype(args)::size_type;
 public:
   /*ctr*/ OperationArgs() = default;
@@ -215,4 +215,13 @@ public:
 class CallOpArgs : public OperationArgs {
 public:
   const FrontendIdTypePair& GetOptions() const { return args[1].idTypePair; }
+};
+
+//TODO: find a better place for this (Common/MemoryAnalysis ?)
+enum class MemorySpace : int8_t {
+  Heap,
+  Stack,
+  Static,
+  ThreadLocal,
+  Invalid
 };
