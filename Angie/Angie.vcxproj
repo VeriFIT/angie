@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugClang|x64">
@@ -11,6 +11,10 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Library|x64">
+      <Configuration>Library</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
@@ -27,6 +31,12 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Library|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -71,6 +81,9 @@
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Library'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='DebugClang'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(INCLUDE_PATH)\clang-c2;$(INCLUDE_PATH);$(IncludePath)</IncludePath>
@@ -96,6 +109,16 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>TYPE_KIND=0;_SCL_SECURE_NO_WARNINGS;_MBCS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Library|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -198,6 +221,7 @@
     </ClCompile>
     <ClCompile Include="..\src\console.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\src\Exceptions.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
@@ -223,6 +247,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles Condition="'$(Configuration)'!='DebugClang'">precompall.hpp</ForcedIncludeFiles>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\croaring\roaring.c">
       <ExcludedFromBuild Condition="'$(Configuration)'=='DebugNoLlvm'">true</ExcludedFromBuild>
