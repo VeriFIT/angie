@@ -29,6 +29,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "IState.hpp"
 #include "StateStorage.hpp"
 #include "FrontedValueMapper.hpp"
+#include "debugbreak.h"
 
 //TODO: find a better place for this (Common/MemoryAnalysis ?)
 enum class MemorySpace : int8_t {
@@ -56,6 +57,8 @@ public:
     try
     {
       state.SetExplored();
+      if (state.GetNode().HasBreakpoint())
+        debug_break();
       ExecuteOnNewState(static_cast<StateT&>(*successor), static_cast<const OperArgsT&>(args));
       state.GetNode().GetStatesManager().InsertAndEnqueue(std::move(successor));
     }
@@ -76,6 +79,8 @@ public:
     try
     {
       state.SetExplored();
+      if (state.GetNode().HasBreakpoint())
+        debug_break();
       ExecuteOnNewState(static_cast<StateT&>(*successor), static_cast<const OperArgsT&>(args), br);
       state.GetNode().GetStatesManager().InsertAndEnqueue(std::move(successor));
     }

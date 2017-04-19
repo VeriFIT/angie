@@ -32,6 +32,7 @@ class SpecialCfgNode : public ICfgNode {
 public:
   virtual ICfgNode& GetNextTrue() const override { throw NotSupportedException{}; }
   virtual ICfgNode& GetNextFalse() const override { throw NotSupportedException{}; }
+  virtual bool      HasBreakpoint() const override { return false; }
   virtual StatesManager& GetStatesManager() override { throw NotSupportedException{}; }
 
 protected:

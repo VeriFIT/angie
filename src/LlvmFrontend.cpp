@@ -46,14 +46,17 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 class LlvmCfgNode : public CfgNode {
 private:
   const llvm::Instruction& innerInstruction;
+  const bool hasBreakpoint;
   ////const OperationArgs
 
   /*ctr*/ LlvmCfgNode(IOperation& op, OperationArgs args,
     const llvm::Instruction& inner,
+    bool bp,
     ICfgNode& prev,
     ICfgNode& next
   ) :
     innerInstruction{inner},
+    hasBreakpoint{bp},
     CfgNode(op, args, prev, next) {
   }
 
@@ -62,6 +65,7 @@ public:
   virtual void PrintInstruction() const override { innerInstruction.print(llvm::outs()); llvm::outs() << "\n"; llvm::outs().flush();  }
   virtual void PrintLocation() const override { innerInstruction.getDebugLoc().print(llvm::outs()); llvm::outs() << "\n"; llvm::outs().flush(); }
   virtual void GetDebugInfo() const override { innerInstruction.print(llvm::errs()); llvm::errs() << "\n"; llvm::errs().flush(); }
+  virtual bool HasBreakpoint() const override { return hasBreakpoint; }
 
   static LlvmCfgNode& CreateEmpty()
   {
@@ -72,27 +76,27 @@ public:
     return *(LlvmCfgNode*)first;
   }
 
-  static LlvmCfgNode& CreateNode(IOperation& op, OperationArgs args, const llvm::Instruction& inner)
-  {
-    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, *new StartCfgNode{}, *new TerminalCfgNode{}};
-    ((ICfgNode&)newNode->prevs[0]).next = newNode;
-    newNode->next->prevs.push_back(*newNode);
-    return *newNode;
-  }
+  ////static LlvmCfgNode& CreateNode(IOperation& op, OperationArgs args, const llvm::Instruction& inner, bool bp)
+  ////{
+  ////  LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, bp, *new StartCfgNode{}, *new TerminalCfgNode{}};
+  ////  ((ICfgNode&)newNode->prevs[0]).next = newNode;
+  ////  newNode->next->prevs.push_back(*newNode);
+  ////  return *newNode;
+  ////}
 
   //beware - adding a node after terminal node here(after improper cast) would not raise exception
   //same applies for similar linking manipulation
 
-  LlvmCfgNode& InsertNewAfter(IOperation& op, OperationArgs args, const llvm::Instruction& inner)
+  LlvmCfgNode& InsertNewAfter(IOperation& op, OperationArgs args, const llvm::Instruction& inner, bool bp)
   {
-    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, *this, *this->next};
+    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, bp, *this, *this->next};
     this->next = newNode;
     return *newNode;
   }
 
-  LlvmCfgNode& InsertNewBranchAfter(IOperation& op, OperationArgs args, const llvm::Instruction& inner)
+  LlvmCfgNode& InsertNewBranchAfter(IOperation& op, OperationArgs args, const llvm::Instruction& inner, bool bp)
   {
-    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, *this, *this->next};
+    LlvmCfgNode* newNode = new LlvmCfgNode{op, args, inner, bp, *this, *this->next};
     newNode->nextFalse = new TerminalCfgNode{};
     this->next = newNode;
     return *newNode;
@@ -140,6 +144,7 @@ Type LlvmCfgParser::GetValueType(llvm::Type* type)
   return Type{type};
 }
 
+//TODO: rename to GetId, GetFrontendId, ToId or ToFrontendId... i am in favor of ToId
 FrontendValueId LlvmCfgParser::GetValueId(uint64_t id)
 {
   return FrontendValueId{id};
@@ -699,7 +704,8 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
   {
     auto& op = GetOperationFor(*instrPtr);
     auto args = GetOperArgsForInstr(*instrPtr);
-    currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr);
+    bool bp = (instrPtr->getMetadata("angie.debugbreak") != nullptr);
+    currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr, bp);
     instrPtr = instrPtr->getNextNode();
   }
   //last BB instruction
@@ -711,6 +717,8 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
     auto& op = GetOperationFor(*instrPtr);
     // and op's arguments
     auto args = GetOperArgsForInstr(*instrPtr);
+
+    bool bp = (instrPtr->getMetadata("angie.debugbreak") != nullptr);
 
     switch (instrPtr->getOpcode())
     {
@@ -730,7 +738,7 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
       else //if (branchInstrPtr->isConditional())
       {
         // Conditional branch - has two successors for true and false branches
-        currentNode = &currentNode->InsertNewBranchAfter(op, args, *instrPtr);
+        currentNode = &currentNode->InsertNewBranchAfter(op, args, *instrPtr, bp);
         LinkWithOrPlanProcessing(currentNode, branchInstrPtr->getSuccessor(0), 0);
         LinkWithOrPlanProcessing(currentNode, branchInstrPtr->getSuccessor(1), 1);
       }
@@ -739,7 +747,7 @@ LlvmCfgNode& LlvmCfgParser::ParseBasicBlock(const llvm::BasicBlock* entryBlock)
     case llvm::Instruction::Ret:
     {
       // Create node for RET instruction, do not link with anything
-      currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr);
+      currentNode = &currentNode->InsertNewAfter(op, args, *instrPtr, bp);
     }
     break;
     default:
@@ -844,7 +852,7 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
     fmap.RegisterFunction(vid, std::move(handle));
   }
 
-  mainCfg = &fmap.GetFunction(mapper.GetValueId(ToIdTypePair(mainFunc).id)).cfg;
+  mainCfg = &fmap.GetFunction(mapper.GetValueId(GetValueId(mainFunc))).cfg;
 
   // -----------
 
@@ -920,8 +928,18 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
   // -----------
   
   auto mainCall   = llvm::CallInst::Create(mainFunc, callArgs, "", entryBlock);
-  entryPointCfg = &LlvmCfgNode::CreateNode(opFactory.Call(), opArgs, *mainCall);
+  auto finCall    = llvm::CallInst::Create(finFunc,            "", entryBlock);
 
+  // -----------
+
+  auto voidOpArgs = OperationArgs{};
+  voidOpArgs.GetArgs().push_back(GetEmptyOperArg());
+
+  auto currtNode  = &LlvmCfgNode::CreateEmpty();
+  currtNode  = &currtNode->InsertNewAfter(opFactory.Call(),      opArgs,     *mainCall, false);
+  entryPointCfg = currtNode;
+  currtNode  = &currtNode->InsertNewAfter(opFactory.Terminate(), voidOpArgs, *finCall,  false);
+ 
   // -----------
 
   while (!parseAndLinkTogether.empty())

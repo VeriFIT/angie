@@ -47,6 +47,7 @@ public:
   virtual void PrintInstruction() const = 0;
   virtual void PrintLocation() const = 0;
   virtual void GetDebugInfo() const = 0; //TODO@review: maybe find a better name for this method?
+  virtual bool HasBreakpoint() const = 0;
   virtual OperationArgs GetArguments() const = 0;
 
   virtual void Execute(IState& s, const OperationArgs& args) override = 0;
