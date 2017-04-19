@@ -82,7 +82,7 @@ public:
 
   void Plot()
   {
-    ShowSmg(graph);
+    PrintDot(graph);
   }
 
   void Store(ValueId where, ValueId what, Type ofType)

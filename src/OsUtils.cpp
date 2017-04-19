@@ -11,7 +11,8 @@ namespace OsUtils {
 
 std::string GetEnv(boost::string_view str)
 {
-  return{std::getenv(str.data())};
+  auto envVal = std::getenv(str.data());
+  return envVal ? std::string{envVal} : std::string{};
 }
 
 void Exec(boost::string_view str)
@@ -24,9 +25,9 @@ void ExecNoWait(boost::string_view str)
 
 #ifdef _WIN32
   std::system(("start /b cmd /c \"" + str.to_string() + "\"").data());
-#else
-  std::runtime_error("ExecNoWait is only supported on Windows");
-#endif // _WIN32
+#else // _WIN32
+  std::system((str.to_string() + " &").data());
+#endif // ! _WIN32
 }
 
 void PasteToClipboard(boost::string_view str)
