@@ -24,12 +24,6 @@
 //#include <gsl/gsl>
 #include <range/v3/all.hpp>
 
-class InvalidDereferenceException_smg : public std::logic_error {
-public:
-  InvalidDereferenceException_smg() : std::logic_error("") {}
-  InvalidDereferenceException_smg(const char* s) : std::logic_error(s) {}
-};
-
 namespace Smg {
 namespace Impl {
 
@@ -44,12 +38,15 @@ public:
 
   Graph(IValueContainer& vc)
   {
-    ObjectId nullId{0};
+    ObjectId nullId{+0};
     ObjectId unknId{-1};
+    ObjectId freeId{-2};
     auto& nullObj    = objects.emplace(nullId, Region::Create(nullId)).first.operator*().second.operator*();
     auto& unknownObj = objects.emplace(unknId, Region::Create(unknId)).first.operator*().second.operator*();
+    auto& freedObj   = objects.emplace(freeId, Region::Create(freeId)).first.operator*().second.operator*();
     nullObj.size    = {};
     unknownObj.size = {};
+    freedObj.size   = {};
     handles.CreatePtEdge(PtEdge{{}, {}, PTR_TYPE, ObjectId{0}, {}});
   }
   Graph(const Graph& g) :
@@ -187,9 +184,12 @@ public:
 
     auto  objectId = ptrEdge.targetObjectId;
     // for efficiency reasons, we could move/copy the null check to the start and check ptr == {0}
-    if (objectId == ObjectId{0} || objectId == ObjectId{-1})
+    //TODO: duplicate code (read, write) + move/copy this semantics to Object.isValid
+    if (objectId == ObjectId{0} || objectId == ObjectId{-1} || objectId == ObjectId{-2})
     {
-      throw InvalidDereferenceException_smg();
+      objectId == ObjectId{0} ? 
+        throw NulldDereferenceException{} : 
+        throw InvalidDereferenceException{};
     }
 
     auto& object   = *objects.at(objectId);
@@ -280,9 +280,12 @@ public:
     
     auto  objectId = ptrEdge.targetObjectId;
     // for efficiency reasons, we could move/copy the null check to the start and check ptr == {0}
-    if (objectId == ObjectId{0} || objectId == ObjectId{-1})
+    //TODO: duplicate code (read, write) + move/copy this semantics to Object.isValid
+    if (objectId == ObjectId{0} || objectId == ObjectId{-1} || objectId == ObjectId{-2})
     {
-      throw InvalidDereferenceException_smg();
+      objectId == ObjectId{0} ? 
+        throw NulldDereferenceException{} : 
+        throw InvalidDereferenceException{};
     }
 
     auto& object   = *objects.at(objectId);
@@ -326,6 +329,7 @@ public:
 
   }
 
+  // return rng<std::pair<Impl::Object&, Impl::PtEdge&>>
   auto FindPtInEdges(ObjectId id)
   {
     using namespace ranges::view;
@@ -344,18 +348,34 @@ public:
   void Free(ValueId ptr)
   {
     auto& graph = *this;
+
     auto& ptrEdge = FindPtEdge(ptr);
+    auto  objectId = ptrEdge.targetObjectId;
+    // for efficiency reasons, we could move/copy the null check to the start and check ptr == {0}
+    if (objectId == ObjectId{0})
+    {
+      std::cout << "Free on null object" << std::endl;
+      return;
+    }
+    else if (objectId == ObjectId{-1})
+    {
+      throw InvalidFreeException{};
+    }
+    else if (objectId == ObjectId{-2})
+    {
+      throw DoubleFreeException{};
+    }
 
     //TODO: materialize as region, edge gets updates to point to materialized object now
 
     // Set regions state to invalid
-    Region& object = static_cast<Region&>(*graph.objects[ptrEdge.targetObjectId]);
+    Region& object = static_cast<Region&>(*graph.objects[objectId]);
 
     // Remove references from other objects, set them to invalid [freed] memory
     using ret_t = std::pair<Impl::Object&, Impl::PtEdge&>;
     RANGES_FOR(ret_t pair, graph.FindPtInEdges(object.GetId()))
     {
-      pair.second.targetObjectId = ObjectId{-1};
+      pair.second.targetObjectId = ObjectId{-2};
     }
 
     // Delete the object
