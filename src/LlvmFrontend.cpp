@@ -40,6 +40,20 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/utility/string_view.hpp>
 
+LlvmCfgParser::LlvmCfgParser(
+  IOperationFactory& opFactory,
+  IValueContainer& vc, 
+  Mapper& mapper, 
+  FuncMapper& fmap
+  ) 
+  : 
+  opFactory{opFactory}, 
+  vc{vc}, 
+  mapper{mapper},
+  fmap{fmap}
+{}
+LlvmCfgParser::~LlvmCfgParser() = default;
+
 ////std::string dbgstr;
 ////llvm::raw_string_ostream dbgstr_rso(dbgstr);
 
@@ -825,6 +839,7 @@ void LlvmCfgParser::DealWithConstants()
     }
     else if (auto constExpr = llvm::dyn_cast<llvm::ConstantExpr>(x))
     {
+      // this instruction is freely floating and needs to by destroyed! 
       llvm::Instruction* asInstr = deconst_cast(*constExpr).getAsInstruction();
       if (false) {}
       else if (llvm::isa<llvm::CastInst>(asInstr) && asInstr->getNumOperands() == 1)
@@ -847,6 +862,7 @@ void LlvmCfgParser::DealWithConstants()
       }
       else
         throw NotImplementedException();
+      delete asInstr;
     }
     else if (auto constFunc = llvm::dyn_cast<llvm::Function>(x))
     {
@@ -1008,7 +1024,6 @@ uptr<llvm::Module> LlvmCfgParser::OpenIrFile(std::string fileName)
   return module;
 }
 
-uptr<llvm::Module> moduleHandle;
 void LlvmCfgParser::ParseAndOpenIrFile(boost::string_view fileName)
 {
   moduleHandle = OpenIrFile(fileName.to_string());

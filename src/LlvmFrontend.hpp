@@ -57,14 +57,16 @@ class LlvmCfgParser {
   ICfgNode* entryPointCfg = nullptr;
   ICfgNode* mainCfg = nullptr;
 
-public:
-  LlvmCfgParser(IOperationFactory& opFactory, IValueContainer& vc, Mapper& mapper, FuncMapper& fmap) : opFactory{opFactory}, vc{vc}, mapper{mapper}, fmap{fmap} {}
+  uptr<llvm::Module> moduleHandle;
+  //non null!!
+  std::vector<const llvm::Constant*> constantValuesToBeCreated;
 
+public:
+  LlvmCfgParser(IOperationFactory& opFactory, IValueContainer& vc, Mapper& mapper, FuncMapper& fmap);
+  ~LlvmCfgParser();
 private:
   IOperation& GetOperationFor(const llvm::Instruction& instruction) const;
 
-  //non null!!
-  std::vector<const llvm::Constant*> constantValuesToBeCreated;
   void constantValuesToBeCreatedInsert(const llvm::Constant* c);
 
   static Type GetValueType(llvm::Type* type);

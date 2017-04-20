@@ -15,25 +15,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\tests\SmgPrinterUnitTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Angie.licenseheader" />
-    <None Include="..\notes\dulezite_poznatky.md" />
-    <None Include="..\notes\todo.md" />
-    <None Include="..\notes\meetings.md" />
-    <None Include="..\README.md" />
-    <None Include="..\regex_cheat_sheet.md" />
+    <Natvis Include="..\Angie\GSL.natvis" />
+    <Natvis Include="..\Angie\llvm.natvis" />
+    <Natvis Include="..\Angie\custom.natvis" />
+    <Natvis Include="..\Angie\clang.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="llvm.natvis" />
-    <Natvis Include="clang.natvis" />
-    <Natvis Include="custom.natvis" />
-    <Natvis Include="GSL.natvis" />
+    <None Include="..\Angie\Angie.licenseheader" />
   </ItemGroup>
 </Project>

@@ -55,8 +55,8 @@ using ValContT = Z3ValueContainer;
 using ValContT = ValueContainer;
 #endif
 
-//#include "ForwardNullAnalysis.hpp"
-//#include "MemoryGraphAnalysis.hpp"
+#include "ForwardNullAnalysis.hpp"
+#include "MemoryGraphAnalysis.hpp"
 
 // queue of states waiting for processing
 ref_queue<IState> toProcess{};
@@ -130,7 +130,7 @@ void main_old(gsl::span<std::string> files)
   for (auto& file : files)
   {
     //Verify<FnaOperationFactory, ForwardNullAnalysisState>(file);
-    //Verify<MemGraphOpFactory, MemoryGraphAnalysisState>(file);
+    Verify<MemGraphOpFactory, MemoryGraphAnalysisState>(file);
   }
 
   //vc.PrintDebug();
