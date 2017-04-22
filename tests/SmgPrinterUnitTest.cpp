@@ -11,38 +11,20 @@
 
 
 
+
 #pragma comment(lib, "gtest.lib")
 
-
-
-TEST(SMGTest, Graph1)
-{
-  ValueContainer vc{};
-
-  Smg::Impl::Graph ig{vc};
-  Smg::Graph        g{ig};
-  
-  {
-    using namespace ::Smg::Impl;
-    auto& objs = ig.objects;
-    auto& hndl = ig.handles;
     
-    Type int8 = Type::CreateIntegerType(8);
-    Type int16 = Type::CreateIntegerType(16);
-    Type int32 = Type::CreateIntegerType(32);
-    Type int64 = Type::CreateIntegerType(64);
-    Type int32Ptr = Type::CreatePointerTo(int32);
-    Type voidT = Type::CreateVoidType();
-
-    Smg::ObjectId o1{1};
-    Smg::ObjectId o2{2};
-    Smg::ObjectId o3{3};
-    Smg::ObjectId o4{4};
-    Smg::ObjectId o5{5};
+Smg::ObjectId o0{0};
+    Smg::ObjectId o1{12};
+    Smg::ObjectId o2{25};
+    Smg::ObjectId o3{21};
+    Smg::ObjectId o4{51};
+    Smg::ObjectId o5{35};
     auto oids
       = {o1,o2,o3,o4,o5};
 
-    ValueId  v0{20};
+    ValueId  v0{0};
     ValueId  v1{1};
     ValueId  v2{2};
     ValueId  v3{3};
@@ -67,9 +49,32 @@ TEST(SMGTest, Graph1)
     std::vector<ValueId> vPtrs
       = {vPtr1,vPtr2,vPtr3,vPtr4,vPtr5,vPtr6,vPtr7,vPtr8};
 
+
+
+TEST(SMGTest, Graph1)
+{
+  Type int8 = Type::CreateIntegerType(8);
+  Type int16 = Type::CreateIntegerType(16);
+  Type int32 = Type::CreateIntegerType(32);
+  Type int64 = Type::CreateIntegerType(64);
+  Type int32Ptr = Type::CreatePointerTo(int32);
+  Type voidT = Type::CreateVoidType();
+
+  ValueContainer vc{};
+
+  Smg::Impl::Graph ig{vc};
+  Smg::Graph        g{ig};
+  
+  {
+    using namespace ::Smg::Impl;
+    auto& objs = ig.objects;
+    auto& hndl = ig.handles;
+    
+    
+
     int i = 0;
 
-    EXPECT_EQ(objs.size(), 1);
+    EXPECT_EQ(objs.size(), 3);
 
     for (auto oid : oids)
     {
@@ -82,14 +87,14 @@ TEST(SMGTest, Graph1)
 
 
       obj.id = oid;
-      PtEdge e = PtEdge{vals[i], vPtrs[i], voidT, oid, vals[i]};
+      PtEdge e = PtEdge{vals[i], vPtrs[i], PTR_TYPE, oid, vals[i]};
       hndl.CreatePtEdge(e);
 
      
 
       auto edge = hndl.FindPtEdgeByOffset(vals[i]);
       EXPECT_NE(edge, nullptr);
-      EXPECT_EQ(edge->valueType, voidT);
+      EXPECT_EQ(edge->valueType, PTR_TYPE);
       EXPECT_EQ(edge->value, vPtrs[i]);
       EXPECT_EQ(edge->sourceOffset, vals[i]);
       EXPECT_EQ(edge->targetOffset, vals[i]);
@@ -120,11 +125,47 @@ TEST(SMGTest, Graph1)
     objs[o2]->size = v4;
     objs[o2]->CreateHvEdge(v0, v5, int32);
 
-    objs[o1]->CreatePtEdge(PtEdge{v8, vPtr1, int32Ptr, o2, v0});
+    objs[o1]->CreatePtEdge(PtEdge{v8, vPtr1, PTR_TYPE, o2, v0});
 
   }
 
 }
+
+    using namespace Smg::Impl;
+TEST(SMGTest, Graph2)
+{
+  Type int8 = Type::CreateIntegerType(8);
+  Type int16 = Type::CreateIntegerType(16);
+  Type int32 = Type::CreateIntegerType(32);
+  Type int64 = Type::CreateIntegerType(64);
+  Type int32Ptr = Type::CreatePointerTo(int32);
+  Type voidT = Type::CreateVoidType();
+
+
+  ValueContainer vc{};
+  Smg::Impl::Graph g{vc};
+
+  auto& objs = g.objects;
+  auto& hndl = g.handles;
+
+  g.handles.CreatePtEdge(PtEdge{v0, vPtr1, PTR_TYPE, o2, v0});
+  Object& obj =  objs.emplace(o2, std::make_unique<Region>()).first.operator*().second.operator*();
+  obj.CreateHvEdge(HvEdge{v8, v16, int64});
+  obj.CreatePtEdge(PtEdge{v0, vPtr6, PTR_TYPE, o5, v0});
+  obj =  objs.emplace(o5, std::make_unique<Region>()).first.operator*().second.operator*();
+  obj.CreatePtEdge(PtEdge{v4, vPtr2, PTR_TYPE, o4, v4});
+  obj =  objs.emplace(o4, std::make_unique<Region>()).first.operator*().second.operator*();
+  obj.CreatePtEdge(PtEdge{v0, vPtr3, PTR_TYPE, o0, v0});
+
+  /*SmgPrinter printer{};
+  SmgCrawler crawler{printer};
+
+  crawler.CrawlSmg(Smg::Object{g.handles,g});
+  std::string dot = printer.GetDot();*/
+
+}
+
+
 
 
 

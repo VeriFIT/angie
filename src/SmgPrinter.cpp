@@ -78,8 +78,21 @@ void SmgPrinter::Visit(Object o)
 }
 void SmgPrinter::Visit(Region r)
 {
+  //draw special type of region
+  if (r.GetId() == Smg::ObjectId{0})
+  {
+    graph->addNode("\"" + to_string(r.GetId()) + "\"")
+      ->setAttr("label", "NULL")
+      ->setAttr("fontcolor", "blue")
+      ->setAttr("bgcolor", "white")
+      ->setAttr("color", "white");
+    return;
+  }
+  
+
+
   memgraph::Subgraph *s;
-  s = graph->addSubgraph("R" + to_string(r.GetId()));
+  s = graph->addSubgraph("clusterR" + to_string(r.GetId()));
   s //->setAttr("rank", "same")
     ->setAttr("label", "")
     ->setAttr("color", "black")
@@ -87,38 +100,38 @@ void SmgPrinter::Visit(Region r)
     ->setAttr("bgcolor", "white")
     ->setAttr("penwidth", 1.0)
     ->setAttr("style", "dashed");
-  s->addNode(to_string(r.GetId()))
+  s->addNode("\"" + to_string(r.GetId()) + "\"")
     ->setAttr("shape", "box")
     ->setAttr("color", "black")
     ->setAttr("fontcolor", "black")
-    ->setAttr("label", "R#" + to_string(r.GetId()) + "\n[sz=" + to_string(r.GetSize()) + "B,va=" + to_string(r.IsValid()) + "]");
+    ->setAttr("label", "R#" + to_string(r.GetId()) + "[sz=" + to_string(r.GetSize()) + "B,va=" + to_string(r.IsValid()) + "]");
 
   for (HvEdge edge : r.GetHvOutEdges())
   {
-    s->addNode("R" + to_string(r.GetId()) + to_string(edge.GetValue()))
+    s->addNode("\"R" + to_string(r.GetId()) + to_string(edge.GetValue()) + "\"")
       ->setAttr("shape", "box")
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "black")
       ->setAttr("label", "F#" + to_string(edge.GetValue()));
-    s->addEdge(to_string(r.GetId()), std::string("R") + to_string(r.GetId()) + to_string(edge.GetValue()))
+    s->addEdge("\"" + to_string(r.GetId()) + "\"", std::string("\"R") + to_string(r.GetId()) + to_string(edge.GetValue()) + "\"")
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "blue")
-      ->setAttr("label", to_string(edge.GetSourceOffset()));
+      ->setAttr("label", (edge.GetSourceOffset() != ValueId(0)) ? to_string(edge.GetSourceOffset()) : "");
   }
 
   for (PtEdge edge : r.GetPtOutEdges())
   {
-    s->addNode("R" + to_string(r.GetId()) + to_string(edge.GetValue()))
+    s->addNode("\"R" + to_string(r.GetId()) + to_string(edge.GetValue()) + "\"")
       ->setAttr("shape", "box")
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "black")
       ->setAttr("label", "F#" + to_string(edge.GetValue()));
-    s->addEdge(to_string(r.GetId()), "R" + to_string(r.GetId()) + to_string(edge.GetValue()))
+    s->addEdge(std::string("\"") + to_string(r.GetId()) + "\"", "\"R" + to_string(r.GetId()) + to_string(edge.GetValue()) + "\"")
       ->setAttr("color", "black")
-      ->setAttr("label", to_string(edge.GetSourceOffset()));
-    s->addEdge("R" + to_string(r.GetId()) + to_string(edge.GetValue()), to_string(edge.GetTargetObject().GetId()))
+      ->setAttr("label", (edge.GetSourceOffset() != ValueId(0)) ? to_string(edge.GetSourceOffset()) : "");
+    s->addEdge("\"R" + to_string(r.GetId()) + to_string(edge.GetValue()) + "\"", std::string("\"") + to_string(edge.GetTargetObject().GetId()) + "\"")
       ->setAttr("color", "blue")
-      ->setAttr("label", to_string(edge.GetTargetOffset()));
+      ->setAttr("label", (edge.GetTargetOffset() != ValueId(0)) ? to_string(edge.GetTargetOffset()) : "");
   }
 }
 void SmgPrinter::Visit(Dls s)
@@ -128,7 +141,7 @@ void SmgPrinter::Visit(Dls s)
 void SmgPrinter::Visit(Sls s)
 {
   memgraph::Subgraph *sub;
-  sub = graph->addSubgraph("SLS" + to_string(s.GetId()));
+  sub = graph->addSubgraph("clusterSLS" + to_string(s.GetId()));
   sub->setAttr("rank", "same")
     ->setAttr("label", "SLS " + to_string(s.GetRank()))
     ->setAttr("color", "red")
@@ -136,7 +149,7 @@ void SmgPrinter::Visit(Sls s)
     ->setAttr("bgcolor", "white")
     ->setAttr("penwidth", 3.0)
     ->setAttr("style", "dashed");
-  sub->addNode(to_string(s.GetId()))
+  sub->addNode(std::string("\"") + to_string(s.GetId()) + "\"")
     ->setAttr("shape", "box")
     ->setAttr("color", "orange")
     ->setAttr("fontcolor", "orange")
@@ -144,32 +157,32 @@ void SmgPrinter::Visit(Sls s)
 
   for (HvEdge edge : s.GetHvOutEdges())
   {
-    sub->addNode("S" + to_string(s.GetId()) + to_string(edge.GetValue()))
+    sub->addNode("\"S" + to_string(s.GetId()) + to_string(edge.GetValue()) + "\"")
       ->setAttr("shape", "box")
       ->setAttr("color", "red")
       ->setAttr("fontcolor", "red")
       ->setAttr("style", "dashed")
       ->setAttr("label", "F#" + to_string(edge.GetValue()));
-    sub->addEdge(to_string(s.GetId()), "S" + to_string(s.GetId()) + to_string(edge.GetValue()))
+    sub->addEdge(std::string("\"") + to_string(s.GetId()), "S" + to_string(s.GetId()) + to_string(edge.GetValue()) + "\"")
       ->setAttr("color", "black")
       ->setAttr("fontcolor", "black")
-      ->setAttr("label", to_string(edge.GetSourceOffset()));
+      ->setAttr("label", (edge.GetSourceOffset() != ValueId(0)) ? to_string(edge.GetSourceOffset()) : "");
   }
 
   for (PtEdge edge : s.GetPtOutEdges())
   {
-    sub->addNode("S" + to_string(s.GetId()) + to_string(edge.GetValue()))
+    sub->addNode("\"S" + to_string(s.GetId()) + to_string(edge.GetValue()) + "\"")
       ->setAttr("shape", "box")
       ->setAttr("color", "red")
       ->setAttr("fontcolor", "red")
       ->setAttr("style", "dashed")
       ->setAttr("label", "F#" + to_string(edge.GetValue()));
-    sub->addEdge(to_string(s.GetId()), "S" + to_string(s.GetId()) + to_string(edge.GetValue()))
+    sub->addEdge(std::string("\"") + to_string(s.GetId()) + "\"", "\"S" + to_string(s.GetId()) + to_string(edge.GetValue()) + "\"")
       ->setAttr("color", "black")
-      ->setAttr("label", to_string(edge.GetSourceOffset()));
+      ->setAttr("label", (edge.GetSourceOffset() != ValueId(0)) ? to_string(edge.GetSourceOffset()) : "");
     sub->addEdge("S" + to_string(s.GetId()) + to_string(edge.GetValue()), to_string(edge.GetTargetObject().GetId()))
       ->setAttr("color", "blue")
-      ->setAttr("label", to_string(edge.GetTargetOffset()));
+      ->setAttr("label", (edge.GetTargetOffset() != ValueId(0)) ? to_string(edge.GetTargetOffset()) : "");
   }
 
 }
