@@ -9,7 +9,8 @@
 #include "../src/SmgPrinter.hpp"
 #include "../src/SmgCrawler.hpp"
 
-
+#include "../src/OsUtils.hpp"
+#include "../src/SmgUtils.hpp"
 
 
 #pragma comment(lib, "gtest.lib")
@@ -66,7 +67,7 @@ TEST(SMGTest, Graph1)
   Smg::Graph        g{ig};
   
   {
-    using namespace ::Smg::Impl;
+    using namespace ::Smg;
     auto& objs = ig.objects;
     auto& hndl = ig.handles;
     
@@ -78,16 +79,16 @@ TEST(SMGTest, Graph1)
 
     for (auto oid : oids)
     {
-      Object& obj =
+      Impl::Object& obj =
         objs
-        .emplace(oid, std::make_unique<Region>())
+        .emplace(oid, std::make_unique<Impl::Region>())
         .first.operator*().second.operator*();
 
       EXPECT_NE(objs.find(oid), objs.end());
 
 
       obj.id = oid;
-      PtEdge e = PtEdge{vals[i], vPtrs[i], PTR_TYPE, oid, vals[i]};
+      Impl::PtEdge e = Impl::PtEdge{vals[i], vPtrs[i], PTR_TYPE, oid, vals[i]};
       hndl.CreatePtEdge(e);
 
      
@@ -118,22 +119,23 @@ TEST(SMGTest, Graph1)
     objs[o1]->size = v16;
     EXPECT_EQ(objs[o1]->GetSize(), v16);
 
-    objs[o1]->CreateHvEdge(HvEdge{v0, v1, int16});
-    objs[o1]->CreateHvEdge(HvEdge{v2, v2, int16});
-    objs[o1]->CreateHvEdge(HvEdge{v4, v3, int16});
+    objs[o1]->CreateHvEdge(Impl::HvEdge{v0, v1, int16});
+    objs[o1]->CreateHvEdge(Impl::HvEdge{v2, v2, int16});
+    objs[o1]->CreateHvEdge(Impl::HvEdge{v4, v3, int16});
 
     objs[o2]->size = v4;
     objs[o2]->CreateHvEdge(v0, v5, int32);
 
-    objs[o1]->CreatePtEdge(PtEdge{v8, vPtr1, PTR_TYPE, o2, v0});
+    objs[o1]->CreatePtEdge(Impl::PtEdge{v8, vPtr1, PTR_TYPE, o2, v0});
 
   }
 
 }
 
-    using namespace Smg::Impl;
 TEST(SMGTest, Graph2)
 {
+  using namespace Smg;
+
   Type int8 = Type::CreateIntegerType(8);
   Type int16 = Type::CreateIntegerType(16);
   Type int32 = Type::CreateIntegerType(32);
@@ -148,20 +150,22 @@ TEST(SMGTest, Graph2)
   auto& objs = g.objects;
   auto& hndl = g.handles;
 
-  g.handles.CreatePtEdge(PtEdge{v0, vPtr1, PTR_TYPE, o2, v0});
-  Object& obj =  objs.emplace(o2, std::make_unique<Region>()).first.operator*().second.operator*();
-  obj.CreateHvEdge(HvEdge{v8, v16, int64});
-  obj.CreatePtEdge(PtEdge{v0, vPtr6, PTR_TYPE, o5, v0});
-  obj =  objs.emplace(o5, std::make_unique<Region>()).first.operator*().second.operator*();
-  obj.CreatePtEdge(PtEdge{v4, vPtr2, PTR_TYPE, o4, v4});
-  obj =  objs.emplace(o4, std::make_unique<Region>()).first.operator*().second.operator*();
-  obj.CreatePtEdge(PtEdge{v0, vPtr3, PTR_TYPE, o0, v0});
+  g.handles.CreatePtEdge(Impl::PtEdge{v0, vPtr1, PTR_TYPE, o2, v0});
+  Impl::Object& obj =  objs.emplace(o2, std::make_unique<Impl::Region>()).first.operator*().second.operator*();
+  obj.CreateHvEdge(Impl::HvEdge{v8, v16, int64});
+  obj.CreatePtEdge(Impl::PtEdge{v0, vPtr6, PTR_TYPE, o5, v0});
+  obj =  objs.emplace(o5, std::make_unique<Impl::Region>()).first.operator*().second.operator*();
+  obj.CreatePtEdge(Impl::PtEdge{v4, vPtr2, PTR_TYPE, o4, v4});
+  obj =  objs.emplace(o4, std::make_unique<Impl::Region>()).first.operator*().second.operator*();
+  obj.CreatePtEdge(Impl::PtEdge{v0, vPtr3, PTR_TYPE, o0, v0});
 
-  /*SmgPrinter printer{};
+  SmgPrinter printer{};
   SmgCrawler crawler{printer};
 
   crawler.CrawlSmg(Smg::Object{g.handles,g});
-  std::string dot = printer.GetDot();*/
+  std::string dot = printer.GetDot();
+  OsUtils::WriteToFile(dot, "dot_test.dot");
+  PrintDot(g, false, "dot_test2.svg"); // not need to use this, but nice to know of it...
 
 }
 
@@ -182,3 +186,11 @@ int main(int argc, char **argv)
   std::cin.get();
   return res;
 }
+
+
+#if defined(_MSC_VER)
+
+#include "../src/SmgCrawler.cpp"
+#include "../src/SmgPrinter.cpp"
+
+#endif
