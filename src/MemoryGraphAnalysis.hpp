@@ -493,10 +493,21 @@ class MemGraphOpCmp : public BasicOperation<MemoryGraphAnalysisState, CmpOpArgs>
   }
 };
 
+extern std::string monade;
+
+class MemGraphOpNotSupported : public IOperation {
+public:
+  virtual void Execute(IState& originalState, const OperationArgs& args) override 
+  {
+    originalState.GetNode().HackMePlease();
+    throw NotSupportedException(("Not supported instruction: " + monade).c_str());
+  }
+};
+
 class MemGraphOpFactory : public IOperationFactory {
 private:
 
-  IOperation* nsop     = new OperationNotSupportedOperation();
+  IOperation* nsop     = new MemGraphOpNotSupported();
   IOperation* noop     = new BasicOperationNoop();
   IOperation* load     = new MemGraphOpLoad();
   IOperation* store    = new MemGraphOpStore();

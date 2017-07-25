@@ -44,6 +44,7 @@ public:
   virtual const ref_vector<ICfgNode>& GetPrevs() const = 0;
 
   virtual StatesManager& GetStatesManager() = 0;
+  virtual void HackMePlease() const {};
   virtual void PrintInstruction() const = 0;
   virtual void PrintLocation() const = 0;
   virtual void GetDebugInfo() const = 0; //TODO@review: maybe find a better name for this method?

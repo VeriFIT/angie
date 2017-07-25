@@ -139,6 +139,8 @@ void main_old(gsl::span<std::string> files)
   return;
 }
 
+std::string monade; // hello there
+
 #if defined(_MSC_VER)
 
 #include "SmgCrawler.cpp"

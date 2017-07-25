@@ -81,6 +81,8 @@ const char* dbg_meta(const llvm::Instruction* val, const char* name)
 }
 const char* dbg_meta(const llvm::Instruction& val, const char* name){ return dbg_meta(&val, name); }
 
+extern std::string monade;
+
 class LlvmCfgNode : public CfgNode {
 private:
   const llvm::Instruction& innerInstruction;
@@ -100,6 +102,7 @@ private:
 
 public:
 
+  virtual void HackMePlease() const override { monade = innerInstruction.getOpcodeName(); }
   virtual void PrintInstruction() const override { innerInstruction.print(llvm::outs()); llvm::outs() << "\n"; llvm::outs().flush();  }
   virtual void PrintLocation() const override { innerInstruction.getDebugLoc().print(llvm::outs()); llvm::outs() << "\n"; llvm::outs().flush(); }
   virtual void GetDebugInfo() const override { innerInstruction.print(llvm::errs()); llvm::errs() << "\n"; llvm::errs().flush(); }
