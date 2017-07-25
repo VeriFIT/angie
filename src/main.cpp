@@ -63,6 +63,8 @@ ref_queue<IState> toProcess{};
 
 ValContT vc;
 
+bool printInterpLlvm = false;
+
 void VerificationLoop()
 {
   // loop
@@ -77,7 +79,8 @@ void VerificationLoop()
       if (!state.IsNew())
         continue;
 
-      state.GetNode().GetDebugInfo();
+      if (printInterpLlvm) 
+        state.GetNode().GetDebugInfo();
       state.GetNode().Execute(state);
     }
 

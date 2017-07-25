@@ -33,8 +33,9 @@ using namespace ::llvm::cl;
 OptionCategory MyCategory("Angie options");
 //opt<string> OutputFilename("o", cat(MyCategory), desc("Specify output filename"), value_desc("filename"), init("-"));
 opt<string> InputFilename("f", cat(MyCategory), desc("LLVM IR file to perfrom analysis on"), value_desc("filename"), init(""));
-opt<bool>   Test("t", cat(MyCategory), desc("Enable test analysis"));
-opt<bool>   Lab ("l", cat(MyCategory), desc("Enable laboratory code"));
+opt<bool>   Test ("t", cat(MyCategory), desc("Enable laboratory test analysis"));
+opt<bool>   Lab  ("l", cat(MyCategory), desc("Enable laboratory code"));
+opt<bool>   Print("p", cat(MyCategory), desc("Enable printing of intepreted LLVM IR on stderr"));
 
 // laboratory.cpp
 extern int lab_main();
@@ -42,14 +43,19 @@ extern std::vector<std::string> GetExamples();
 
 // main.cpp
 extern void main_old(gsl::span<std::string> files);
+extern bool printInterpLlvm;
 
 // smg.cpp
 extern void playground();
+
 
 int main(int argc, char** argv)
 {
   HideUnrelatedOptions(MyCategory);
   ParseCommandLineOptions(argc, argv);
+
+  if (Print)
+    printInterpLlvm = true;
 
   if (Lab)
   {
