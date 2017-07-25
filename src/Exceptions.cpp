@@ -22,7 +22,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Exceptions.hpp"
 
-#if ! defined(NDEBUG)
+#if 0 //! defined(NDEBUG)
 
 #else
 
