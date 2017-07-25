@@ -295,6 +295,17 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
             op = &opFactory.Memset();
             break;
           }
+          //else if (func->getName().startswith("llvm.memcpy"))
+          //{
+          //  op = &opFactory.Memcpy();
+          //  break;
+          //}
+          else
+          {            
+            throw NotSupportedException(
+              ("unsupported instrinsic function: " + func->getName().str()).c_str()
+            );
+          }
         }
       }
       if (func->getName().startswith("__ANGIE"))
