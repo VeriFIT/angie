@@ -32,14 +32,6 @@ public:
   virtual void Execute(IState& originalState, const OperationArgs& args) = 0;
 };
 
-class OperationNotSupportedOperation : public IOperation {
-public:
-  virtual void Execute(IState& originalState, const OperationArgs& args) override 
-  {
-    throw NotSupportedException();
-  }
-};
-
 //not a true factory, shares one instance
 //might be changed to uptr<..> then it would be true factory
 class IOperationFactory {

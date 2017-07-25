@@ -266,11 +266,19 @@ class FnaOperationCast : public BasicOperation<ForwardNullAnalysisState, CastOpA
   }
 };
 
+class FnaNotSupportedOperation : public IOperation {
+public:
+  virtual void Execute(IState& originalState, const OperationArgs& args) override 
+  {
+    throw NotSupportedException("Not supported instruction");
+  }
+};
+
 class FnaOperationFactory : public IOperationFactory {
 private:
 
   IOperation* noop = new BasicOperationNoop();
-  IOperation* notSupported = new OperationNotSupportedOperation();
+  IOperation* notSupported = new FnaNotSupportedOperation();
   IOperation* binop = new BasicOperationBinOp();
   IOperation* gep = new FnaOperationGetElementPtr();
   IOperation* allocaop = new FnaOperationAlloca();

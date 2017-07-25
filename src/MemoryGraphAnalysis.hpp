@@ -414,7 +414,7 @@ class MemGraphOpCast : public BasicOperation<MemoryGraphAnalysisState, CastOpArg
 };
 
 
-class FnaxOperationCall : public OperationCall<MemoryGraphAnalysisState> {
+class MemGraphOpCall : public OperationCall<MemoryGraphAnalysisState> {
   virtual void ExecuteOnNewState(MemoryGraphAnalysisState& newState, const CallOpArgs& args) override
   {
     auto callTargetId = args.GetOptions().id;
@@ -523,7 +523,7 @@ private:
   IOperation* gep      = new MemGraphOpGetElementPtr();
   IOperation* cast     = new MemGraphOpCast();
 
-  IOperation* callop   = new FnaxOperationCall();
+  IOperation* callop   = new MemGraphOpCall();
   IOperation* br       = new BasicOperationBranch();
   IOperation* ret      = new MemGraphOpRet();
 
