@@ -844,7 +844,7 @@ void LlvmCfgParser::DealWithConstants()
         id = vc.CreateConstFloatVal(constFp->getValueAPF().convertToFloat(), Type{constFp->getType()});
       }
       else
-        throw NotImplementedException();
+        throw NotImplementedException("unsupported floating point constant");
     }
     else if (auto constNullPtr = llvm::dyn_cast<llvm::ConstantPointerNull>(x))
     {
@@ -872,10 +872,10 @@ void LlvmCfgParser::DealWithConstants()
           id = vc.CreateVal(Type{constExpr-> getType()});
         }
         else
-          throw NotImplementedException();
+          throw NotImplementedException("unsupported constant constexpr");
       }
       else
-        throw NotImplementedException();
+        throw NotImplementedException("unsupported constant constexpr");
       delete asInstr;
     }
     else if (auto constFunc = llvm::dyn_cast<llvm::Function>(x))
@@ -883,7 +883,7 @@ void LlvmCfgParser::DealWithConstants()
       id = mapper.GetValueId(GetValueId(constFunc));
     }
     else
-      throw NotImplementedException();
+      throw NotImplementedException("unsupported constant");
 
     mapper.LinkToValueId(GetValueId(x), id);
   }
