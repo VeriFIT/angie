@@ -53,6 +53,9 @@ public:
       ExecuteOnNewState(static_cast<StateT&>(*successor), static_cast<const OperArgsT&>(args));
       state.GetNode().GetStatesManager().InsertAndEnqueue(std::move(successor));
     }
+    catch (BranchException e)
+    {
+    }
     catch (AnalysisErrorException e)
     {
       state.GetNode().PrintLocation();
@@ -74,6 +77,9 @@ public:
         debug_break();
       ExecuteOnNewState(static_cast<StateT&>(*successor), static_cast<const OperArgsT&>(args), br);
       state.GetNode().GetStatesManager().InsertAndEnqueue(std::move(successor));
+    }
+    catch (BranchException e)
+    {
     }
     catch (AnalysisErrorException e)
     {
@@ -251,14 +257,14 @@ public:
     {
       // if this state can not happen
       if (newState.GetVc().IsFalse(lhs, Type::CreateIntegerType(1)))
-        throw AnalysisErrorException("Branch: can not go true");
+        throw BranchException("Branch: can not go true");
       newState.GetVc().AssumeTrue(lhs);
     }
     else
     {
       // if this state can not happen
       if (newState.GetVc().IsTrue(lhs, Type::CreateIntegerType(1)))
-        throw AnalysisErrorException("Branch: can not go false");
+        throw BranchException("Branch: can not go false");
       newState.GetVc().AssumeFalse(lhs);
     }
   }

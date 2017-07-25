@@ -63,6 +63,14 @@ public:
   }
 };
 
+class BranchException : public AnalysisErrorException {
+public:
+  /*ctr*/ BranchException(const char* c)
+    : AnalysisErrorException(c)
+  {
+  }
+};
+
 class NulldDereferenceException : public AnalysisErrorException {
 public:
   /*ctr*/ NulldDereferenceException()
