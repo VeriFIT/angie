@@ -137,6 +137,17 @@ private:
 
     uptr<IState> successor;
     {
+      ValueId funcVid;
+      try
+      {
+        funcVid = state.GetValue(args.GetOptions());
+      }
+      catch (std::exception err)
+      {
+        throw NotSupportedException(
+          "attempted to call unknown function -- either an unsupported stdlib function or missing definition");
+      }
+      auto& func = state.GetFuncMapping().GetFunction(funcVid);
       auto& nextJump = state.GetFuncMapping().GetFunction(state.GetValue(args.GetOptions())).cfg;
       successor = state.CreateSuccessor(nextJump);
 
