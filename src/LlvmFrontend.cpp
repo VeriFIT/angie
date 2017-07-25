@@ -882,6 +882,10 @@ void LlvmCfgParser::DealWithConstants()
     {
       id = mapper.GetValueId(GetValueId(constFunc));
     }
+    else if (auto constOther = llvm::dyn_cast<llvm::GlobalVariable>(x))
+    {
+      throw NotImplementedException("global variables are not supported yet");
+    }
     else
       throw NotImplementedException("unsupported constant");
 
