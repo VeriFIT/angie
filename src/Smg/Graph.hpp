@@ -313,13 +313,19 @@ public:
         // Throw! OR fallback to HvEdge scenario
 
         // HvEdge fallback
+        if (PtEdge* existingPtEdge = object.FindPtEdgeByOffset(offset))
+        {
+          std::cout << "Writing unknown pointer as plain value, EXISTING POINTER DISABLED" << std::endl;
+          existingPtEdge->sourceOffset = ValueId{(uint64_t)-1}; // instead of deleting, hide the edge
+        }
         //! we are not decaying the type to PTR_TYPE here!
         object.CreateOrModifyHvEdge(offset, value, type);        
 
+
         // Or use undefined value / special meaning value
         // Find out whether it is undefined-unknown or abstracted-unknown
-        auto status = vc.GetAbstractionStatus(value);
-        std::cout << AbstractionStatusToString(status) << std::endl;
+        ////auto status = vc.GetAbstractionStatus(value);
+        ////std::cout << AbstractionStatusToString(status) << std::endl;
         //HACK: need this for argv 
         ////throw std::runtime_error{"Writing unknown pointer value"}; 
       }
