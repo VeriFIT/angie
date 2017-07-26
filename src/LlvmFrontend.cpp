@@ -908,6 +908,12 @@ void LlvmCfgParser::ParseModule(llvm::Module& module)
 
   // -----------
 
+  if (module.getFunctionList().size() == 0)
+  {
+    throw std::runtime_error(
+      "The input LLVM IR module contains zero functions -- compilation probably failed");
+  }
+
   for (auto& func : module.functions())
   {
     if (func.isDeclaration())
