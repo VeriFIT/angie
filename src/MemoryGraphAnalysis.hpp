@@ -345,7 +345,8 @@ class MemGraphOpGetElementPtr : public BasicOperation<MemoryGraphAnalysisState> 
     //! We assume, that getelementptr instruction is always generated as forerunner of load/store op.
     if (vc.IsZero(sourceId))
     {
-      throw PossibleNullDereferenceException();
+      std::cout << "Possible null dereference exception occurred - getElementPtr" << std::endl;
+      //throw PossibleNullDereferenceException();
     }
 
     // possible opt
