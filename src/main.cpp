@@ -144,7 +144,10 @@ void main_old(gsl::span<std::string> files)
 
 std::string monade; // hello there
 
-#if defined(_MSC_VER)
+// the following files have references which results in repated compilation of all the templates 
+// compile them as part of this module to cut compilation time
+
+#if 1 //defined(_MSC_VER) 
 
 #include "SmgCrawler.cpp"
 #include "SmgPrinter.cpp"

@@ -105,9 +105,9 @@ set(SOURCE_FILES
     src/Smg/Wrappers_fwd.hpp
     src/Smg.cpp
     src/Smg.hpp
-    src/SmgCrawler.cpp
+    #src/SmgCrawler.cpp
     src/SmgCrawler.hpp
-    src/SmgPrinter.cpp
+    #src/SmgPrinter.cpp
     src/SmgPrinter.hpp
     src/SmgUtils.hpp
     src/StateStorage.cpp
