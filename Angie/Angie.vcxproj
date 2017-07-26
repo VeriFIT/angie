@@ -174,8 +174,6 @@
     <ClInclude Include="..\src\Analysis.hpp" />
     <ClInclude Include="..\src\CfgNodeBase.hpp" />
     <ClInclude Include="..\src\Definitions.hpp" />
-    <ClInclude Include="..\src\DummyOperations.hpp" />
-    <ClInclude Include="..\src\DummyState.hpp" />
     <ClInclude Include="..\src\enum_flags.h" />
     <ClInclude Include="..\src\Exceptions.hpp" />
     <ClInclude Include="..\src\ForwardNullAnalysis.hpp" />

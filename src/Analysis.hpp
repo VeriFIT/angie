@@ -1,5 +1,7 @@
 #pragma once
 
+// The following file is yet not used in the application
+
 #include "Definitions.hpp"
 #include "ICfgNode.hpp"
 

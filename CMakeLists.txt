@@ -68,8 +68,6 @@ set(SOURCE_FILES
     src/CfgNodeBase.hpp
     src/console.cpp
     src/Definitions.hpp
-    src/DummyOperations.hpp
-    src/DummyState.hpp
     src/enum_flags.h
     src/Exceptions.cpp
     src/Exceptions.hpp
