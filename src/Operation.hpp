@@ -59,7 +59,7 @@ public:
     catch (AnalysisErrorException e)
     {
       state.GetNode().PrintLocation();
-      std::cout << e.what() << std::endl;
+      std::cout << "Error: " << e.what() << std::endl;
     }
   }
   virtual void ExecuteOnNewState(StateT& newState, const OperArgsT& args) = 0;
@@ -84,7 +84,7 @@ public:
     catch (AnalysisErrorException e)
     {
       state.GetNode().PrintLocation();
-      std::cout << e.what() << std::endl;
+      std::cout << "Error: " << e.what() << std::endl;
     }
   }
   virtual void ExecuteOnNewState(StateT& newState, const OperArgsT& args, bool br) = 0;

@@ -109,7 +109,7 @@ void Verify(boost::string_view fileName)
 #include <Windows.h>
 #endif
 
-void main_old(gsl::span<std::string> files)
+void main_verify_files(gsl::span<std::string> files)
 {
 #ifdef _WIN32
   SetConsoleTitleA("NextGen");

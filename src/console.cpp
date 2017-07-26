@@ -42,7 +42,7 @@ extern int lab_main();
 extern std::vector<std::string> GetExamples();
 
 // main.cpp
-extern void main_old(gsl::span<std::string> files);
+extern void main_verify_files(gsl::span<std::string> files);
 extern bool printInterpLlvm;
 
 // smg.cpp
@@ -65,13 +65,13 @@ int main(int argc, char** argv)
   else if (Test)
   {
     auto files = GetExamples();
-    main_old(files);
+    main_verify_files(files);
     return 0;
   }
   else if (InputFilename != "")
   {
     auto files = std::array<std::string,1>{InputFilename};
-    main_old(files);
+      main_verify_files(files);
     return 0;
   }
   else
