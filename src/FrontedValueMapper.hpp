@@ -67,11 +67,11 @@ public:
 class Mapper {
 
 private:
-  std::map<FrontendValueId, ValueId> innerMap;
+  std::map<FrontendId, ValueId> innerMap;
 
 public:
 
-  ValueId GetValueId(FrontendValueId id) const
+  ValueId GetValueId(FrontendId id) const
   {
     return innerMap.at(id);
   }
@@ -81,7 +81,7 @@ public:
     return nullptr;//innerMap | ranges::view::remove_if([=](STL_ITEM_T(innerMap) pair){ return pair.second == id; });
   }
 
-  void LinkToValueId(FrontendValueId id, ValueId value)
+  void LinkToValueId(FrontendId id, ValueId value)
   {
     //TODO@michkot: unify code with CreateOrGetValueId, probably remove "MapperDebug", what is its purpose??
     auto res = innerMap.emplace(id, value);
@@ -91,7 +91,7 @@ public:
 
   ValueId CreateOrGetValueId(FrontendIdTypePair arg, IValueContainer& vc)
   {
-    FrontendValueId id = arg.id;
+    FrontendId id = arg.id;
 
     // src: http://stackoverflow.com/a/101980
 
@@ -114,7 +114,7 @@ public:
     }
   }
   
-  ValueId CreateOrGetValueId(FrontendValueId id) 
+  ValueId CreateOrGetValueId(FrontendId id) 
   {
     // src: http://stackoverflow.com/a/101980
 
@@ -144,19 +144,19 @@ public:
 class MapperDebug {
 private:
 
-  std::map<FrontendValueId, ValueId> map;
+  std::map<FrontendId, ValueId> map;
 
 public:
 
-  void LinkToValueId(FrontendValueId id, ValueId value)
+  void LinkToValueId(FrontendId id, ValueId value)
   {
     map.insert({id, value});
   }
 
-  ValueId CreateOrGetValueId(FrontendValueId id) 
+  ValueId CreateOrGetValueId(FrontendId id) 
   {
     // src: http://stackoverflow.com/a/101980
-    typedef std::map<FrontendValueId, ValueId> MapType;   // Your innerMap type may vary, just change the typedef
+    typedef std::map<FrontendId, ValueId> MapType;   // Your innerMap type may vary, just change the typedef
 
     MapType::iterator lb = map.lower_bound(id);
 

@@ -201,7 +201,7 @@ class FnaOperationLoad : public BasicOperation<ForwardNullAnalysisState> {
 
     // this operation should somehow load a value from memory to register
     // as registers are "direct values",
-    // it in fact means just to bind an existing value to another FrontendValueId
+    // it in fact means just to bind an existing value to another FrontendId
     // which value is to be loaded is but entirely up to the specific analysis
     
     auto target = newState.GetValue(args.GetOperand(0));

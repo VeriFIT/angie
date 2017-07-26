@@ -29,30 +29,30 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "enum_flags.h"
 
 
-class FrontendValueId {
+class FrontendId {
   // Fields
 private:
   uint64_t id;
 
   // Constructors
 private:
-  /**/     FrontendValueId()            : id{ 0 }  { }
+  /**/     FrontendId()            : id{ 0 }  { }
 public:
-  explicit FrontendValueId(uint64_t id) : id{ id } { }
+  explicit FrontendId(uint64_t id) : id{ id } { }
 
   // Conversion methods
   explicit operator uint64_t() const { return id; }
 
   // Methods
-  FrontendValueId operator++()    { id++; return *this; } // prefix
-  FrontendValueId operator++(int) { auto copy = *this; id++; return copy; } // postfix
+  FrontendId operator++()    { id++; return *this; } // prefix
+  FrontendId operator++(int) { auto copy = *this; id++; return copy; } // postfix
 
-  bool operator==(const FrontendValueId& other) const { return this->id == other.id; }
-  bool operator!=(const FrontendValueId& other) const { return this->id != other.id; }
-  bool operator< (const FrontendValueId& other) const { return this->id < other.id; }
-  bool operator> (const FrontendValueId& other) const { return this->id > other.id; }
-  bool operator<=(const FrontendValueId& other) const { return this->id <= other.id; }
-  bool operator>=(const FrontendValueId& other) const { return this->id >= other.id; }
+  bool operator==(const FrontendId& other) const { return this->id == other.id; }
+  bool operator!=(const FrontendId& other) const { return this->id != other.id; }
+  bool operator< (const FrontendId& other) const { return this->id < other.id; }
+  bool operator> (const FrontendId& other) const { return this->id > other.id; }
+  bool operator<=(const FrontendId& other) const { return this->id <= other.id; }
+  bool operator>=(const FrontendId& other) const { return this->id >= other.id; }
 
 };
 
@@ -140,11 +140,11 @@ struct CastOpOptions {
 };
 
 struct FrontendIdTypePair {
-  FrontendValueId id;
+  FrontendId id;
   Type type;  
 
   auto ToTie() const { return std::tie(id, type); };
-  /*ctr*/ FrontendIdTypePair(FrontendValueId id, Type type) : id{id}, type{type} {}
+  /*ctr*/ FrontendIdTypePair(FrontendId id, Type type) : id{id}, type{type} {}
 };
 
 struct OperArg {
@@ -157,9 +157,9 @@ public:
     CmpFlags        cmpFlags;
   };
 private:
-  /*ctr*/ OperArg() : idTypePair{FrontendValueId{0}, Type{0}} {}
+  /*ctr*/ OperArg() : idTypePair{FrontendId{0}, Type{0}} {}
 public:
-  /*ctr*/ OperArg(FrontendValueId id, Type type) : idTypePair{id, type} {}
+  /*ctr*/ OperArg(FrontendId id, Type type) : idTypePair{id, type} {}
   /*ctr*/ OperArg(BinaryOpKind opKind, ArithFlags flags) : binOpOpts{opKind, flags} {}
   /*ctr*/ OperArg(CastOpKind opKind, ArithFlags flags) : castOpOpts{opKind, flags} {}
   /*ctr*/ OperArg(ArithFlags flags) : arithFlags{flags} {}

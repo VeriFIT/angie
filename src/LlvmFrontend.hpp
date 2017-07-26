@@ -71,9 +71,9 @@ private:
 
   static Type GetValueType(llvm::Type* type);
 
-  static FrontendValueId GetValueId(uint64_t id);
-  static FrontendValueId GetValueId(const llvm::Value* value);
-  static FrontendValueId GetValueId(const llvm::Value& value);
+  static FrontendId GetValueId(uint64_t id);
+  static FrontendId GetValueId(const llvm::Value* value);
+  static FrontendId GetValueId(const llvm::Value& value);
 
   FrontendIdTypePair ToIdTypePair(const llvm::Value* value);
   FrontendIdTypePair ToIdTypePair(const llvm::Value& value);

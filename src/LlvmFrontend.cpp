@@ -186,17 +186,17 @@ Type LlvmCfgParser::GetValueType(llvm::Type* type)
 }
 
 //TODO: rename to GetId, GetFrontendId, ToId or ToFrontendId... i am in favor of ToId
-FrontendValueId LlvmCfgParser::GetValueId(uint64_t id)
+FrontendId LlvmCfgParser::GetValueId(uint64_t id)
 {
-  return FrontendValueId{id};
+  return FrontendId{id};
 }
-FrontendValueId LlvmCfgParser::GetValueId(const llvm::Value* instr)
+FrontendId LlvmCfgParser::GetValueId(const llvm::Value* instr)
 {
-  return FrontendValueId{reinterpret_cast<uintptr_t>(instr)};
+  return FrontendId{reinterpret_cast<uintptr_t>(instr)};
 }
-FrontendValueId LlvmCfgParser::GetValueId(const llvm::Value& instr)
+FrontendId LlvmCfgParser::GetValueId(const llvm::Value& instr)
 {
-  return FrontendValueId{reinterpret_cast<uintptr_t>(&instr)};
+  return FrontendId{reinterpret_cast<uintptr_t>(&instr)};
 }
 
 FrontendIdTypePair LlvmCfgParser::ToIdTypePair(const llvm::Value* value)
@@ -557,7 +557,7 @@ OperationArgs LlvmCfgParser::GetOperArgsForInstr(const llvm::Instruction& instr)
     llvm::APInt constantOffset{64, 0};
     if (typedInstr.accumulateConstantOffset(llvmDataLayout, constantOffset))
     {
-      args.push_back(OperArg{FrontendValueId{constantOffset.getZExtValue()}, Type::CreateVoidType()});
+      args.push_back(OperArg{FrontendId{constantOffset.getZExtValue()}, Type::CreateVoidType()});
     }
     else
     {

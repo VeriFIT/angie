@@ -176,7 +176,7 @@ public:
     return graph.CreateDerivedPointer(basePtr, offset, GetVc()).first;
   }
 
-  std::vector<std::tuple<Mapper,FrontendValueId,ICfgNode&>> stack;
+  std::vector<std::tuple<Mapper,FrontendId,ICfgNode&>> stack;
   ICfgNode* stackRetNode;
 
   virtual ICfgNode& GetStackRetNode() const override
@@ -188,7 +188,7 @@ public:
     stackRetNode = &node;
   }
 
-  void StackPush(FrontendValueId retFrontendId)
+  void StackPush(FrontendId retFrontendId)
   {
     //TODO: push mappins in graph
     stack.emplace_back(std::move(this->localMapping), retFrontendId, *stackRetNode);
@@ -238,7 +238,7 @@ class MemGraphOpLoad : public BasicOperation<MemoryGraphAnalysisState> {
 
     // this operation should somehow load a value from memory to register
     // as registers are "direct values",
-    // it in fact means just to bind an existing value to another FrontendValueId
+    // it in fact means just to bind an existing value to another FrontendId
     // which value is to be loaded is but entirely up to the specific analysis
 
     auto ptr = args.GetOperand(0);
