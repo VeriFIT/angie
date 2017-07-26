@@ -1,6 +1,7 @@
 /*******************************************************************************
 
 Copyright (C) 2017 Michal Charvát
+Copyright (C) 2017 Michal Kotoun
 
 This file is a part of Angie project.
 

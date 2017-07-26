@@ -1,6 +1,7 @@
 /*******************************************************************************
 
 Copyright (C) 2017 Michal Charvát
+Copyright (C) 2017 Michal Kotoun
 
 This file is a part of Angie project.
 
@@ -26,20 +27,6 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 #include "ISmgVisitor.hpp"
 
 #include <set>
-
-// TEMPLATE STRUCT less
-template<class _Ty = void>
-struct ref_less
-{ // functor for operator<
-  typedef _Ty first_argument_type;
-  typedef _Ty second_argument_type;
-  typedef bool result_type;
-
-  constexpr bool operator()(const ref_wr<_Ty> _Left, const ref_wr<_Ty> _Right) const
-  { // apply operator< to operands
-    return (&static_cast<const _Ty&>(_Left) < &static_cast<const _Ty&>(_Right));
-  }
-};
 
 typedef uint64_t ObjectId;
 class SmgCrawler : public ISmgVisitor {
