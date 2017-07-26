@@ -77,11 +77,16 @@ public:
   virtual IOperation& Exit() = 0;
 
   // C memory operations
-  virtual IOperation& Memset() = 0;
+  virtual IOperation& Memset() = 0; // now, in fact, intrinsic llvm.memset
   virtual IOperation& Memcpy() = 0;
   virtual IOperation& Memmove() = 0;
   virtual IOperation& Malloc() = 0;
+  ////virtual IOperation& Calloc() = 0;
   virtual IOperation& Free() = 0;
+
+  // Intrinsic memory operations
+  ////virtual IOperation& IntrMemset() = 0;
+  ////virtual IOperation& IntrMemcpy() = 0;
 
   // Not a supported instruction
   virtual IOperation& NotSupportedInstr() = 0;
