@@ -1,4 +1,7 @@
 #!/bin/bash 
+
+# one parameter - directory where all .c should be compiled into .ll default: examples 
+
 # Absolute path to this script, e.g. /home/user/bin/foo.sh
 SCRIPT=$(readlink -f "$0")
 # Absolute path this script is in, thus /home/user/bin
@@ -10,7 +13,7 @@ cd $SCRIPTPATH
 : ${CLANG:=clang}
 : ${CLANGXX:=clang++}
 
-# for predator testcasses
+# for predator testcasses, put verifier-builtins.h to CPATH
 export CPATH=$SCRIPTPATH
 
 # $CLANGXX -S -g -emit-llvm input1.cpp -o - | $COPT -lowerswitch -S -o input1.ll
@@ -24,7 +27,8 @@ export CPATH=$SCRIPTPATH
 passes_normal="-lowerswitch -globalopt -demanded-bits -branch-prob -inferattrs -ipsccp -dse -loop-simplify -scoped-noalias -barrier -adce -memdep -licm -globals-aa -rpo-functionattrs -basiccg -loop-idiom -forceattrs -early-cse -instcombine -sccp "
 passes_leave_deadcode="-lowerswitch -globalopt -demanded-bits -branch-prob -inferattrs -ipsccp      -loop-simplify -scoped-noalias -barrier       -memdep -licm -globals-aa -rpo-functionattrs -basiccg -loop-idiom -forceattrs                         -sccp "
 
-directory=examples
+directory=$1 #directory to compile all .c files in
+: ${directory:=examples}
 ext=.c
 deadcode="\[dead\]"
 for ll_file in $(ls $directory/*$ext); do
