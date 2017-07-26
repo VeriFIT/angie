@@ -409,7 +409,7 @@ class MemGraphOpCast : public BasicOperation<MemoryGraphAnalysisState, CastOpArg
       newState.AssignValue(args.GetTarget(), trunc); //TODO: hack!
     }
     else
-      throw NotImplementedException();
+      throw NotImplementedException("unimplemented cast op type");
   }
 };
 

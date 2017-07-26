@@ -686,6 +686,7 @@ OperationArgs LlvmCfgParser::GetOperArgsForInstr(const llvm::Instruction& instr)
       case llvm::Instruction::CastOps::BitCast:
         opKind = CastOpKind::BitCast;
         break;
+        //TODO@michkot PtrToInt and IntToPtr
       }
       args.push_back(OperArg{opKind, flags});
     }
