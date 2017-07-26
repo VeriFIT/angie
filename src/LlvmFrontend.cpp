@@ -303,7 +303,7 @@ IOperation& LlvmCfgParser::GetOperationFor(const llvm::Instruction& instr) const
           else
           {            
             throw NotSupportedException(
-              ("unsupported instrinsic function: " + func->getName().str()).c_str()
+              ("unsupported intrinsic function: " + func->getName().str()).c_str()
             );
           }
         }
@@ -845,7 +845,7 @@ void LlvmCfgParser::DealWithConstants()
         id = vc.CreateConstFloatVal(constFp->getValueAPF().convertToFloat(), Type{constFp->getType()});
       }
       else
-        throw NotImplementedException("unsupported floating point constant");
+        throw NotSupportedException("unsupported floating point constant");
     }
     else if (auto constNullPtr = llvm::dyn_cast<llvm::ConstantPointerNull>(x))
     {
@@ -873,10 +873,10 @@ void LlvmCfgParser::DealWithConstants()
           id = vc.CreateVal(Type{constExpr-> getType()});
         }
         else
-          throw NotImplementedException("unsupported constant constexpr");
+          throw NotSupportedException("unsupported constant constexpr");
       }
       else
-        throw NotImplementedException("unsupported constant constexpr");
+        throw NotSupportedException("unsupported constant constexpr");
       delete asInstr;
     }
     else if (auto constFunc = llvm::dyn_cast<llvm::Function>(x))
@@ -885,10 +885,10 @@ void LlvmCfgParser::DealWithConstants()
     }
     else if (auto constOther = llvm::dyn_cast<llvm::GlobalVariable>(x))
     {
-      throw NotImplementedException("global variables are not supported yet");
+      throw NotSupportedException("global variables are not supported yet");
     }
     else
-      throw NotImplementedException("unsupported constant");
+      throw NotImplementedException("'other constan value types' ");
 
     mapper.LinkToValueId(GetValueId(x), id);
   }
