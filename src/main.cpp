@@ -117,7 +117,7 @@ void main_verify_files(gsl::span<std::string> files)
 
   //lab_main();
 
-  //this is a debugging code for experimenting
+  //this is a debugging code for experimenting, preallocates constants on the first 2000 IDs
   //vc.CreateVal(Type{0});
   for (int i = 0; i < 1001; i++)
   {
@@ -132,7 +132,8 @@ void main_verify_files(gsl::span<std::string> files)
   //Verify("examples/01_mincase_01_nullptr_dereference[dead].ll");
   for (auto& file : files)
   {
-    //Verify<FnaOperationFactory, ForwardNullAnalysisState>(file);
+    // for switching the analysis to simple Forward null analysis, switch the following two lines
+    ////Verify<FnaOperationFactory, ForwardNullAnalysisState>(file);
     Verify<MemGraphOpFactory, MemoryGraphAnalysisState>(file);
   }
 
