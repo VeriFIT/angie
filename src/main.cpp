@@ -20,6 +20,9 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 /** @file main.cpp */
 
+// for function main, please see file console.cpp!
+// for change of analysis, please see function main_verify_files in this file
+
 #include <cstdio>
 #include <memory>
 
@@ -112,7 +115,7 @@ void Verify(boost::string_view fileName)
 void main_verify_files(gsl::span<std::string> files)
 {
 #ifdef _WIN32
-  SetConsoleTitleA("NextGen");
+  SetConsoleTitleA("Angie");
 #endif
 
   //lab_main();

@@ -83,9 +83,9 @@ public:
 
   ValueId stackCurrentAddr;
 
-  //------------------------------------
-
   std::map<ValueId, ValueId> hasValue;
+
+  //------------------------------------
 
   void Store(ValueId what, ValueId where)
   {

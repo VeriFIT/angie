@@ -33,8 +33,6 @@ using namespace ::llvm::cl;
 OptionCategory MyCategory("Angie options");
 //opt<string> OutputFilename("o", cat(MyCategory), desc("Specify output filename"), value_desc("filename"), init("-"));
 opt<string> InputFilename("f", cat(MyCategory), desc("LLVM IR file to perfrom analysis on"), value_desc("filename"), init(""));
-opt<bool>   Test ("t", cat(MyCategory), desc("Enable laboratory test analysis"));
-opt<bool>   Lab  ("l", cat(MyCategory), desc("Enable laboratory code"));
 opt<bool>   Print("p", cat(MyCategory), desc("Enable printing of intepreted LLVM IR on stderr"));
 
 // laboratory.cpp
@@ -57,27 +55,24 @@ int main(int argc, char** argv)
   if (Print)
     printInterpLlvm = true;
 
-  if (Lab)
-  {
-    lab_main();
-    return 0;
-  }
-  else if (Test)
-  {
-    auto files = GetExamples();
-    main_verify_files(files);
-    return 0;
-  }
-  else if (InputFilename != "")
+  if (InputFilename != "")
   {
     auto files = std::array<std::string,1>{InputFilename};
+    try
+    {
       main_verify_files(files);
+    }
+    catch (std::exception err)
+    {
+      std::cerr << "The application encountered an unexpected exception:" << std::endl;
+      std::cerr << err.what() << std::endl;
+      return 10;
+    }
     return 0;
   }
   else
   {
-    Type::InitTypeSystem();
-    playground();
+    std::cout << "No command specified. Use --help" << std::endl;
     return 0;
   }
 }
