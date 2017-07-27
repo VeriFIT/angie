@@ -40,7 +40,9 @@ COPT=opt
 CLANGXX=clang++
 CLANG=clang
 export COPT CLANGXX CLANG
-(bash ./compile-inputs-to-ll.sh; mkdir tmp; cd tmp; cmake ../; make; cd .. ; ./tmp/ng)
+(bash ./compile-inputs-to-ll.sh <DIRECTORY_WITH_SOURCE_FILES>; mkdir tmp; cd tmp; cmake ../; make)
+# ./tmp/angie --help
+./tmp/angie -f <FILE_TO_ANALYSE>
 ```
 
 Dependencies install
