@@ -1,4 +1,5 @@
 #include "02_heap.h"
+#include <verifier-builtins.h>
 
 void body(void);
 
@@ -24,6 +25,7 @@ void body()
       
       segment = segment->next;
       segment->data.first = i; // we are leaving data.second uninitialized
+      __VERIFIER_plot("0");
     }
     segment->next = NULL;
   }
@@ -39,3 +41,4 @@ void body()
 }
 
 // This example allocates nodes of double linked list separately and then links them together
+// Modification with plotting

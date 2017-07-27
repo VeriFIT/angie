@@ -30,3 +30,5 @@ void body()
     check_inner_data(&ptr->data);
   }
 }
+
+// This example allocates nodes of single linked list in a single block and then links them together

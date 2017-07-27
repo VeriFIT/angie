@@ -10,6 +10,7 @@ int main(int argc, char** argv)
 
   main_struct struktura_init = {0};
   main_struct struktura_neinit;
+  main_struct* ptr_non_init;
 
   main_struct* ptr = &struktura_init;
 
@@ -21,6 +22,11 @@ int main(int argc, char** argv)
     return ZKONTROLUJ_STRUKTURU(ptr);
   }
   else if (supernumber == 1)
+  {
+    ptr = ptr_non_init;
+    return ZKONTROLUJ_STRUKTURU(ptr);
+  }
+  else if (supernumber == 2)
   {
     ptr = &struktura_neinit;
     return ZKONTROLUJ_STRUKTURU(ptr);

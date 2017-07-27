@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#define USE_FUNCTIONS 1
+#define USE_FUNCTIONS 0
 #include "01_mincase.h"
 
 int main(int argc, char** argv)
@@ -14,19 +14,7 @@ int main(int argc, char** argv)
   main_struct* ptr = &struktura_init;
 
   NASTAV_STRUKTURU(ptr);
-
-  if (supernumber == 0)
-  {
-    ptr = NULL;
-    return ZKONTROLUJ_STRUKTURU(ptr);
-  }
-  else if (supernumber == 1)
-  {
-    ptr = &struktura_neinit;
-    return ZKONTROLUJ_STRUKTURU(ptr);
-  }
-  else
-  {
-    return ZKONTROLUJ_STRUKTURU(ptr);
-  }
+  main_struct* ptr_non_init;
+  ptr = ptr_non_init;
+  return ZKONTROLUJ_STRUKTURU(ptr);
 }

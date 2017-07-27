@@ -42,3 +42,5 @@ void body()
     check_inner_data(&ptr->data);
   }
 }
+
+// This example allocates nodes of double linked list separately in an infinite loop

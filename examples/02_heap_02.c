@@ -34,3 +34,5 @@ void body()
     check_inner_data(&ptr->data);
   }
 }
+
+// This example allocates nodes of single linked list separately and then links them together
