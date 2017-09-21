@@ -62,7 +62,7 @@ void PrintDot(Smg::Impl::Graph& g, bool stack, const char* file)
     {
       temp = OsUtils::GetEnv("PWD");
     }
-    dotFileName = temp + PATH_SEPARATOR + std::to_string(printgen) + ".dot";
+    dotFileName = temp + PATH_SEPARATOR + "graph" + std::to_string(printgen++) + ".dot";
   }
   else
   {
