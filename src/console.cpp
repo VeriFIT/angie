@@ -27,6 +27,11 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Type.hpp"
 
+// If on windows, use SetConsoleTitleA function to change the name of console window
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 using namespace ::std;
 using namespace ::llvm::cl;
 
@@ -49,6 +54,11 @@ extern void playground();
 
 int main(int argc, char** argv)
 {
+  // If on windows, use SetConsoleTitleA function to change the name of console window
+#ifdef _WIN32
+  SetConsoleTitleA("Angie");
+#endif
+
   HideUnrelatedOptions(MyCategory);
   ParseCommandLineOptions(argc, argv);
 
