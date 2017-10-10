@@ -50,12 +50,19 @@ std::vector<std::string> GetExamples()
 std::vector<std::string> GetExamples()
 {
   return {
-  "examples/01_mincase_01_nullptr_dereference[dead].ll",
-  "examples/01_mincase_02_non_init_dereference[dead].ll",
-  "examples/01_mincase_03_normal_dereference[dead].ll",
-  "examples/01_mincase_04_all_conditional.ll",
-  "examples/01_mincase_05_all_conditional_with_function_calls.ll",
+    "examples/01_mincase_01_nullptr_dereference[dead].ll",
+    "examples/01_mincase_02_non_init_ptr_dereference[dead].ll",
+    "examples/01_mincase_03_non_init_value_dereference[dead].ll",
+    "examples/01_mincase_04_normal_dereference[dead].ll",
+    "examples/01_mincase_05_all_conditional.ll",
+    "examples/01_mincase_06_all_conditional_with_function_calls.ll",
   };
+}
+
+std::vector<std::string> GetFiles(std::string dirname)
+{
+  //HACK!
+  return GetExamples();
 }
 
 #endif

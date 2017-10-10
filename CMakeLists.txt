@@ -139,8 +139,9 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 add_custom_target(tests 
     DEPENDS ${PROJECT_NAME} 
     WORKING_DIRECTORY "../" 
-    COMMAND "bash" "./compile-inputs-to-ll.sh" 
-    COMMAND "${PROJECT_BINARY_DIR}/${PROJECT_NAME}" "-t")
+    COMMAND "bash" "./compile-inputs-to-ll.sh"
+    COMMAND "${PROJECT_BINARY_DIR}/${PROJECT_NAME}" "-help"
+    COMMAND "${PROJECT_BINARY_DIR}/${PROJECT_NAME}" "-d=examples")
 
 # includes
 

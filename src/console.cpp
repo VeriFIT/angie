@@ -20,6 +20,10 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 /** @file console.cpp */
 
+#if (defined(DEBUG) || defined(_DEBUG)) && !defined(NDEBUG)
+#define PRIMARY_CATCH
+#endif
+
 #include <llvm/Support/CommandLine.h>
 #include <string>
 #include <boost/utility/string_view.hpp>
@@ -38,11 +42,13 @@ using namespace ::llvm::cl;
 OptionCategory MyCategory("Angie options");
 //opt<string> OutputFilename("o", cat(MyCategory), desc("Specify output filename"), value_desc("filename"), init("-"));
 opt<string> InputFilename("f", cat(MyCategory), desc("LLVM IR file to perfrom analysis on"), value_desc("filename"), init(""));
+opt<string> InputDirname("d", cat(MyCategory), desc("Directory containing LLVM IR files to perfrom analysis on"), value_desc("filename"), init(""));
 opt<bool>   Print("p", cat(MyCategory), desc("Enable printing of intepreted LLVM IR on stderr"));
 
 // laboratory.cpp
 extern int lab_main();
 extern std::vector<std::string> GetExamples();
+extern std::vector<std::string> GetFiles(std::string dirName);
 
 // main.cpp
 extern void main_verify_files(gsl::span<std::string> files);
@@ -68,9 +74,12 @@ int main(int argc, char** argv)
   if (InputFilename != "")
   {
     auto files = std::array<std::string,1>{InputFilename};
+#if defined(PRIMARY_CATCH)
     try
     {
+#endif
       main_verify_files(files);
+#if defined(PRIMARY_CATCH)
     }
     catch (std::exception err)
     {
@@ -78,6 +87,26 @@ int main(int argc, char** argv)
       std::cerr << err.what() << std::endl;
       return 10;
     }
+#endif
+    return 0;
+  }
+  else if (InputDirname != "")
+  {
+    auto files = GetFiles(InputDirname);
+#if defined(PRIMARY_CATCH)
+    try
+    {
+#endif
+      main_verify_files(files);
+#if defined(PRIMARY_CATCH)
+  }
+    catch (std::exception err)
+    {
+      std::cerr << "The application encountered an unexpected exception:" << std::endl;
+      std::cerr << err.what() << std::endl;
+      return 10;
+    }
+#endif
     return 0;
   }
   else
