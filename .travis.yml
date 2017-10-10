@@ -18,11 +18,11 @@ matrix:
             apt:
                 sources:
                     - ubuntu-toolchain-r-test
-                    - llvm-toolchain-precise-3.9
+                    - llvm-toolchain-trusty-5.0
                 packages:
                     #- libgtest-dev
-                    - llvm-3.9-dev
-                    - clang-3.9
+                    - llvm-5.0-dev
+                    - clang-5.0
                     - g++-4.9
         env:
             - MCXX="g++-4.9"
@@ -34,30 +34,30 @@ matrix:
             apt:
                 sources:
                     - ubuntu-toolchain-r-test
-                    - llvm-toolchain-precise-3.9
+                    - llvm-toolchain-trusty-5.0
                 packages:
                     #- libgtest-dev
-                    - llvm-3.9-dev
-                    - clang-3.9
+                    - llvm-5.0-dev
+                    - clang-5.0
                     - g++-6
         env:
             - MCXX="g++-6"
             - MCC="gcc-6"
 
-      - compiler: clang-3.9
+      - compiler: clang-5.0
         language: cpp
         addons:
             apt:
                 sources:
                     - ubuntu-toolchain-r-test
-                    - llvm-toolchain-precise-3.9
+                    - llvm-toolchain-trusty-5.0
                 packages:
                     #- libgtest-dev
-                    - llvm-3.9-dev
-                    - clang-3.9
+                    - llvm-5.0-dev
+                    - clang-5.0
         env:
-            - MCXX="clang++-3.9"
-            - MCC="clang-3.9"
+            - MCXX="clang++-5.0"
+            - MCC="clang-5.0"
 
 cache:
     apt: true
@@ -68,9 +68,9 @@ cache:
 install:
     - export CXX=$MCXX CC=$MCC
     - $CXX --version
-    - alias opt=opt-3.9
+    - alias opt=opt-5.0
     - opt --version
-    - opt-3.9 --version
+    - opt-5.0 --version
 
 #export PREFIX
     - export PREFIX=$HOME/local
@@ -91,6 +91,6 @@ install:
     - sh utils/install_main.sh gsl-lite
 
 script: 
-    - export COPT=opt-3.9 CLANGXX=clang++-3.9 CLANG=clang-3.9
+    - export COPT=opt-5.0 CLANGXX=clang++-5.0 CLANG=clang-5.0
     - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ../
     - make && make tests
