@@ -686,7 +686,15 @@ OperationArgs LlvmCfgParser::GetOperArgsForInstr(const llvm::Instruction& instr)
       case llvm::Instruction::CastOps::BitCast:
         opKind = CastOpKind::BitCast;
         break;
-        //TODO@michkot PtrToInt and IntToPtr
+      case llvm::Instruction::CastOps::PtrToInt:
+        opKind = CastOpKind::PtrToInt;
+        break;
+      case llvm::Instruction::CastOps::IntToPtr:
+        opKind = CastOpKind::IntToPtr;
+        break;
+      default:
+        //TODO@michkot Add some info level debugging warning, when other (FP or address space) casts occur
+        break;
       }
       args.push_back(OperArg{opKind, flags});
     }
@@ -836,11 +844,11 @@ void LlvmCfgParser::DealWithConstants()
     }
     else if (auto constFp = llvm::dyn_cast<llvm::ConstantFP>(x))
     {
-      if (&constFp->getValueAPF().getSemantics() == &llvm::APFloat::IEEEdouble)
+      if (&constFp->getValueAPF().getSemantics() == &llvm::APFloat::IEEEdouble())
       {
         id = vc.CreateConstFloatVal(constFp->getValueAPF().convertToDouble(), Type{constFp->getType()});
       }
-      else if (&constFp->getValueAPF().getSemantics() == &llvm::APFloat::IEEEsingle)
+      else if (&constFp->getValueAPF().getSemantics() == &llvm::APFloat::IEEEsingle())
       {
         id = vc.CreateConstFloatVal(constFp->getValueAPF().convertToFloat(), Type{constFp->getType()});
       }
@@ -877,7 +885,7 @@ void LlvmCfgParser::DealWithConstants()
       }
       else
         throw NotSupportedException("unsupported constant constexpr");
-      delete asInstr;
+      asInstr->deleteValue();
     }
     else if (auto constFunc = llvm::dyn_cast<llvm::Function>(x))
     {

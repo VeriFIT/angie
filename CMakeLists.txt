@@ -6,7 +6,7 @@ set(Z3 0)
 
 # packages
 # LLVM
-find_package(LLVM 3.9 REQUIRED CONFIG)
+find_package(LLVM 5.0 REQUIRED CONFIG)
 message(STATUS "LLVM version ${LLVM_PACKAGE_VERSION}")
 
 # Boost
