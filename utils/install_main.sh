@@ -62,8 +62,16 @@ if [ -z "$SHARE_DIR" ]; then
 	SHARE_DIR="$PREFIX/share"
 fi
 
+combine_path_write_to() {
+	echo export ${3}=${1}${2:+:${2}}
+}
+
 if [ "${1}" = "export" ]; then
-	echo export LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH" LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH" CPATH="$INC_DIR:$CPATH" INCLUDE="$INC_DIR:$CPATH" PATH="$BIN_DIR:$PATH"
+	combine_path_write_to "$LIB_DIR" "$LD_LIBRARY_PATH" LIBRARY_PATH
+	combine_path_write_to "$LIB_DIR" "$LD_LIBRARY_PATH" LD_LIBRARY_PATH
+	combine_path_write_to "$INC_DIR" "$CPATH" CPATH
+	combine_path_write_to "$INC_DIR" "$CPATH" INCLUDE
+	combine_path_write_to "$BIN_DIR" "$PATH" PATH
 	exit 0
 fi
 
@@ -186,7 +194,7 @@ check_not_installed() {
 ####################################################
 
 export INSTALL_INVOKE=YES
-. $(dirname $0)/install_$1.sh
+. $(dirname $0)/conf/install_$1.sh
 
 mkdir -p $PREFIX $INC_DIR $BIN_DIR $LIB_DIR $SHARE_DIR
 
