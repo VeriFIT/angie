@@ -55,6 +55,7 @@ matrix:
                     #- libgtest-dev
                     - llvm-5.0-dev
                     - clang-5.0
+                    - g++-4.9
         env:
             - MCXX="clang++-5.0"
             - MCC="clang-5.0"
