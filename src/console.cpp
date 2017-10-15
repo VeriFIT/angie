@@ -20,7 +20,7 @@ along with Angie.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 /** @file console.cpp */
 
-#if (defined(DEBUG) || defined(_DEBUG)) && !defined(NDEBUG)
+#if !(defined(DEBUG) || defined(_DEBUG)) && defined(NDEBUG)
 #define PRIMARY_CATCH
 #endif
 
