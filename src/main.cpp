@@ -59,7 +59,7 @@ using ValContT = ValueContainer;
 #endif
 
 #include "ForwardNullAnalysis.hpp"
-#include "MemoryGraphAnalysis.hpp"
+////#include "MemoryGraphAnalysis.hpp"
 
 // queue of states waiting for processing
 ref_queue<IState> toProcess{};
@@ -130,8 +130,8 @@ void main_verify_files(gsl::span<std::string> files)
   for (auto& file : files)
   {
     // for switching the analysis to simple Forward null analysis, switch the following two lines
-    ////Verify<FnaOperationFactory, ForwardNullAnalysisState>(file);
-    Verify<MemGraphOpFactory, MemoryGraphAnalysisState>(file);
+    Verify<FnaOperationFactory, ForwardNullAnalysisState>(file);
+    ////Verify<MemGraphOpFactory, MemoryGraphAnalysisState>(file);
   }
 
   //vc.PrintDebug();
@@ -147,7 +147,7 @@ std::string monade; // hello there
 
 #if 1 //defined(_MSC_VER) 
 
-#include "SmgCrawler.cpp"
-#include "SmgPrinter.cpp"
+////#include "SmgCrawler.cpp"
+////#include "SmgPrinter.cpp"
 
 #endif
