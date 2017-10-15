@@ -293,6 +293,10 @@ private:
   IOperation* br = new BasicOperationBranch();
   IOperation* ret = new FnaOperationRet();
 
+
+  IOperation* unkn     = new BasicOperationCreateUnknown();
+  IOperation* abort    = new BasicOperationAbort();
+
 public:
 
   // Inherited via IOperationFactory
@@ -320,4 +324,11 @@ public:
 
   virtual IOperation & NotSupportedInstr() override { return *notSupported; }
   virtual IOperation & Noop() override { return *noop; }
+
+
+  virtual IOperation& Abort() override { return *abort; }
+  virtual IOperation& Exit() override { return *abort; }
+  virtual IOperation & Terminate() override { return *noop; }
+  virtual IOperation & CreateUnknownVal() override { return *unkn; }
+  virtual IOperation & DiagnosticsPlotMem() override { return *noop; }
 };
