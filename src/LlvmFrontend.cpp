@@ -1057,9 +1057,102 @@ uptr<llvm::Module> LlvmCfgParser::OpenIrFile(std::string fileName)
   return module;
 }
 
+void devel(llvm::Module* moduleHandle);
+
 void LlvmCfgParser::ParseAndOpenIrFile(boost::string_view fileName)
 {
   moduleHandle = OpenIrFile(fileName.to_string());
   setLlvmGlobalVars(&*moduleHandle);
+  devel(&*moduleHandle);
   ParseModule(*moduleHandle);
 }
+
+std::string GetStringFromConstant(llvm::Constant val)
+{
+  
+  return "";
+}
+
+std::uint64_t ReadAsInt64(const llvm::Value& val)
+{
+  auto x = &val;
+  if (auto constInt = llvm::dyn_cast<llvm::ConstantInt>(x))
+  {
+    return constInt->getSExtValue();
+  }
+  else
+    throw NotSupportedException("TODO"); 
+}
+std::uint64_t ReadAsUInt64(const llvm::Value& val)
+{
+  auto x = &val;
+  if (auto constInt = llvm::dyn_cast<llvm::ConstantInt>(x))
+  {
+    return constInt->getZExtValue();
+  }
+  else
+    throw NotSupportedException("TODO"); 
+}
+
+void devel(llvm::Module* moduleHandle)
+{
+  for (const auto& func : moduleHandle->getFunctionList())
+  {
+    std::string funcName = func.getName();
+    std::cout << funcName;
+  }
+
+  for (const auto& glVar : moduleHandle->getGlobalList())
+  {
+    glVar.print(llvm::outs());
+    std::cout << std::endl;
+
+    assert(glVar.hasInitializer());
+    auto cArray = glVar.getInitializer();
+    auto initializerType = cArray->getType();
+    assert(initializerType->isArrayTy());
+
+    int arrayLength = cArray->getType()->getArrayNumElements(); // cast to int, no need for ultra-strings
+    auto elementType = cArray->getType()->getArrayElementType();
+
+
+    assert(elementType->isIntegerTy(8)); // is an array of bytes, possibly a null-t. string
+    
+    // it is a null-terminated string
+    assert(ReadAsUInt64(*cArray->getAggregateElement(arrayLength - 1)) == 0);
+    auto str = std::string((size_t)(arrayLength - 1), (char)0);
+
+    for (int i = 0; (i < arrayLength - 1); ++i)
+    {
+      auto element = cArray->getAggregateElement(i);
+      str[i] = ReadAsUInt64(*element);
+    }
+
+    std::cout << str << std::endl;
+    
+  }
+
+}
+
+//
+//std::uint64_t ConvertToUInt64(llvm::Value& val)
+//{
+//  auto x = &val;
+//  /**/ if (auto constInt = llvm::dyn_cast<llvm::ConstantInt>(x))
+//  {
+//    return constInt->getZExtValue();
+//  }
+//  else if (auto constFp = llvm::dyn_cast<llvm::ConstantFP>(x))
+//  {
+//    if (&constFp->getValueAPF().getSemantics() == &llvm::APFloat::IEEEdouble())
+//    {
+//      id = vc.CreateConstFloatVal(constFp->getValueAPF().convertToDouble(), Type{constFp->getType()});
+//    }
+//    else if (&constFp->getValueAPF().getSemantics() == &llvm::APFloat::IEEEsingle())
+//    {
+//      id = vc.CreateConstFloatVal(constFp->getValueAPF().convertToFloat(), Type{constFp->getType()});
+//    }
+//    else
+//      throw NotSupportedException("unsupported floating point constant");
+//  }
+//}
