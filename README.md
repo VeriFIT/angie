@@ -47,6 +47,13 @@ export COPT CLANGXX CLANG
 
 Dependencies install
 --------------------
+First of all, `memgraph` submodule must be initialized and checked out:
+
+```sh
+git submodule init
+git submodule update
+```
+
 For simple deployment, `install_*` helpers in `utils` directory will handle installation of CMake built or include-only libraries. Main motivation was repetitive fixing of Travis-CI and custom *nix server deployment.
 Currently needed dependencies to get Angie compiled:
 ```sh
