@@ -32,19 +32,6 @@ All those are to my best knowledge distributed under compatible licenses.
 Proud user of:
 - https://github.com/petervanderdoes/gitflow-avh/
 
-Build & Run
------------
-```sh
-# set to your executables
-COPT=opt
-CLANGXX=clang++
-CLANG=clang
-export COPT CLANGXX CLANG
-(bash ./compile-inputs-to-ll.sh <DIRECTORY_WITH_SOURCE_FILES>; mkdir tmp; cd tmp; cmake ../; make)
-# ./tmp/angie --help
-./tmp/angie -f <FILE_TO_ANALYSE>
-```
-
 Dependencies install
 --------------------
 First of all, `memgraph` submodule must be initialized and checked out:
@@ -68,6 +55,21 @@ sh utils/install_main.sh range-v3-vs2015
 sh utils/install_main.sh gsl-lite
 # export or '-D'set CMAKE_PREFIX_PATH or CMAKE_INCLUDE_PATH
 export CMAKE_PREFIX_PATH=$PREFIX
+```
+
+Build & Run
+-----------
+```sh
+# set to your executables
+COPT=opt
+CLANGXX=clang++
+CLANG=clang
+export COPT CLANGXX CLANG
+# configure and build the project
+(bash ./compile-inputs-to-ll.sh <DIRECTORY_WITH_SOURCE_FILES>; mkdir tmp; cd tmp; cmake ../; make)
+# ready to run!
+# ./tmp/angie --help
+./tmp/angie -f <FILE_TO_ANALYSE>
 ```
 
 Contribution and credits
